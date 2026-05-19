@@ -1,0 +1,229 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &403648997013242677
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4651122525546521565}
+  m_Layer: 0
+  m_Name: start
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4651122525546521565
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 403648997013242677}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
+  m_LocalPosition: {x: 3.5, y: 0.6, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8266530927262198979}
+  m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
+--- !u!1 &5848184906683987402
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8266530927262198979}
+  - component: {fileID: 173760328443247355}
+  - component: {fileID: 3068164435285337769}
+  m_Layer: 0
+  m_Name: StationStrucutreGen
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8266530927262198979
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5848184906683987402}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -40.600002, y: 0, z: 30}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4651122525546521565}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &173760328443247355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5848184906683987402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13bffc8333ee6fe4b9088a6d76711fc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StructureMaster
+  structureList:
+  - {fileID: 3068164435285337769}
+  structureType: 1
+  startConnection:
+    connectionTransform: {fileID: 4651122525546521565}
+    validConnectionNameList: []
+    endPrefabList: []
+    connectedPrefabList: []
+    useGlobalEnds: 0
+    dontConnect: 0
+    ignoreConnections: 0
+    section: {fileID: 0}
+  overlapCheckLayerMask:
+    serializedVersion: 2
+    m_Bits: 1064960
+  structureConnectionList: []
+  structureSectionList: []
+  onSectionAdded:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &3068164435285337769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5848184906683987402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d08e85745c880934ab2f722c4a57ff8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BasicStructureGenerator
+  generationEntryList:
+  - sectionPrefabList:
+    - {fileID: 2427493482864173330, guid: afc65d34151c1e94b8ec0c76180cffd3, type: 3}
+    countType: 1
+    minMaxCount: {x: 6, y: 10}
+    lengthType: 2
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 3608849174374438339, guid: c6c9d4f2cd9349c41b74204d45477189, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 4758857078176821051, guid: 873bde4b392c4f44c9011cf4e26803d5, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 6066456399119994034, guid: 6260b9eb5f72ec34788edf0aaea09da4, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 3277837456172786711, guid: 37412fb7023ad7244889e514a904aae4, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 2
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 5770510200677921166, guid: a59cfd568ea9c6240b80301fe4a20b95, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 2
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 1747217957745850429, guid: 0ced4a707c678a141a976ce01c3fb48b, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 2
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 4706443940158993255, guid: 0bf67e90dc3e79345ac9dd20d4763d29, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 2
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 5861913691153950515, guid: eb5449541c5ae8d4397f008e4b3d1553, type: 3}
+    countType: 0
+    minMaxCount: {x: 7, y: 8}
+    lengthType: 2
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0

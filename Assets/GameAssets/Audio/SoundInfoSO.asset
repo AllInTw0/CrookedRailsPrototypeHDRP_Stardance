@@ -1,0 +1,214 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 64e8ee2e2ce764a4fb116d83f0f51ee6, type: 3}
+  m_Name: SoundInfoSO
+  m_EditorClassIdentifier: Assembly-CSharp::SoundInfoSO
+  soundList:
+  - name: FootStep - Stone
+    AudioClips:
+    - {fileID: 8300000, guid: 1102b2a5a47d042448bca704ebeac500, type: 3}
+    - {fileID: 8300000, guid: bf0df4827e9e91e4585ceee522e8366a, type: 3}
+    - {fileID: 8300000, guid: b8d6f1aa7c9b9ba4ea8374049e5ac7ae, type: 3}
+    - {fileID: 8300000, guid: 96121530e0bd6574e8771b4c2eb2e1c1, type: 3}
+    - {fileID: 8300000, guid: 70939a8a6bd78974988751bbbf745dac, type: 3}
+    - {fileID: 8300000, guid: de2c6428595c0774b895580da379853a, type: 3}
+    - {fileID: 8300000, guid: 5472df30f4b0b764883eee8fb6de91f5, type: 3}
+    - {fileID: 8300000, guid: 97b8f52429189d347b9d7c7f446cb1fd, type: 3}
+    volume: 0.11
+    pitch: {x: 0.8, y: 1.2}
+    groupType: 0
+  - name: Jump
+    AudioClips:
+    - {fileID: 8300000, guid: 08cdb9a5feb2e344484bdbedb4c3a1d6, type: 3}
+    volume: 0.4
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Land
+    AudioClips:
+    - {fileID: 8300000, guid: bc28fbd44289c35408827c62138394f8, type: 3}
+    volume: 0.8
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Click
+    AudioClips:
+    - {fileID: 8300000, guid: b2287c5cadcda454381ea0c4d027ab18, type: 3}
+    - {fileID: 8300000, guid: 714d28d95d32e27469457925919faf68, type: 3}
+    - {fileID: 8300000, guid: 163e325449e500042ba19a70da3eff58, type: 3}
+    volume: 1
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Item - Drop
+    AudioClips:
+    - {fileID: 8300000, guid: a682168882542d6439c2f248982e3e09, type: 3}
+    - {fileID: 8300000, guid: b221d682d52a57a43b81d8a7e750e25e, type: 3}
+    - {fileID: 8300000, guid: 3a1cc2550fc21d8488be3f04003ef690, type: 3}
+    - {fileID: 8300000, guid: 148096220d8a543499a6dc928c613ade, type: 3}
+    - {fileID: 8300000, guid: 92b81e6a84ed34443b6a867dccd52562, type: 3}
+    - {fileID: 8300000, guid: 4ec77a7f0b9a98f4c998008426036551, type: 3}
+    - {fileID: 8300000, guid: 5681e55d79c50c24fba7fc7c13e2a684, type: 3}
+    volume: 1
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Shotgun Shot
+    AudioClips:
+    - {fileID: 8300000, guid: 7315ffe955b3d234aacdd6a1128f2b07, type: 3}
+    - {fileID: 8300000, guid: 14634efe88465ce42995d9ee84def633, type: 3}
+    - {fileID: 8300000, guid: 897cadeca6062494cbadc10e51fb1c2c, type: 3}
+    volume: 0.2
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Shotgun Reload
+    AudioClips:
+    - {fileID: 8300000, guid: ecc688d25f99b994bba2b1bb7f3b2c54, type: 3}
+    volume: 0.75
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Shotgun Failed
+    AudioClips:
+    - {fileID: 8300000, guid: a50cc4c7a270f3f49b6b032096c899f0, type: 3}
+    volume: 2
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: HitSound
+    AudioClips:
+    - {fileID: 8300000, guid: 8e5551389f5761344a17dffd9527bf47, type: 3}
+    volume: 0.1
+    pitch: {x: 0.95, y: 1.05}
+    groupType: 1
+  - name: Melee Swing
+    AudioClips:
+    - {fileID: 8300000, guid: 27f5eec1134b3984191bdd2ee1d3c31d, type: 3}
+    volume: 0.8
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Melee Impact
+    AudioClips:
+    - {fileID: 8300000, guid: 2cbf6d7bdfb314a48a81a8898ab341c9, type: 3}
+    - {fileID: 8300000, guid: 3a36487193081ad4288fdf3f4d5b04d8, type: 3}
+    volume: 0.5
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Small Enemy Attack
+    AudioClips:
+    - {fileID: 8300000, guid: e3e2493c46b244140ba3507f7a577545, type: 3}
+    - {fileID: 8300000, guid: 7db23cac816bec54d8ace42233dcd216, type: 3}
+    - {fileID: 8300000, guid: 90d3247d98e5db9498a72d7c1c0a38ec, type: 3}
+    - {fileID: 8300000, guid: bc3557943eb0cc1468d765e0264ad9d8, type: 3}
+    - {fileID: 8300000, guid: 5cc829f7a5b64414aa47c889c13bdbe0, type: 3}
+    volume: 1
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Enemy Attack Impact
+    AudioClips:
+    - {fileID: 8300000, guid: 84181075d1739274d9b177ffbc43f045, type: 3}
+    volume: 1
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Player Takes Damage
+    AudioClips:
+    - {fileID: 8300000, guid: db364ee2d9c3e324b99b75105f0c01ba, type: 3}
+    volume: 1
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Door - Sliding
+    AudioClips:
+    - {fileID: 8300000, guid: 285f0ec587048a540b94c9e7ae6541b8, type: 3}
+    - {fileID: 8300000, guid: 21b497261e9c4f744a43018beae00e75, type: 3}
+    - {fileID: 8300000, guid: e3390fe43dd1e0648af8137a98017660, type: 3}
+    volume: 1
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Bucket - Fill
+    AudioClips:
+    - {fileID: 8300000, guid: 8e6f2ac2d402fcc41927755b56170d12, type: 3}
+    volume: 1
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Explosion
+    AudioClips:
+    - {fileID: 8300000, guid: b0ddaa4b07b2cc3409aad6bbf25dbf59, type: 3}
+    - {fileID: 8300000, guid: 62e8fd92057a6094baca271516a211b0, type: 3}
+    - {fileID: 8300000, guid: 4b0f7c9fca99c1b4e8963a857bf86abe, type: 3}
+    volume: 1
+    pitch: {x: 0.7, y: 1.3}
+    groupType: 0
+  - name: Launcher Shot
+    AudioClips:
+    - {fileID: 8300000, guid: 2e4f090a6ad4b384d890112f6eb2bc0d, type: 3}
+    - {fileID: 8300000, guid: 8e01826c370bfbc4daefafa0b9f6a34f, type: 3}
+    volume: 1
+    pitch: {x: 1, y: 1.3}
+    groupType: 0
+  - name: Train - Chuff
+    AudioClips:
+    - {fileID: 8300000, guid: fd2d165da2fd2fc409d9c6c04190b87b, type: 3}
+    volume: 0.8
+    pitch: {x: 0.9, y: 1.1}
+    groupType: 0
+  - name: Sentry - Break
+    AudioClips:
+    - {fileID: 8300000, guid: 42e96607ab7bc0147a5a438eaedda595, type: 3}
+    volume: 1
+    pitch: {x: 0.9, y: 1.1}
+    groupType: 0
+  - name: Water - Bubbles
+    AudioClips:
+    - {fileID: 8300000, guid: 0b2d0b3876d132e4491aa1b1797dca89, type: 3}
+    - {fileID: 8300000, guid: e331e7729e2bbe44f98e118726eee286, type: 3}
+    - {fileID: 8300000, guid: d307eb4902af5c446b6aaa8b3b82a3b4, type: 3}
+    - {fileID: 8300000, guid: bbfae93c04e478749b30789992e5a688, type: 3}
+    - {fileID: 8300000, guid: e57bc2c04d20e764fac256ed6e53d787, type: 3}
+    volume: 1
+    pitch: {x: 0.9, y: 1.1}
+    groupType: 0
+  - name: FootStep - Water
+    AudioClips:
+    - {fileID: 8300000, guid: 9972bf9121cb3a749a501389e2f51924, type: 3}
+    - {fileID: 8300000, guid: f321b1254e7454544b8add5c42f41549, type: 3}
+    - {fileID: 8300000, guid: 07d03fd28a97243449d15d8a605694fd, type: 3}
+    - {fileID: 8300000, guid: 84b2c335acb919444b85300382c20b15, type: 3}
+    - {fileID: 8300000, guid: 3ca7ba7f05532fd4ba032533bd385eae, type: 3}
+    volume: 1
+    pitch: {x: 0.9, y: 1.1}
+    groupType: 0
+  - name: Water - Impact
+    AudioClips:
+    - {fileID: 8300000, guid: 97e4a98b0d109bc4f9cf011b6cfb3126, type: 3}
+    - {fileID: 8300000, guid: c4af81c55dc3eec4391897a251349273, type: 3}
+    - {fileID: 8300000, guid: 32954bc472c331b46a31db1deddf58a0, type: 3}
+    - {fileID: 8300000, guid: 937e6571050173a4cbac998261dded06, type: 3}
+    - {fileID: 8300000, guid: 9b6462cf832209a42a4d4d246d211aff, type: 3}
+    volume: 1
+    pitch: {x: 0.9, y: 1.1}
+    groupType: 0
+  - name: Enemy - Footstep
+    AudioClips:
+    - {fileID: 8300000, guid: 72a0c4a4d54b4ed418cb21a2e3d66905, type: 3}
+    - {fileID: 8300000, guid: b2644c332e191c24fa3429a55fb0ebc4, type: 3}
+    - {fileID: 8300000, guid: 0835ef1ef1dc6174bb9a1d2788a42deb, type: 3}
+    - {fileID: 8300000, guid: a1d84e7780a4c634c9a5af9e15e324c1, type: 3}
+    - {fileID: 8300000, guid: 4303fe404e00357418da40883ea8853b, type: 3}
+    volume: 0.7
+    pitch: {x: 0.9, y: 1.1}
+    groupType: 0
+  - name: Robot0
+    AudioClips:
+    - {fileID: 8300000, guid: 205715d9d6ca864d2a10b5c6077dabb1, type: 3}
+    volume: 0.7
+    pitch: {x: 0.8, y: 1.2}
+    groupType: 0
+  - name: Robot1
+    AudioClips:
+    - {fileID: 8300000, guid: 068455d03668fcc9986d9282be585e5e, type: 3}
+    volume: 0.7
+    pitch: {x: 0.8, y: 1.2}
+    groupType: 0

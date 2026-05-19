@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f31a82457e9ad9a448d39854d88aac01, type: 3}
+  m_Name: SpeedTest
+  m_EditorClassIdentifier: Assembly-CSharp::UpgradeSO
+  nameOverride: Speed Upgrade
+  prefab: {fileID: 3015091432788408613, guid: bbb85c7984788d046ba39690000f2a78, type: 3}
+  description: An Upgrade's description
+  offset: {x: 0, y: 0.25, z: 0.5}
+  origin: {x: 0, y: 0.25, z: 0}
+  rotation: {x: 0, y: 0, z: 0}
+  icon: {fileID: 2800000, guid: fcb45a163bc448b4db66d51dcf7ee55f, type: 2}
+  renderLayer:
+    serializedVersion: 2
+    m_Bits: 256
+  upgradeList:
+  - trainStat: 3
+    upgradeType: 0
+    value: 3
+  - trainStat: 6
+    upgradeType: 0
+    value: 3
+  requiredBoughtUpgrades: []

@@ -1,0 +1,161 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &8988481200726931713
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 708374115421714344, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 708374115421714344, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 708374115421714344, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 708374115421714344, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 708374115421714344, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 708374115421714344, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 708374115421714344, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 90
+      objectReference: {fileID: 0}
+    - target: {fileID: 1571392402059326440, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_Name
+      value: FirewoodItem
+      objectReference: {fileID: 0}
+    - target: {fileID: 1571392402059326440, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2107542769437945735, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 8822356137299489385, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8822356137299489385, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8822356137299489385, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8822356137299489385, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8822356137299489385, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8822356137299489385, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8822356137299489385, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8822356137299489385, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8822356137299489385, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8822356137299489385, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 1571392402059326440, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5746737522215115531}
+    - targetCorrespondingSourceObject: {fileID: 1571392402059326440, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9097076605347010778}
+  m_SourcePrefab: {fileID: 100100000, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+--- !u!4 &491682008752442216 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 8822356137299489385, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+  m_PrefabInstance: {fileID: 8988481200726931713}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &6341045089741391512 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 3117171465772842905, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+  m_PrefabInstance: {fileID: 8988481200726931713}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &7598475369353874153 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1571392402059326440, guid: e4be5bc15f05d3a4dbd2aadb2525fbb4, type: 3}
+  m_PrefabInstance: {fileID: 8988481200726931713}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &5746737522215115531
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7598475369353874153}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.49, y: 0.23, z: 0.25773}
+  m_Center: {x: -0.001275003, y: 0.12, z: -0.00024399906}
+--- !u!114 &9097076605347010778
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7598475369353874153}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab936a6e08d6b12439a2d35989899aa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Item
+  objectName: Firewood
+  actionName: Pick Up
+  timeToInteract: 0
+  iconPosition: {fileID: 491682008752442216}
+  interactSound: Click
+  objectNameOverride: 
+  actionNameOverride: 
+  itemInfo: {fileID: 11400000, guid: fba5de258cb318342bb90a8d0b6bf548, type: 2}
+  meshRenderers:
+  - {fileID: 6341045089741391512}
+  interactableCollider: {fileID: 5746737522215115531}
+  count: 5

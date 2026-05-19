@@ -1,0 +1,136 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &447644258696654728
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 135873090161672725, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      propertyPath: m_Name
+      value: WhrenchItem
+      objectReference: {fileID: 0}
+    - target: {fileID: 135873090161672725, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 3282856209553049695, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -10.785006
+      objectReference: {fileID: 0}
+    - target: {fileID: 3282856209553049695, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.63000005
+      objectReference: {fileID: 0}
+    - target: {fileID: 3282856209553049695, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 1.755586
+      objectReference: {fileID: 0}
+    - target: {fileID: 3282856209553049695, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3282856209553049695, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3282856209553049695, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3282856209553049695, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3282856209553049695, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3282856209553049695, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3282856209553049695, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 135873090161672725, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4551615317567682271}
+    - targetCorrespondingSourceObject: {fileID: 135873090161672725, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3221410473862374847}
+  m_SourcePrefab: {fileID: 100100000, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+--- !u!1 &564337330547355037 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 135873090161672725, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+  m_PrefabInstance: {fileID: 447644258696654728}
+  m_PrefabAsset: {fileID: 0}
+--- !u!65 &4551615317567682271
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 564337330547355037}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.05, y: 0.45, z: 0.1}
+  m_Center: {x: 0, y: 0.09, z: 0.025}
+--- !u!114 &3221410473862374847
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 564337330547355037}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 96038cc164a2f5d4ab3ec3ced72b4449, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemMelee
+  objectName: Wrench
+  actionName: Pick up
+  timeToInteract: 0
+  iconPosition: {fileID: 3150644250056796119}
+  interactSound: Click
+  objectNameOverride: 
+  actionNameOverride: 
+  itemInfo: {fileID: 11400000, guid: 6b98a312017cbb842bc8e70f44ed800f, type: 2}
+  meshRenderers:
+  - {fileID: 9016297662250386149}
+  interactableCollider: {fileID: 4551615317567682271}
+  count: 1
+  falling: 0
+  damage: 5
+  range: 3.5
+  swingCoolDown: 0.5
+  damageDelay: 0.1
+  swingSound: Melee Swing
+  impactSound: Melee Impact
+--- !u!4 &3150644250056796119 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 3282856209553049695, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+  m_PrefabInstance: {fileID: 447644258696654728}
+  m_PrefabAsset: {fileID: 0}
+--- !u!23 &9016297662250386149 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: 8869286278391524717, guid: 29537fc1fd242a04e8e620a1cef27bb6, type: 3}
+  m_PrefabInstance: {fileID: 447644258696654728}
+  m_PrefabAsset: {fileID: 0}

@@ -1,0 +1,374 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1941214935221314731
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6195120294307432716}
+  m_Layer: 0
+  m_Name: start
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6195120294307432716
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1941214935221314731}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 7171124915655394662}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3791161114667938621
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7171124915655394662}
+  - component: {fileID: 441208033611964475}
+  - component: {fileID: 3971425371039602981}
+  - component: {fileID: 2398839078740992964}
+  - component: {fileID: 7267936075137670101}
+  m_Layer: 0
+  m_Name: CoalingTowerGen
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7171124915655394662
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3791161114667938621}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -49.300003, y: 0, z: -26.1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 6195120294307432716}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &441208033611964475
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3791161114667938621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13bffc8333ee6fe4b9088a6d76711fc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StructureMaster
+  structureList:
+  - {fileID: 3971425371039602981}
+  - {fileID: 2398839078740992964}
+  - {fileID: 7267936075137670101}
+  structureType: 0
+  startConnection:
+    connectionTransform: {fileID: 6195120294307432716}
+    validConnectionNameList: []
+    endPrefabList: []
+    connectedPrefabList: []
+    useGlobalEnds: 0
+    dontConnect: 0
+    ignoreConnections: 0
+    section: {fileID: 0}
+  overlapCheckLayerMask:
+    serializedVersion: 2
+    m_Bits: 5259264
+  maxRetryCount: 10
+  structureConnectionList: []
+  structureSectionList: []
+  onSectionAdded:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &3971425371039602981
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3791161114667938621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d08e85745c880934ab2f722c4a57ff8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BasicStructureGenerator
+  generationEntryList:
+  - sectionPrefabList:
+    - {fileID: 7700154915809681781, guid: b200f19488d0e7044bd8e1cea6c35636, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 152029324503992919, guid: bcb39e58a604a30468011bb16833cf22, type: 3}
+    countType: 0
+    minMaxCount: {x: 2, y: 3}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 3011358695056164666, guid: a1de240cae4ad5f44b9b71920130c840, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 6161050143942209677, guid: d62045a06335e074eb625d0ee1f08636, type: 3}
+    - {fileID: 7556971992805666211, guid: 590650735f91467428f42e2aeb99de0b, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 280973015089086566, guid: 12c8daa0e26b3d14ba4d3f436ac90f00, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 5691380650168216378, guid: a9f2aea24ded07042aa1155188cf2396, type: 3}
+    countType: 0
+    minMaxCount: {x: 2, y: 4}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 6939680908587384229, guid: 557c95e51a28d8544912dac51c60aeb5, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 1
+  - sectionPrefabList:
+    - {fileID: 5427037372831579819, guid: 7970fd23e7f03b04dae8b9f9e2ba7163, type: 3}
+    countType: 0
+    minMaxCount: {x: 2, y: 3}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 6161050143942209677, guid: d62045a06335e074eb625d0ee1f08636, type: 3}
+    - {fileID: 7556971992805666211, guid: 590650735f91467428f42e2aeb99de0b, type: 3}
+    countType: 0
+    minMaxCount: {x: 3, y: 3}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 280973015089086566, guid: 12c8daa0e26b3d14ba4d3f436ac90f00, type: 3}
+    countType: 0
+    minMaxCount: {x: 3, y: 3}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 5691380650168216378, guid: a9f2aea24ded07042aa1155188cf2396, type: 3}
+    countType: 0
+    minMaxCount: {x: 2, y: 3}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 3211963792748113132, guid: 975a486bb3e105c4d832c5a0bf4038d7, type: 3}
+    countType: 0
+    minMaxCount: {x: 2, y: 3}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 6534009490081440243, guid: 04f07e8987a96724d94df136c97074ae, type: 3}
+    countType: 0
+    minMaxCount: {x: 2, y: 4}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 4
+    obligatory: 0
+--- !u!114 &2398839078740992964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3791161114667938621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f42cd77c2d8e114b8af3c08f658897d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PropSpawner
+  propProbabilityList:
+  - element: {fileID: 8233793823709743621, guid: 9f01320a72e4d0c4e918565a2e493d37, type: 3}
+    probability: 1
+    maxCount: 20
+    pickCount: 7
+  - element: {fileID: 5665030851727382187, guid: 4c0909c6d993074409bbe9ca9acebe60, type: 3}
+    probability: 1
+    maxCount: 20
+    pickCount: 8
+  - element: {fileID: 3455371132266965207, guid: 278ed4a35cd971c468ab7742c842f4a4, type: 3}
+    probability: 1
+    maxCount: 20
+    pickCount: 9
+  - element: {fileID: 3018761946558244021, guid: e7ff3f933410c82478e1bcfab988bd9d, type: 3}
+    probability: 1
+    maxCount: 20
+    pickCount: 5
+  - element: {fileID: 5704545427248538201, guid: 1a566df30d4a5e244b19d5e98ecdf072, type: 3}
+    probability: 1
+    maxCount: 20
+    pickCount: 2
+  - element: {fileID: 3542499168498709358, guid: f7879c08aff8e9444a30e644b5d95cc7, type: 3}
+    probability: 1
+    maxCount: 20
+    pickCount: 10
+  overlapCheckLayerMask:
+    serializedVersion: 2
+    m_Bits: 2097152
+  maxPropCount: 100
+  maxSpawnTries: 200
+--- !u!114 &7267936075137670101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3791161114667938621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3c8c104c80568a4882428dba72f1878, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSpawner
+  itemSpawnEntryList:
+  - element:
+      item: {fileID: 11400000, guid: fba5de258cb318342bb90a8d0b6bf548, type: 2}
+      minMaxStackCount: {x: 1, y: 3}
+    probability: 0.65
+    maxCount: 16
+    pickCount: 8
+  - element:
+      item: {fileID: 11400000, guid: 37b28eef436127340b96cf8afef5fc0a, type: 2}
+      minMaxStackCount: {x: 3, y: 6}
+    probability: 0.3
+    maxCount: -1
+    pickCount: 7
+  - element:
+      item: {fileID: 11400000, guid: eace34aab063c944ab7933acb4427aa0, type: 2}
+      minMaxStackCount: {x: 3, y: 6}
+    probability: 0.25
+    maxCount: -1
+    pickCount: 5
+  - element:
+      item: {fileID: 11400000, guid: 517ca367be1565a4294aa7684a1e17ae, type: 2}
+      minMaxStackCount: {x: 1, y: 1}
+    probability: 0.04
+    maxCount: 2
+    pickCount: 5
+  - element:
+      item: {fileID: 11400000, guid: 277c7caad7a7f2447a65933adf1a7c17, type: 2}
+      minMaxStackCount: {x: 1, y: 1}
+    probability: 0.01
+    maxCount: 1
+    pickCount: 5
+  minMaxCount: {x: 35, y: 50}

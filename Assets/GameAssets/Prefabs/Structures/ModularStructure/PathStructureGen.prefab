@@ -1,0 +1,260 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3225583120770421061
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7337750444291004079}
+  m_Layer: 0
+  m_Name: start
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7337750444291004079
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3225583120770421061}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 1, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 478050604541844276}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &7037236421062656352
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 478050604541844276}
+  - component: {fileID: 6893819316307276848}
+  - component: {fileID: 3678465640613875052}
+  - component: {fileID: 4777892336995982985}
+  - component: {fileID: 8549810271426857713}
+  m_Layer: 0
+  m_Name: PathStructureGen
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &478050604541844276
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7037236421062656352}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7337750444291004079}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6893819316307276848
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7037236421062656352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13bffc8333ee6fe4b9088a6d76711fc8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::StructureMaster
+  structureList:
+  - {fileID: 3678465640613875052}
+  - {fileID: 4777892336995982985}
+  - {fileID: 8549810271426857713}
+  structureType: 0
+  startConnection:
+    connectionTransform: {fileID: 7337750444291004079}
+    validConnectionNameList: []
+    endPrefabList: []
+    connectedPrefabList: []
+    useGlobalEnds: 0
+    dontConnect: 0
+    ignoreConnections: 0
+    section: {fileID: 0}
+  overlapCheckLayerMask:
+    serializedVersion: 2
+    m_Bits: 16384
+  maxRetryCount: 10
+  structureConnectionList: []
+  structureSectionList: []
+  onSectionAdded:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &3678465640613875052
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7037236421062656352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d08e85745c880934ab2f722c4a57ff8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BasicStructureGenerator
+  generationEntryList:
+  - sectionPrefabList:
+    - {fileID: 9061682910642552403, guid: e93dada4af911784181fb895afa1ee55, type: 3}
+    countType: 0
+    minMaxCount: {x: 3, y: 3}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 3211963792748113132, guid: 15b1c0813cc511141b046b11651b41a7, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    obligatory: 1
+  - sectionPrefabList:
+    - {fileID: 2636634606818126311, guid: be77bb7d079811d47810827521e4a76d, type: 3}
+    countType: 0
+    minMaxCount: {x: 4, y: 5}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 6871242722575679383, guid: a64c8835ac33b064eabfb0b29017ef01, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 3211963792748113132, guid: f9231a3cae873de44847cbd45b1ec47b, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    obligatory: 1
+--- !u!114 &4777892336995982985
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7037236421062656352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f42cd77c2d8e114b8af3c08f658897d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PropSpawner
+  propProbabilityList:
+  - element: {fileID: 3018761946558244021, guid: e7ff3f933410c82478e1bcfab988bd9d, type: 3}
+    probability: 1
+    maxCount: 20
+    pickCount: 4
+  - element: {fileID: 3455371132266965207, guid: 278ed4a35cd971c468ab7742c842f4a4, type: 3}
+    probability: 1
+    maxCount: 20
+    pickCount: 4
+  - element: {fileID: 8233793823709743621, guid: 9f01320a72e4d0c4e918565a2e493d37, type: 3}
+    probability: 1
+    maxCount: 10
+    pickCount: 10
+  - element: {fileID: 5665030851727382187, guid: 4c0909c6d993074409bbe9ca9acebe60, type: 3}
+    probability: 1
+    maxCount: 3
+    pickCount: 3
+  overlapCheckLayerMask:
+    serializedVersion: 2
+    m_Bits: 2097152
+  maxPropCount: 100
+  maxSpawnTries: 100
+--- !u!114 &8549810271426857713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7037236421062656352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3c8c104c80568a4882428dba72f1878, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSpawner
+  itemSpawnEntryList:
+  - element:
+      item: {fileID: 11400000, guid: fba5de258cb318342bb90a8d0b6bf548, type: 2}
+      minMaxStackCount: {x: 1, y: 3}
+    probability: 0.65
+    maxCount: 16
+    pickCount: 8
+  - element:
+      item: {fileID: 11400000, guid: 37b28eef436127340b96cf8afef5fc0a, type: 2}
+      minMaxStackCount: {x: 3, y: 6}
+    probability: 0.3
+    maxCount: -1
+    pickCount: 7
+  - element:
+      item: {fileID: 11400000, guid: eace34aab063c944ab7933acb4427aa0, type: 2}
+      minMaxStackCount: {x: 3, y: 6}
+    probability: 0.25
+    maxCount: -1
+    pickCount: 5
+  - element:
+      item: {fileID: 11400000, guid: 517ca367be1565a4294aa7684a1e17ae, type: 2}
+      minMaxStackCount: {x: 1, y: 1}
+    probability: 0.04
+    maxCount: 2
+    pickCount: 5
+  - element:
+      item: {fileID: 11400000, guid: 277c7caad7a7f2447a65933adf1a7c17, type: 2}
+      minMaxStackCount: {x: 1, y: 1}
+    probability: 0.01
+    maxCount: 1
+    pickCount: 5
+  minMaxCount: {x: 20, y: 30}

@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8a290c0fc2c8ac4c8e1ed797331a5ee, type: 3}
+  m_Name: Gas
+  m_EditorClassIdentifier: Assembly-CSharp::CargoSO
+  cargoName: Gas
+  fittingCargo:
+  - {fileID: 11400000}
+  - {fileID: 11400000, guid: 4715cc542e4088448b6041c9ea8e2fa9, type: 2}
+  dangerLevel: 1
+  fittingRailCars:
+  - {fileID: 11400000, guid: 446e9a07baf0262498e27dc3cbee4289, type: 2}
+  - {fileID: 11400000, guid: eec3eb34338ceb048bbe66618626f75c, type: 2}
