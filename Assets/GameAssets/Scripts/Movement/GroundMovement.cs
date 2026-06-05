@@ -3,11 +3,6 @@ using UnityEngine;
 
 public class GroundMovement : MonoBehaviour
 {
-    public enum MovementScriptState
-    {
-        Default,
-        Disabled
-    }
     //Variables
     [Header("Speed")]
     [SerializeField]
@@ -49,9 +44,9 @@ public class GroundMovement : MonoBehaviour
     public float waterSlowDownMult;
     
     //Runtime References
-    private MovementScriptState scriptState = MovementScriptState.Default;
     [NonSerialized]
     public Rigidbody rb;
+    private RigidbodyInterpolation rbStartInterpolation;
     
     [NonSerialized]
     public bool grounded = true;
@@ -73,12 +68,9 @@ public class GroundMovement : MonoBehaviour
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        rbStartInterpolation = rb.interpolation;
     }
-
-    public void SetMovementScriptState(MovementScriptState scriptState)
-    {
-        this.scriptState = scriptState;
-    }
+    
     public virtual Vector2 GetMovementVector()
     {
         return Vector2.zero;
@@ -100,8 +92,6 @@ public class GroundMovement : MonoBehaviour
 
     public void UpdateMovement()
     {
-        if(scriptState == MovementScriptState.Disabled) return;
-        
         CheckGrounded();
         
         //FootStep Sound
@@ -130,8 +120,6 @@ public class GroundMovement : MonoBehaviour
     {
         targetSpeed = GetTargetSpeed();
         movementVector = GetMovementVector();
-        Debug.Log(transform.name + scriptState);
-        if(scriptState == MovementScriptState.Disabled) return;
         
         //Gravity
         rb.AddForce(grounded ? -groundNormal * (gravityForce * 0.5f) : Vector3.down * gravityForce);
@@ -152,13 +140,13 @@ public class GroundMovement : MonoBehaviour
         {
             Vector3 velocityPlane = new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z);
             float velocity = velocityPlane.sqrMagnitude;
-            
-            if (movementVector == Vector2.zero)
+
+            if (movementVector == Vector2.zero || targetSpeed == 0f)
             {
                 //Drag
                 if (velocity > 0.1f)
                 {
-                    rb.AddForce(-velocityPlane.normalized * ((targetSpeed / baseSpeed) * deceleration));
+                    rb.AddForce(-velocityPlane.normalized * deceleration);
                 }
                 else
                 {
@@ -238,7 +226,7 @@ public class GroundMovement : MonoBehaviour
                 grounded = true;
                 
                 if(hit.transform.CompareTag("Moving"))
-                    MovingPlatformManager.active.AddEntry(rb,transform,hit.transform,true);
+                    MovingPlatformManager.active.AddEntry(rb,transform,hit.transform,true,rbStartInterpolation);
                 else
                     MovingPlatformManager.active.RemoveEntry(transform);
             }
@@ -263,7 +251,7 @@ public class GroundMovement : MonoBehaviour
 
         if (lockToRailCar != null)
         {
-            MovingPlatformManager.active.AddEntry(rb, transform, lockToRailCar.transform, true);
+            MovingPlatformManager.active.AddEntry(rb, transform, lockToRailCar.transform, true, rbStartInterpolation);
         }
     }
     public void UnFreeze()

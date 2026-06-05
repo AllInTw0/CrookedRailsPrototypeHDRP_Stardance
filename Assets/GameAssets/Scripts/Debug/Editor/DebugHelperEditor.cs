@@ -26,5 +26,10 @@ public class DebugHelperEditor : Editor
         {
             EnemyManager.active.SpawnEnemy(debugHelper.enemy.prefab, PlayerMovement.active.transform.position + new Vector3(3f,1f,0), Quaternion.identity);
         }
+
+        if (GUILayout.Button("Spawn Item"))
+        {
+            Item.SpawnItem(debugHelper.item,PlayerMovement.active.transform.position + PlayerMovement.active.transform.forward + Vector3.up,Quaternion.identity);
+        }
     }
 }

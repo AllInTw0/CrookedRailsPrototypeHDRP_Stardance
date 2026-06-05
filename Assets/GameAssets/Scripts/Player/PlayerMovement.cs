@@ -50,6 +50,11 @@ public class PlayerMovement : GroundMovement
     private float jumpForce = 1f;
     [SerializeField]
     private float jumpCoolDown = 0.25f;
+    [Header("Variable Jump")] 
+    [SerializeField]
+    private Vector2 variableJumpTime;
+    [SerializeField]
+    private float variableJumpGravityForce;
     
     //Runtime References
     private float colliderStandingHeight;
@@ -63,6 +68,7 @@ public class PlayerMovement : GroundMovement
     private float stamina;
     private float staminaGainDelayTime;
 
+    private bool sentATooFarFromTrainWarning;
     private bool tooFarFromTrain;
 
     private Ladder currentLadder;
@@ -102,18 +108,32 @@ public class PlayerMovement : GroundMovement
         Debug.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + new Vector3(xMag, 0, zMag), Color.cyan);
         Debug.DrawLine(transform.position + Vector3.up, transform.position + Vector3.up + rb.linearVelocity, Color.green);
 
-        if (moveInput.x > 0 && xMag > targetSpeed) moveInput.x = 0;
-        if (moveInput.x < 0 && xMag < -targetSpeed) moveInput.x = 0;
-        if (moveInput.y > 0 && zMag > targetSpeed) moveInput.y = 0;
-        if (moveInput.y < 0 && zMag < -targetSpeed) moveInput.y = 0;
+        if (targetSpeed > 0)//dont modify move input if target speed is zero. This will mess with movement prediction for gameplay space distance checking
+        {
+            if (moveInput.x > 0 && xMag > targetSpeed) moveInput.x = 0;
+            if (moveInput.x < 0 && xMag < -targetSpeed) moveInput.x = 0;
+            if (moveInput.y > 0 && zMag > targetSpeed) moveInput.y = 0;
+            if (moveInput.y < 0 && zMag < -targetSpeed) moveInput.y = 0;
+        }
 
         Vector3 targetVector = ((orientation.forward * moveInput.y) + (orientation.right * moveInput.x)).normalized;
         return new Vector2(targetVector.x, targetVector.z);
     }
 
+    private Vector3 GetNoclipVector()
+    {
+        Vector3 movementVector = PlayerCamera.active.transform.forward * moveInput.y +
+                                 PlayerCamera.active.transform.right * moveInput.x;
+        movementVector = movementVector.normalized * noclipSpeed;
+
+        if (InputManager.sprintAction.IsPressed())
+            movementVector *= 6f;
+        return movementVector;
+    }
     private void Update()
     {
-        UpdateMovement();
+        if(noclip == false && currentLadder == null)
+            UpdateMovement();
         
         if (InputManager.debugCamAction.triggered && canNoclip)
         {
@@ -127,13 +147,7 @@ public class PlayerMovement : GroundMovement
         if (noclip)
         {
             //Noclip
-            Vector3 movementVector = PlayerCamera.active.transform.forward * moveInput.y +
-                                     PlayerCamera.active.transform.right * moveInput.x;
-            movementVector = movementVector.normalized * (noclipSpeed * Time.deltaTime);
-
-            if (InputManager.sprintAction.IsPressed())
-                movementVector *= 6f;
-            rb.MovePosition(transform.position + movementVector);
+            rb.MovePosition(transform.position + GetNoclipVector() * Time.deltaTime);
         }
         else
         {
@@ -183,8 +197,8 @@ public class PlayerMovement : GroundMovement
             
 
             //Jumping
-            jumpTimer -= Time.deltaTime;
-            if (InputManager.jumpAction.IsPressed() && grounded && jumpTimer <= 0f)
+            jumpTimer += Time.deltaTime;
+            if (InputManager.jumpAction.WasPressedThisFrame() && grounded && jumpTimer >= jumpCoolDown)
             {
                 float force = jumpForce;
                 if (IsInWater())
@@ -192,7 +206,7 @@ public class PlayerMovement : GroundMovement
 
                 rb.AddForce(0f, crouched ? force * 0.5f : force, 0f);
                 
-                jumpTimer = jumpCoolDown;
+                jumpTimer = 0f;
                 
                 DisableGrounded();
 
@@ -211,12 +225,9 @@ public class PlayerMovement : GroundMovement
 
     private void FixedUpdate()
     {
-        FixedUpdateMovement();
-        
         if(noclip)
             return;
-       
-
+        
         if (currentLadder != null) 
         {
             //Ladder
@@ -265,7 +276,13 @@ public class PlayerMovement : GroundMovement
         }
         else
         {
-
+            if (jumpTimer >= variableJumpTime.x && jumpTimer <= variableJumpTime.y &&
+                InputManager.jumpAction.IsPressed() == false && grounded == false)
+            {
+                rb.AddForce(Vector3.down * variableJumpGravityForce);
+            }
+            
+            
             //Max Distance 
             if (maxDistanceLimitEnabled && Train.playerTrain != null && GameStateManager.gameStarted)
             {
@@ -289,38 +306,47 @@ public class PlayerMovement : GroundMovement
                     if (distanceToWaypoint > closestWaypoint.maxDistance && Vector3.Distance(transform.position + projectedVector, closestWaypoint.transform.position) > distanceToWaypoint)
                     {
                         Debug.Log("Walking away from a waypoint!");
-                        targetSpeed = 0f;
-                        if (tooFarFromTrain == false)
+                        if (sentATooFarFromTrainWarning == false)
                         {
                             Override title = new Override("Title", OverrideType.Text, "WARNING");
                             Override message = new Override("Message", OverrideType.Text, "You're to far from the structure! You may NOT go FURTHER!");
                             Override subText = new Override("SubText", OverrideType.Text, Mathf.Round(distanceToWaypoint) + "m");
                             MiniPrinter.active.AddNotification(PaperRenderer.active.RenderPaper("Message", new List<Override>() { title, message, subText }));
+                            sentATooFarFromTrainWarning = true;
                         }
                         tooFarFromTrain = true;
                     }
-                    else if (distanceToWaypoint < closestWaypoint.maxDistance - 2f)
+                    else
+                    {
+                        if (distanceToWaypoint < closestWaypoint.maxDistance - 2f)
+                            sentATooFarFromTrainWarning = false;
                         tooFarFromTrain = false;
+                    }
                 }
                 else
                 {
                     if (trainDist >= maxDistanceFromTrain && Train.playerTrain.GetClosestDistanceToPos(transform.position + projectedVector) > trainDist)
                     {
                         Debug.Log("Walking away from the train!");
-                        targetSpeed = 0f;
-                        if (tooFarFromTrain == false)
+                        if (sentATooFarFromTrainWarning == false)
                         {
                             Override title = new Override("Title", OverrideType.Text, "WARNING");
                             Override message = new Override("Message", OverrideType.Text, "You're to far from the train! You may NOT go FURTHER!");
                             Override subText = new Override("SubText", OverrideType.Text, Mathf.Round(trainDist) + "m");
                             MiniPrinter.active.AddNotification(PaperRenderer.active.RenderPaper("Message", new List<Override>() { title, message, subText }));
+                            sentATooFarFromTrainWarning = true;
                         }
                         tooFarFromTrain = true;
                     }
-                    else if (trainDist < maxDistanceFromTrain - 2f)
+                    else
+                    {
+                        if (trainDist < maxDistanceFromTrain - 2f)
+                            sentATooFarFromTrainWarning = false;
                         tooFarFromTrain = false;
+                    }
                 }
             }
+            FixedUpdateMovement();
         }
     }
     
@@ -341,21 +367,17 @@ public class PlayerMovement : GroundMovement
     
     public void EnableNoclip()
     {
-        Freeze();
+        UnFreeze();
         MovingPlatformManager.active.RemoveEntry(transform);
         capsuleCollider.enabled = false;
         noclip = true;
         ExitLadder();
-        
-        SetMovementScriptState(MovementScriptState.Disabled);
     }
     public void DisableNoclip()
     {
-        UnFreeze();
         capsuleCollider.enabled = true;
         noclip = false;
-        
-        SetMovementScriptState(MovementScriptState.Default);
+        rb.linearVelocity = GetNoclipVector();
     }
 
     //Ladders
@@ -379,14 +401,34 @@ public class PlayerMovement : GroundMovement
         MovingPlatformManager.active.RemoveEntry(transform);
         MovingPlatformManager.active.AddEntry(rb, orientation, currentLadder.ladderCollider.transform, true);
         grounded = false;
-        
-        SetMovementScriptState(MovementScriptState.Disabled);
     }
     private void ExitLadder()
     {
         currentLadder = null;
         MovingPlatformManager.active.RemoveEntry(transform);
+    }
+
+    public void Teleport(Vector3 worldPos)
+    {
+        PlayerMovement.active.rb.position = worldPos;
+    }
+
+    public bool IsPositionInGameplaySpace(Vector3 worldPos)
+    {
+        DistanceWaypoint closestWaypoint = null;
+        float distanceToWaypoint = float.MaxValue;
+        foreach (DistanceWaypoint waypoint in GameStateManager.waypointList)
+        {
+            float d = Vector3.Distance(worldPos, waypoint.transform.position);
+            if(d < distanceToWaypoint)
+            {
+                closestWaypoint = waypoint;
+                distanceToWaypoint = d;
+            }
+        }
         
-        SetMovementScriptState(MovementScriptState.Default);
+        float trainDist = Train.playerTrain.GetClosestDistanceToPos(worldPos);
+
+        return trainDist < maxDistanceFromTrain || (closestWaypoint != null && distanceToWaypoint < closestWaypoint.maxDistance);
     }
 }

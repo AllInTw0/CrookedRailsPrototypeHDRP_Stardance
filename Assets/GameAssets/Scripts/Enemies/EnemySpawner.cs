@@ -318,7 +318,6 @@ public class EnemySpawner : MonoBehaviour
             {
                 Debug.LogWarning("Did not spawn enemy! Couldnt sample position on nav!");
             }
-            EnemyManager.GenerateNavMesh(spawnPos);
 
             spawnedDanger += enemy.dangerValue;
         }

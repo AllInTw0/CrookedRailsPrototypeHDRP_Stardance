@@ -212,3 +212,9 @@ MonoBehaviour:
     volume: 0.7
     pitch: {x: 0.8, y: 1.2}
     groupType: 0
+  - name: Teleporter - Paired
+    AudioClips:
+    - {fileID: 8300000, guid: 46a9a4f3f85c42a4fa1144a48bc80096, type: 3}
+    volume: 0.7
+    pitch: {x: 0.8, y: 1.2}
+    groupType: 0

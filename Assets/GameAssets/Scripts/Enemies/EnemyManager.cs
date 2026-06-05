@@ -198,19 +198,6 @@ public class EnemyManager : MonoBehaviour
         return enemyList.Count;
     }
 
-    public static void GenerateNavMesh(Vector3 worldPos)
-    {
-        Vector2Int coord = TerrainGeneration.active.GetChunkCoord(worldPos);
-        for (int x = -1; x <= 1; x++)
-        {
-            for (int y = -1; y <= 1; y++)
-            {
-                TerrainGeneration.Chunk chunk = TerrainGeneration.active.CreateOrGetChunk(new Vector2Int(coord.x + x, coord.y + y));
-                chunk.GenerateNavMesh();
-            }
-        }
-    }
-
     public void OnDrawGizmos()
     {
         foreach (EnemyPack pack in activePackList)

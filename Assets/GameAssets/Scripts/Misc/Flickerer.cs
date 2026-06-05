@@ -44,6 +44,11 @@ public class Flickerer : MonoBehaviour
         time = turnOnOffTime;
         on = false;
     }
+
+    public bool IsOn()
+    {
+        return on;
+    }
     private void DisableEnableObjects(bool enable)
     {
         foreach (GameObject obj in objectList)

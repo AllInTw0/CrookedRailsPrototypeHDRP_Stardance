@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -21,6 +22,7 @@ public class PathFindingGroundMovement : GroundMovement
     [HideInInspector] public TargetType currentTargetType;
     private Vector3 targetPosition;
     private Transform targetTransform;
+    public Transform GetTargetTransform(){return targetTransform;}
     [HideInInspector] public EnemyPack targetPack;
     private float targetDistance = 5f;
     
@@ -36,6 +38,8 @@ public class PathFindingGroundMovement : GroundMovement
     
     //Other
     private Vector3 previousPosition;
+    private float distanceFromPreviousPosition;
+    private float timeSinceTargetChange;
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -50,7 +54,7 @@ public class PathFindingGroundMovement : GroundMovement
     {
         
     }
-    public bool UpdateNavigationBehaviour(bool checkForPartialPaths = false)
+    public bool UpdateNavigationBehaviour(bool preferPath = false, bool checkForPartialPaths = false)
     {
         //Make sure nav is off if we are near the target
         //if (IsNavigatingByPath() && distanceFromTarget < 1f)
@@ -58,7 +62,7 @@ public class PathFindingGroundMovement : GroundMovement
         //    currentNavigationType = NavigationType.StraightLine;
         //}
         //Turn on nav if we have stopped
-        if (IsNavigatingByPath() == false && Vector3.Distance(previousPosition, transform.position) < EnemyManager.active.pathFindingTriggerMovedDistance)
+        if (IsNavigatingByPath() == false && (IsStuck() || preferPath))
         {
             currentNavigationType = NavigationType.Path;
         }
@@ -85,6 +89,7 @@ public class PathFindingGroundMovement : GroundMovement
             }
         }
         
+        distanceFromPreviousPosition = Vector3.Distance(previousPosition, transform.position);
         previousPosition = transform.position;
         
         return navPath.status == NavMeshPathStatus.PathPartial;
@@ -112,6 +117,8 @@ public class PathFindingGroundMovement : GroundMovement
 
     public void UpdateNavMovement()
     {
+        timeSinceTargetChange += Time.deltaTime;
+        
         //Get target Direction depending on navigation type
         if (IsNavigatingByPath() && navPath.corners.Length > pathIndex)
             targetDirVector = navPath.corners[pathIndex] - transform.position;
@@ -135,6 +142,11 @@ public class PathFindingGroundMovement : GroundMovement
         if(distanceFromTarget <= targetDistance)
             return true;
         return false;
+    }
+
+    public bool IsStuck()
+    {
+        return distanceFromPreviousPosition < 0.5f && timeSinceTargetChange > 0.5f;
     }
     
     public Vector3 GetTargetPosition()
@@ -162,6 +174,7 @@ public class PathFindingGroundMovement : GroundMovement
     {
         if (IsInPack()) LeavePack();
 
+        timeSinceTargetChange = 0f;
         currentTargetType = TargetType.Position;
         targetPosition = pos;
         //currentNavigationType = NavigationType.StraightLine;
@@ -171,6 +184,9 @@ public class PathFindingGroundMovement : GroundMovement
     {
         if (IsInPack()) LeavePack();
 
+        if (currentTargetType != TargetType.Transform || transform != targetTransform)
+            timeSinceTargetChange = 0f;
+        
         currentTargetType = TargetType.Transform;
         targetTransform = transform;
         //currentNavigationType = NavigationType.StraightLine;
@@ -181,6 +197,7 @@ public class PathFindingGroundMovement : GroundMovement
         if (IsInPack()) LeavePack();
         pack.AddEnemy(GetComponent<Enemy>());
 
+        timeSinceTargetChange = 0f;
         currentTargetType = TargetType.Pack;
         targetPack = pack;
         targetPosition = offset;

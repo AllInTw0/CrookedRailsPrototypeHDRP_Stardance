@@ -207,7 +207,7 @@ public static class Util
             if (probabilityList.Count == 0) return default(T);
 
             float randomProbability = Random.Range(0f, probabilitySum);
-            Debug.Log("randomProbability: " + randomProbability+", max: " + probabilitySum);
+            //`Debug.Log("randomProbability: " + randomProbability+", max: " + probabilitySum);
             for (int i = 0; i < probabilityList.Count; i++)
             {
                 if (probabilityList[i].enabled)

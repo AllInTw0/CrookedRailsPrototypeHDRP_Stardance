@@ -815,6 +815,9 @@ MonoBehaviour:
   targetRagdollDistance: 3.5
   ragdollCameraZoomSpeed: 7
   ragdollCameraRotSpeed: 120
+  responsiveFOVSpeedRange: {x: 2.5, y: 10}
+  responsiveFOVAddition: 15
+  responsiveFOVSmoothness: 3
 --- !u!114 &8383389969143072240
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1178,14 +1181,16 @@ MonoBehaviour:
   cameraTransform: {fileID: 6879617517326091863}
   colliderCrouchHeight: 0.9
   cameraCrouchHeight: 0.7
-  maxDistanceFromTrain: 0
-  maxDistanceLimitEnabled: 0
+  maxDistanceFromTrain: 15
+  maxDistanceLimitEnabled: 1
   maxStamina: 100
   staminaGainDelay: 0.9
   staminaGain: 10
   staminaLoss: 8.5
-  jumpForce: 450
+  jumpForce: 500
   jumpCoolDown: 0.2
+  variableJumpTime: {x: 0, y: 1}
+  variableJumpGravityForce: 16
 --- !u!114 &4364363206151166149
 MonoBehaviour:
   m_ObjectHideFlags: 0

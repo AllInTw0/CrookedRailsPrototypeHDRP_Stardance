@@ -8,6 +8,7 @@ public class MovingPlatformEntry
     public Transform rotationTransform;
     public bool onlyUpdateYRot;
     public Rigidbody rb;
+    public RigidbodyInterpolation rbInterpolation;
     
     public Transform platform;
     public Quaternion platformLastRot;
@@ -73,7 +74,7 @@ public class MovingPlatformManager : MonoBehaviour
         }
     }
 
-    public void AddEntry(Transform entryTransform, Transform entryRotationTransform, Transform entryPlatform, bool entryOnlyUpdateYRot = false)
+    public void AddEntry(Transform entryTransform, Transform entryRotationTransform, Transform entryPlatform, bool entryOnlyUpdateYRot = false, RigidbodyInterpolation rigidbodyInterpolation = RigidbodyInterpolation.Interpolate)
     {
         if(FindEntry(entryTransform) != -1)
             return;
@@ -83,12 +84,13 @@ public class MovingPlatformManager : MonoBehaviour
             transform = entryTransform,
             rotationTransform = entryRotationTransform,
             platform = entryPlatform,
-            onlyUpdateYRot = entryOnlyUpdateYRot
+            onlyUpdateYRot = entryOnlyUpdateYRot,
+            rbInterpolation = rigidbodyInterpolation
         };
         entry.UpdateValues();
         entries.Add(entry);
     }
-    public void AddEntry(Rigidbody entryRigidBody, Transform entryRotationTransform, Transform entryPlatform, bool entryOnlyUpdateYRot = false)
+    public void AddEntry(Rigidbody entryRigidBody, Transform entryRotationTransform, Transform entryPlatform, bool entryOnlyUpdateYRot = false, RigidbodyInterpolation rigidbodyInterpolation = RigidbodyInterpolation.Interpolate)
     {
         if(FindEntry(entryRigidBody.transform) != -1)
             return;
@@ -100,7 +102,25 @@ public class MovingPlatformManager : MonoBehaviour
             rotationTransform = entryRotationTransform,
             rb = entryRigidBody,
             platform = entryPlatform,
-            onlyUpdateYRot = entryOnlyUpdateYRot
+            onlyUpdateYRot = entryOnlyUpdateYRot,
+            rbInterpolation = rigidbodyInterpolation
+        };
+        entry.UpdateValues();
+        entries.Add(entry);
+    }
+
+    public void AddEntry(Transform entryTransform, Transform entryPlatform, bool entryOnlyUpdateYRot = false, RigidbodyInterpolation rigidbodyInterpolation = RigidbodyInterpolation.Interpolate)
+    {
+        if (FindEntry(entryTransform) != -1)
+            return;
+
+        MovingPlatformEntry entry = new MovingPlatformEntry()
+        {
+            transform = entryTransform,
+            rotationTransform = entryTransform,
+            platform = entryPlatform,
+            onlyUpdateYRot = entryOnlyUpdateYRot,
+            rbInterpolation = rigidbodyInterpolation
         };
         entry.UpdateValues();
         entries.Add(entry);
@@ -114,7 +134,7 @@ public class MovingPlatformManager : MonoBehaviour
             if (entries[i].rb != null)
             {
                 entries[i].rb.linearVelocity += entries[i].velocity;
-                entries[i].rb.interpolation = RigidbodyInterpolation.Interpolate;
+                entries[i].rb.interpolation = entries[i].rbInterpolation;
             }
             entries.RemoveAt(i);
         }

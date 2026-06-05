@@ -95,10 +95,17 @@ public class PlayerInteract : MonoBehaviour
                     {
                         //Debug.Log(hit.transform + " : " + interactable.transform + " : " + hit.collider.transform);
 
-                        currentTarget = hit.collider.transform;
-                        currentInteractable = interactable;
-                        
-                        InteractIcon.active.Enable(currentInteractable);
+                        if (interactable.enabled)
+                        {
+                            currentTarget = hit.collider.transform;
+                            currentInteractable = interactable;
+
+                            InteractIcon.active.Enable(currentInteractable);
+                        }
+                        else
+                        {
+                            StopInteracting();
+                        }
                     }
                     else
                     {

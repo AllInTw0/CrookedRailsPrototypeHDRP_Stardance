@@ -86,7 +86,7 @@ public class TrackGeneration : MonoBehaviour
     {
         for (int i = 0; i < nodePath.path.Count; i++)
         {
-            nodePath.path[i].worldPos.y += 0.4f;
+            nodePath.path[i].worldPos.y += 1f;
             if (nodePath.path[i].worldPos.y < 0)
                 nodePath.path[i].worldPos.y = 0;
         }

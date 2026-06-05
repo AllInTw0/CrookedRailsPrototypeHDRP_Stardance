@@ -55,8 +55,6 @@ public class TerrainGeneration : MonoBehaviour
     private float renderDistanceMeters;
     [SerializeField]
     private float foliageRenderDistanceMeters;
-    [SerializeField]
-    private int chunkRadiusNavMeshGen;
     private bool updateRenderDistance = false;
     private Vector2Int lastUpdateCoord;
     [Header("Navigation")]
@@ -147,17 +145,6 @@ public class TerrainGeneration : MonoBehaviour
                     }
                 }
             }
-            if (EnemySpawner.CanEnemiesSpawn())//Dont generate nav at station
-            {
-                for (int x = -chunkRadiusNavMeshGen; x <= chunkRadiusNavMeshGen; x++)
-                {
-                    for (int y = -chunkRadiusNavMeshGen; y <= chunkRadiusNavMeshGen; y++)
-                    {
-                        Chunk navChunk = CreateOrGetChunk(new Vector2Int(chunk.x + x, chunk.y + y));
-                        navChunk.GenerateNavMesh();
-                    }
-                }
-            }
             foreach (KeyValuePair<Vector2Int,Chunk> keyValuePair in chunkDictionary)
             {
                 if(keyValuePair.Key.x < chunk.x - renderDistanceChunks - 2 || keyValuePair.Key.x > chunk.x + renderDistanceChunks + 2 ||
@@ -180,6 +167,22 @@ public class TerrainGeneration : MonoBehaviour
             Chunk newChunk = new Chunk(coord);
             chunkDictionary.Add(coord, newChunk);
             return newChunk;
+        }
+    }
+
+    public bool HasChunkGenerated(Vector2Int coord)
+    {
+        if (chunkDictionary.TryGetValue(coord, out Chunk chunk))
+        {
+            if (chunk.threading)
+                return false;
+            if (chunk.meshData != null)
+                return true;
+            return false;
+        }
+        else
+        {
+            return false;
         }
     }
     public Chunk CreateOrUpdateChunk(Vector2Int coord, bool regenerateHeightMesh = false, bool createMesh = false, bool threadHeightMapGen = false, bool spawnFoliage = false)
@@ -325,7 +328,6 @@ public class TerrainGeneration : MonoBehaviour
         public bool onMeshRecievedSpawnFoliage;
         public bool foliageSpawned;
         public bool threading = false;
-        public bool hasNavMesh = false;
         public Chunk(Vector2Int coord, bool threadHeightMapGen = false)
         {
             this.coord = coord;
@@ -427,32 +429,6 @@ public class TerrainGeneration : MonoBehaviour
                 active.StartCoroutine(SpawnFoliage());   
         }
         
-        public void GenerateNavMesh()
-        {
-            if (hasNavMesh || meshData == null || meshData.meshObject == null)
-                return;
-            hasNavMesh = true;
-            ThreadManager.AddMainThreadJob(delegate {
-                NavMeshSurface navMeshSurface = meshData.meshObject.AddComponent<NavMeshSurface>();
-
-                navMeshSurface.agentTypeID = NavMesh.GetSettingsByIndex(1).agentTypeID;//enemy
-
-                navMeshSurface.collectObjects = CollectObjects.Volume;
-                navMeshSurface.size = new Vector3(chunkSize + 5f, 40, chunkSize + 5f);
-                navMeshSurface.center = new Vector3(chunkSize * 0.5f + 2.5f, 10, chunkSize * 0.5f + 2.5f);
-                navMeshSurface.useGeometry = UnityEngine.AI.NavMeshCollectGeometry.PhysicsColliders;
-                navMeshSurface.layerMask = active.navMeshLayerMask;
-                navMeshSurface.defaultArea = NavMesh.GetAreaFromName("Walkable");
-
-                navMeshSurface.overrideTileSize = true;
-                navMeshSurface.tileSize = 32;
-
-                navMeshSurface.overrideVoxelSize = true;
-                navMeshSurface.voxelSize = 0.15f;
-
-                navMeshSurface.BuildNavMesh();
-            });
-        }
         public IEnumerator SpawnFoliage()
         {
             if (foliageSpawned || threading || meshData == null)
@@ -562,7 +538,6 @@ public class TerrainGeneration : MonoBehaviour
 
             meshData.Destroy();
             meshData = null;
-            hasNavMesh = false;
             foliageSpawned = false;
             onMeshRecievedSpawnFoliage = false;
             

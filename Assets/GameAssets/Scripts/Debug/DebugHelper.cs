@@ -7,4 +7,6 @@ public class DebugHelper : MonoBehaviour
     public CargoSO cargo;
     [Header("Enemy")] 
     public EnemySO enemy;
+    [Header("Item")]
+    public ItemSO item;
 }

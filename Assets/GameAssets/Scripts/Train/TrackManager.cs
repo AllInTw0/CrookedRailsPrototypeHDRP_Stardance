@@ -122,7 +122,7 @@ public class TrackManager : MonoBehaviour
         Spline.DEBUG_DrawPointGizmos(pointB,60f);
         
         CalculatePath(pointA,pointB,Spline.CalculateSplineLenght(pointA, pointB),out List<PathPoint> path);
-        CalculatePath(path,out List<PathPoint> newPath,1,true, 0.015f);
+        CalculatePath(path,out List<PathPoint> newPath,1,true, 0.0175f);
         Debug.Log("OldPathLenght: " + path[^1].distance + " NewPathLenght: " + newPath[^1].distance);
         DEBUG_DrawPath(path);
         DEBUG_DrawPath(newPath);
@@ -384,7 +384,7 @@ public class TrackManager : MonoBehaviour
         {
             Vector3 pos = GetPathPosition(path, progress);
 
-            if (randomOffset != 0f)
+            if (randomOffset != 0f && progress > 0.05f && progress < pathLenght - 0.05f)
             {
                 pos += new Vector3(Random.Range(-randomOffset, randomOffset), Random.Range(-randomOffset, randomOffset) * 0.5f, Random.Range(-randomOffset, randomOffset));
             }

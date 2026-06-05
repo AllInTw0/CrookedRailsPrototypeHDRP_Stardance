@@ -23,6 +23,16 @@ public class PlayerCamera : MonoBehaviour
     private float ragdollCameraZoomSpeed = 7f;
     [SerializeField]
     private float ragdollCameraRotSpeed = 120f;
+
+    [Header("Responsive FOV")] 
+    [SerializeField]
+    private Vector2 responsiveFOVSpeedRange;
+    [SerializeField]
+    private float responsiveFOVAddition;
+    [SerializeField] 
+    private float responsiveFOVSmoothness;
+
+    private float currentResponsiveFOV;
     //Run time
     [NonSerialized]
     public float rotationX;
@@ -45,7 +55,11 @@ public class PlayerCamera : MonoBehaviour
     }
     private void Update()
     {
-        camera.fieldOfView = Settings.fov;
+        float speed = new Vector3(PlayerMovement.active.rb.linearVelocity.x,0,PlayerMovement.active.rb.linearVelocity.z).magnitude;
+        speed = Mathf.Clamp((speed - responsiveFOVSpeedRange.x)/responsiveFOVSpeedRange.y, 0, 1);
+        currentResponsiveFOV = Mathf.Lerp(currentResponsiveFOV, speed * responsiveFOVAddition, Time.deltaTime * responsiveFOVSmoothness);
+        
+        camera.fieldOfView = Settings.fov + currentResponsiveFOV;
 
         if (GameOverScreen.IsGameOver()) return;
 

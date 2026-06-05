@@ -102,6 +102,8 @@ public class Companion : MonoBehaviour
     private int faceIndex;
     private float faceStateTimer;
     private float faceTimer;
+    [Header("Behaviour")] 
+    public float behaviourUpdateTime = 0.5f;
     [Header("TV")] 
     public GameObject tvObject;
     public Vector2 randomTimeToActivateTV;
@@ -110,8 +112,6 @@ public class Companion : MonoBehaviour
     public float minJumpVelocityAddition;
     public float jumpDelay;
     public bool angleMode;
-    private Vector3 jumpStart;
-    private Vector3 jumpEnd;
     [Header("Shooting")] 
     public Transform gunRot;
     public Transform gunEnd;
@@ -127,12 +127,19 @@ public class Companion : MonoBehaviour
     private float jumpTimmer;
     private bool touchingGround = true;
     private Transform helperTransform;
+    private Transform[] navigationTransformArray;
 
     private float lastScreenRotX;
     private void Start()
     {
         movement = GetComponent<PathFindingGroundMovement>();
         helperTransform = new GameObject("CompanionHelperTransform").transform;
+        navigationTransformArray = new Transform[2];
+        for (int i = 0; i < navigationTransformArray.Length; i++)
+        {
+            navigationTransformArray[i] = new GameObject("CompanionNavigationTransform: " + i).transform;
+        }
+        
         tvObject.SetActive(false);
         health.onTakeDamage.AddListener((dmg, force) =>
         {
@@ -141,23 +148,44 @@ public class Companion : MonoBehaviour
             Ragdoll(force);
             movement.rb.angularVelocity = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f));
         });
+        InvokeRepeating(nameof(UpdateBehaviour), behaviourUpdateTime, behaviourUpdateTime);
     }
 
     private void UpdateBehaviour()
     { 
+        Debug.Log("Current state: " + state);
         switch (state)
         {
             case CompanionState.normal:
-                movement.SetTarget(PlayerCamera.active.transform,2f);
+                movement.SetTarget(PlayerMovement.active.transform, 1f);
+                //Check if should jump
+                bool shouldJump = false;
+                if (IsPointOnMovingPlatform(movement.GetTargetPosition(), out Transform playerPlatform))
+                {
+                    if (IsPointOnMovingPlatform(transform.position, out Transform companionPlatform))
+                    {
+                        if (!(playerPlatform == companionPlatform || playerPlatform.parent == companionPlatform || playerPlatform == companionPlatform.parent))
+                        {
+                            shouldJump = true;
+                        }
+                    }
+                    else
+                    {
+                        shouldJump = true;
+                    }
+                }
+                
                 if (CheckForTargets(out Health h))
                 {
                     state = CompanionState.shooting;
                 }
-                else if (movement.UpdateNavigationBehaviour(true))
+                else if (shouldJump)
                 {
                     //Partial path - jump
                     
                     //Find jump start / end
+                    
+                    //Path from target to companion. Last path point will be the jump end
                     NavMeshPath reversedPath = new NavMeshPath();
                     NavMesh.CalculatePath(movement.GetTargetPosition(), transform.position, NavMesh.AllAreas, reversedPath);
                     
@@ -165,21 +193,35 @@ public class Companion : MonoBehaviour
                     if(reversedPath.corners.Length < 2)
                         break;
                     
-                    jumpEnd = reversedPath.corners[^1];
+                    //Assign jump end pos to a transform that will move with a moving platform if needed
+                    MovingPlatformManager.active.RemoveEntry(navigationTransformArray[1]);
+                    navigationTransformArray[1].position = reversedPath.corners[^1];
+                    if (IsPointOnMovingPlatform(reversedPath.corners[^1], out Transform platform))
+                    {
+                        MovingPlatformManager.active.AddEntry(navigationTransformArray[1],platform);
+                    }
+                    
+                    //Find jump start
                     Vector3 pathDir = (reversedPath.corners[^1] - reversedPath.corners[^2]).normalized;
                     
                     Vector3 bias = Vector3.down;
-                    if (jumpEnd.y < transform.position.y) bias = -bias;
-                    NavMesh.SamplePosition(jumpEnd + pathDir * 6f + Vector3.up * 2f, out NavMeshHit hit, 6f, NavMesh.AllAreas);
+                    if (reversedPath.corners[^1].y < transform.position.y) bias = -bias;
+                    Vector3 samplePos = reversedPath.corners[^1] + pathDir * 6f + Vector3.up * 2f;
+
+
+                    if (SampleNavPos(samplePos, 6f, out Vector3 hitPos, out Transform movingPlatform))
+                    {
+                        NavMeshPath safetyPath = new NavMeshPath();
+                        NavMesh.CalculatePath(transform.position, hitPos, NavMesh.AllAreas, safetyPath);
+                        //Assign jump start to a transform that will move with a platform if needed
+                        MovingPlatformManager.active.RemoveEntry(navigationTransformArray[0]);
+                        navigationTransformArray[0].position = safetyPath.corners[^1];
+                        if(movingPlatform != null)
+                            MovingPlatformManager.active.AddEntry(navigationTransformArray[0],platform);
+                    }
                     
-                    NavMeshPath safetyPath = new NavMeshPath();
-                    NavMesh.CalculatePath(transform.position, hit.position, NavMesh.AllAreas, safetyPath);
-                    jumpStart = safetyPath.corners[^1];
-            
-                    Debug.DrawRay(jumpStart,Vector3.up,Color.red,60f);
-                    Debug.DrawRay(jumpEnd,Vector3.up,Color.green,60f);
                     
-                    movement.SetTarget(jumpStart,0.5f);
+                    movement.SetTarget(navigationTransformArray[0],0.5f);
                     jumpTimmer = 0f;
                     state = CompanionState.goingToJumpStart;
                 }
@@ -191,7 +233,7 @@ public class Companion : MonoBehaviour
                             tvTime = Random.Range(randomTimeToActivateTV.x, randomTimeToActivateTV.y);
                         else
                         {
-                            tvTime -= Time.deltaTime;
+                            tvTime -= behaviourUpdateTime;
                             if (tvTime <= 0)
                                 state = CompanionState.TV;
 
@@ -205,8 +247,7 @@ public class Companion : MonoBehaviour
                 }
                 break;
             case  CompanionState.goingToJumpStart:
-                movement.SetTarget(jumpStart,0.5f);
-                movement.UpdateNavigationBehaviour();
+                movement.SetTarget(navigationTransformArray[0],0.5f);
                 if (movement.HasReachedTarget())
                 {
                     //At jump start
@@ -218,20 +259,20 @@ public class Companion : MonoBehaviour
                             animator.SetTrigger("jump");
                         }
 
-                        jumpTimmer += Time.deltaTime;
-                        lookVectorOverride = jumpEnd - transform.position;
+                        jumpTimmer += behaviourUpdateTime;
+                        lookVectorOverride = navigationTransformArray[1].position - transform.position;
                         break;
                     }
                     lookVectorOverride = Vector3.zero;
                     
-                    float angle = Util.SolveTrajectoryMinAngle(transform.position, jumpEnd);
-                    float velocity = Util.SolveVelocityForAngle(angle, transform.position, jumpEnd);
+                    float angle = Util.SolveTrajectoryMinAngle(transform.position, navigationTransformArray[1].position);
+                    float velocity = Util.SolveVelocityForAngle(angle, transform.position, navigationTransformArray[1].position);
                     velocity += minJumpVelocityAddition;
                     //Debug.Log("Angle: " + angle + ", Velocity: " + velocity);
-                    Debug.Log(Util.SolveTrajectory(velocity, transform.position, jumpEnd, angleMode, out angle));
+                    Debug.Log(Util.SolveTrajectory(velocity, transform.position, navigationTransformArray[1].position, angleMode, out angle));
 
                     helperTransform.position = transform.position;
-                    helperTransform.LookAt(jumpEnd);
+                    helperTransform.LookAt(navigationTransformArray[1].position);
                     if (angle == float.NaN)
                         angle = 0f;
                     helperTransform.rotation = Quaternion.Euler(angle, helperTransform.eulerAngles.y, 0f);
@@ -245,6 +286,13 @@ public class Companion : MonoBehaviour
                     ChangeFaceState(1, 500f);
                     SoundManager.active.PlayAtPos(transform.position, "Robot1", parent: transform);
                 }
+                else if (movement.IsStuck())
+                {
+                    Debug.LogWarning("Got stuck going to jump start");
+                    state = CompanionState.normal;
+                    movement.SetTarget(transform.position + new Vector3(Random.Range(-2f,2f),0f,Random.Range(-2f,2f)));
+                }
+
                 break;
             case CompanionState.ragdolled:
                 if (movement.rb.linearVelocity.magnitude < 0.1f)
@@ -256,7 +304,7 @@ public class Companion : MonoBehaviour
                 }
                 break;
             case CompanionState.TV:
-                movement.SetTarget(PlayerCamera.active.transform,2f);
+                movement.SetTarget(PlayerMovement.active.transform,1f);
                 if (movement.HasReachedTarget() == false)
                 {
                     state = CompanionState.normal;
@@ -313,11 +361,47 @@ public class Companion : MonoBehaviour
                 }
                 break;
         }
+        movement.UpdateNavigationBehaviour(preferPath: true);
+    }
 
+    private bool SampleNavPos(Vector3 worldPos, float range, out Vector3 hitPos, out Transform movingPlatform)
+    {
+        if (NavMesh.SamplePosition(worldPos, out NavMeshHit navHit, range, NavMesh.AllAreas))
+        {
+            if (IsPointOnMovingPlatform(navHit.position, out Transform platform))
+            {
+                hitPos = navHit.position;
+                movingPlatform = platform;
+                return true;
+            }
+            
+            hitPos = navHit.position;
+            movingPlatform = null;
+            return true;
+        }
+
+        hitPos = Vector3.zero;
+        movingPlatform = null;
+        return false;
+    }
+
+    private bool IsPointOnMovingPlatform(Vector3 worldPos, out Transform movingPlatform)
+    {
+        if (Physics.Raycast(worldPos + new Vector3(0f, 0.1f, 0f), Vector3.down, out RaycastHit rayHit, 1f,
+                movement.groundLayer))
+        {
+            if (rayHit.collider.tag == "Moving")
+            {
+                //Is on a moving platform
+                movingPlatform = rayHit.collider.transform;
+                return true;
+            }
+        }
+        movingPlatform = null;
+        return false;
     }
     private void Update()
     {
-        UpdateBehaviour();
         if (state != CompanionState.ragdolled)
         {
             movement.UpdateNavMovement();
@@ -391,7 +475,7 @@ public class Companion : MonoBehaviour
         //Rotation
         //Logic
         Vector3 bodyLook = Vector3.zero;
-        Vector3 screenLook = movement.GetTargetPosition() - screen.position;
+        Vector3 screenLook = movement.GetTargetTransform() == PlayerMovement.active.transform ? PlayerCamera.active.transform.position - screen.position : movement.GetTargetPosition() - screen.position;
 
         if (movement.HasReachedTarget() == false)
         {
@@ -468,7 +552,7 @@ public class Companion : MonoBehaviour
             SoundManager.active.PlayAtPos(transform.position, "Robot0", parent: transform);
             Ragdoll(collision.rigidbody.linearVelocity * 0.9f);
         }
-        else if (movement.rb.linearVelocity.magnitude > 1f)
+        else if (state == CompanionState.ragdolled && movement.rb.linearVelocity.magnitude > 1f)
             SoundManager.active.PlayAtPos(transform.position, "Robot0", parent: transform);
     }
 
@@ -479,5 +563,15 @@ public class Companion : MonoBehaviour
             //Debug.Log("Im Fine!");
             touchingGround = false;
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        if(Application.isPlaying == false) return;
+        
+        Gizmos.color = Color.green;
+        Gizmos.DrawCube(navigationTransformArray[0].position, Vector3.one);
+        Gizmos.color = Color.red;
+        Gizmos.DrawCube(navigationTransformArray[1].position, Vector3.one);
     }
 }

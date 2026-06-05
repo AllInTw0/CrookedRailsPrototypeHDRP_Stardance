@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
 using static Util;
 using Random = UnityEngine.Random;
 
@@ -18,14 +19,13 @@ public class GenerationManager : MonoBehaviour
     private TrackGeneration trackGeneration;
     [Header("Player Train")]
     public Train playerTrain;
-    [Header("Navigation")]
-    [SerializeField] 
-    private NavMeshSurface navMeshSurface;
     [Header("Starting Location")]
     [SerializeField]
     private StructureSO startingLocationSO;
     [SerializeField]
     private float startingLocationStructureTrackLength;
+    [Header("Generation")] 
+    public float waterHeight;
     [Header("Stations")]
     [SerializeField]
     private AnimationCurve stationSpawnDistance;
@@ -97,6 +97,9 @@ public class GenerationManager : MonoBehaviour
     private float currentStructureDistanceBuffer;
 
     private List<PathPoint> generatedPath;
+    
+    //Navigation
+    private Vector4 navigationMeshBoundsVector;
     private void Start()
     {
         active = this;
@@ -108,7 +111,9 @@ public class GenerationManager : MonoBehaviour
     public void GenerateTillNextStation()
     {
         LoadingScreen.active.Enable("Generating");
-
+        
+        navigationMeshBoundsVector = Vector4.zero;
+        
         if (GameStateManager.currentHaulingJob == null)
         {
             FindPathsRequest(9, 3, 0.4f, OnFindPaths);
@@ -163,7 +168,13 @@ public class GenerationManager : MonoBehaviour
         }
         else
             nodepath = (NodePath)pathObj;
-
+        
+        //Add nodePath positions to navigation gen
+        foreach (Node node in nodepath.path)
+        {
+            AddWorldPosToNavGen(node.worldPos);
+        }
+        
         trackGeneration.CreateTrackAlongNodes(nodepath, out List<PathPoint> path, out TrackSection lastTrackSectionOut, lastPoint, lastSection);
 
         currentStationPos = lastTrackSectionOut.path[^1].position;
@@ -199,8 +210,135 @@ public class GenerationManager : MonoBehaviour
     }
     public void OnFinishedModifyingGround()
     {
+        LoadingScreen.active.SetProgress(0.9f, "Generating Navigation Mesh");
+        ThreadManager.AddMainThreadJob(delegate { GenerateNavMesh();});
+    }
+
+    public void AddWorldPosToNavGen(Vector3 worldPos)
+    {
+        Vector2Int chunk = terrainGeneration.GetChunkCoord(worldPos);
+        if (navigationMeshBoundsVector == Vector4.zero)
+        {
+            navigationMeshBoundsVector.x = chunk.x;
+            navigationMeshBoundsVector.y = chunk.y;
+            navigationMeshBoundsVector.z = chunk.x;
+            navigationMeshBoundsVector.w = chunk.y;
+        }
+        else
+        {
+            if (chunk.x < navigationMeshBoundsVector.x)
+            {
+                navigationMeshBoundsVector.x = chunk.x;
+            }
+            if (chunk.y < navigationMeshBoundsVector.x)
+            {
+                navigationMeshBoundsVector.y = chunk.y;
+            }
+            if (chunk.x > navigationMeshBoundsVector.z)
+            {
+                navigationMeshBoundsVector.z = chunk.x;
+            }
+            if (chunk.y > navigationMeshBoundsVector.w)
+            {
+                navigationMeshBoundsVector.w = chunk.y;
+            }
+        }
+    }
+    public void GenerateNavMesh()
+    {
+        navigationMeshBoundsVector.x += -2;
+        navigationMeshBoundsVector.y += -2;
+        navigationMeshBoundsVector.z += 2;
+        navigationMeshBoundsVector.w += 2;
+
+        float xSize = navigationMeshBoundsVector.z - navigationMeshBoundsVector.x;
+        float ySize = navigationMeshBoundsVector.w - navigationMeshBoundsVector.y;
+        float xCenter = (navigationMeshBoundsVector.x + navigationMeshBoundsVector.z) * 0.5f;
+        float yCenter = (navigationMeshBoundsVector.y + navigationMeshBoundsVector.w) * 0.5f;
+        
+        //Load in chunks
+        List<Vector2Int> chunkCoordList = new List<Vector2Int>();
+        for (int x = 0; x < xSize; x++)
+        {
+            for (int y = 0; y < ySize; y++)
+            {
+                Vector2Int chunkCoord = new Vector2Int(Mathf.RoundToInt(x + navigationMeshBoundsVector.x), Mathf.RoundToInt(y + navigationMeshBoundsVector.y));
+                //Non Threaded Generation
+                terrainGeneration.CreateOrUpdateChunk(chunkCoord, false, true, false, false);
+                chunkCoordList.Add(chunkCoord);
+            }
+        }
+        
+        //Delete last navmesh
+        Transform previousNavMesh = transform.Find("NavMesh");
+        if(previousNavMesh != null) Destroy(previousNavMesh.gameObject);
+        
+        //Create NavMesh
+        NavMeshSurface navMeshSurface = new GameObject("NavMesh").AddComponent<NavMeshSurface>(); 
+        navMeshSurface.transform.SetParent(transform);
+        navMeshSurface.transform.position = Vector3.zero;
+
+        navMeshSurface.size = new Vector3(xSize * TerrainGeneration.chunkSize, 40f, ySize * TerrainGeneration.chunkSize);
+        navMeshSurface.center = new Vector3(xCenter * TerrainGeneration.chunkSize, 10f, yCenter * TerrainGeneration.chunkSize);
+        
+        navMeshSurface.agentTypeID = NavMesh.GetSettingsByIndex(1).agentTypeID;//enemy
+
+        navMeshSurface.collectObjects = CollectObjects.Volume;
+        navMeshSurface.useGeometry = NavMeshCollectGeometry.PhysicsColliders;
+        navMeshSurface.layerMask = TerrainGeneration.active.navMeshLayerMask;
+        navMeshSurface.defaultArea = NavMesh.GetAreaFromName("Walkable");
+
+        navMeshSurface.overrideTileSize = true;
+        navMeshSurface.tileSize = 64;
+
+        navMeshSurface.overrideVoxelSize = true;
+        navMeshSurface.voxelSize = 0.15f;
+        
+        //Dont generate nav in water 
+        NavMeshModifierVolume modifierVolume = navMeshSurface.gameObject.AddComponent<NavMeshModifierVolume>();
+        modifierVolume.size = new Vector3(navMeshSurface.size.x, 10f, navMeshSurface.size.z);
+        modifierVolume.center = new Vector3(navMeshSurface.center.x, -5f + waterHeight, navMeshSurface.center.z);
+
+        modifierVolume.area = NavMesh.GetAreaFromName("Water");
+        modifierVolume.AffectsAgentType(navMeshSurface.agentTypeID); //Enemy
+        
+        StartCoroutine(WaitForChunkGen(navMeshSurface,chunkCoordList));
+    }
+
+    private IEnumerator WaitForChunkGen(NavMeshSurface navMeshSurface, List<Vector2Int> chunkCoordList)
+    {
+        LoadingScreen.active.SetProgress(0.95f, "Generating Navigation Mesh");
+        while (true)
+        {
+            bool finishedGenerating = true;
+            foreach (Vector2Int chunkCoord in chunkCoordList)
+            {
+                //Threaded Generation
+                if (terrainGeneration.HasChunkGenerated(chunkCoord) == false)
+                {
+                    finishedGenerating = false;
+                    break;
+                }
+            }
+            if(finishedGenerating)
+                break;
+            Debug.Log("Waiting For Chunks!");
+            yield return new WaitForEndOfFrame();
+        }
+
+        yield return new WaitForSecondsRealtime(1f);
+        
+        //Generate
+        navMeshSurface.BuildNavMesh();
+        
+        yield return new WaitForSecondsRealtime(1f);
+        FinishGeneration();
+    }
+
+    public void FinishGeneration()
+    {
         GameStateManager.gameStarted = true;
-        EnemySpawner.ResetWaveValues(2.5f);
+        EnemySpawner.ResetWaveValues(5f);
         terrainGeneration.SetUpdateRenderDistance(true);
         LoadingScreen.active.Disable();
     }

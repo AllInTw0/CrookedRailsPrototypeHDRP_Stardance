@@ -1,10 +1,17 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
 public class Item : Interactable
 {
+    [NonSerialized] 
+    public UnityEvent onDroppedOnGround;
+    [NonSerialized] 
+    public UnityEvent onPickedUp;
+    [NonSerialized] 
+    public UnityEvent onPhysicsEnabled;
     //Variables
     [Header("Item")]
     public ItemSO itemInfo;
@@ -29,6 +36,10 @@ public class Item : Interactable
     private bool dropSilently;
     private void Awake()
     {
+        onDroppedOnGround = new UnityEvent();
+        onPickedUp = new UnityEvent();
+        onPhysicsEnabled = new UnityEvent();
+        
         if (TryGetComponent(out Rigidbody rigidbody))
         {
             rb = rigidbody;
@@ -51,6 +62,7 @@ public class Item : Interactable
         {
             falling = false;
             DisablePhysics();  
+            onPickedUp.Invoke();
         }
         Debug.Log("Item Equipped Successfully: " + success);
 
@@ -102,6 +114,8 @@ public class Item : Interactable
                     SoundManager.active.PlayAtPos(transform.position, "Item - Drop");
                 else
                     dropSilently = false;
+                
+                onDroppedOnGround.Invoke();
             }
         }
     }
@@ -159,6 +173,8 @@ public class Item : Interactable
         physicsEnabled = true;
         rb.linearVelocity = velocity;
         rb.angularVelocity = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f));
+        
+        onPhysicsEnabled.Invoke();
     }
     public void AddExplosionForce(Vector3 explosionPos, float force, float range)
     {
