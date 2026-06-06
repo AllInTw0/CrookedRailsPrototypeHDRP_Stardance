@@ -18,7 +18,7 @@ public class ItemManager : MonoBehaviour
 
         foreach (ShopItemSO shopItem in shopItemList)
         {
-            shopItem.EvaluateCurves(0f);
+            shopItem.EvaluateCurves(0);
         }
     }
 }

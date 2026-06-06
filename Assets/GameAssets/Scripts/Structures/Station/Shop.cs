@@ -37,11 +37,14 @@ public class Shop : MonoBehaviour
     [SerializeField]
     private Texture2D missingIcon;
 
+    [Header("Debug")] 
+    public int debugLevel;
+    
     private List<ShopItem> shopItemList;
 
     [HideInInspector]
     public ShopItem selectedShopItem;
-
+    
     private void Start()
     {
         shopMonitor.onInteract.AddListener(() => {
@@ -84,16 +87,25 @@ public class Shop : MonoBehaviour
 
         shopItemList = new List<ShopItem>();
     }
-    public void Initialize()
+    public void Initialize(int overrideLevel = -1)
     {
         if (shopItemEntryList.Count == 0) return;
 
+        int currentLevel = overrideLevel == -1 ? GameStateManager.currentLevel : overrideLevel;
+        
         List<ProbabilityListElement<ShopItemSO>> shopItemProbabilityList = new List<ProbabilityListElement<ShopItemSO>>();
         
         for (int i = 0; i < shopItemEntryList.Count; i++)
         {
-            shopItemEntryList[i].EvaluateCurves(GameStateManager.currentLevel, forceSingleStock ? 1 : -1);
-
+            //Values
+            shopItemEntryList[i].EvaluateCurves(currentLevel);
+            
+            //Stock
+            if (forceSingleStock)
+                shopItemEntryList[i].stock = 1;
+            else
+                shopItemEntryList[i].EvaluateStock(currentLevel);
+            
             if (GameStateManager.IsItemUnlocked(shopItemEntryList[i]) && shopItemEntryList[i].probability > 0)
             {
                 shopItemProbabilityList.Add(new ProbabilityListElement<ShopItemSO>(shopItemEntryList[i], shopItemEntryList[i].probability, 1));
@@ -108,7 +120,7 @@ public class Shop : MonoBehaviour
         {
             str += shopItemProbabilityList[i].element + ":" + shopItemProbabilityList[i].probability + ", ";
         }
-        Debug.Log("Shop probbability [" + GameStateManager.currentLevel +"]: " + str);
+        Debug.Log("Shop probbability [" + currentLevel +"]: " + str);
 
         //Pick Items
         for (int i = 0; i < shopStandList.Count; i++)
@@ -130,6 +142,15 @@ public class Shop : MonoBehaviour
         {
             Debug.LogWarning("Cant add item to shop!");
         }
+    }
+
+    public void ClearShop()
+    {
+        foreach (ShopStand stand in shopStandList)
+        {
+            stand.ClearStand();
+        }
+        shopItemList.Clear();
     }
     public void SelectShopItem(ShopItem shopItem)
     {
@@ -195,7 +216,11 @@ public class Shop : MonoBehaviour
         if (shopLight != null) shopLight.TurnOn();
         if(selectedShopItem != null) RenderMonitorPaper();
     }
-
+    //This gets called only in the upgrade/general shops and not in the unlock shop
+    public void PlayerEnteredOnce()
+    {
+        Initialize();
+    }
     public void PlayerExited()
     {
         if (shopLight != null) shopLight.TurnOff();

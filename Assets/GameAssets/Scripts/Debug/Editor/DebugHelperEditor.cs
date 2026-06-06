@@ -31,5 +31,9 @@ public class DebugHelperEditor : Editor
         {
             Item.SpawnItem(debugHelper.item,PlayerMovement.active.transform.position + PlayerMovement.active.transform.forward + Vector3.up,Quaternion.identity);
         }
+        if (GUILayout.Button("Shake Camera"))
+        {
+            PlayerCamera.active.Shake(debugHelper.shakeStrength, debugHelper.shakeSpring, debugHelper.shakeDamp);
+        }
     }
 }

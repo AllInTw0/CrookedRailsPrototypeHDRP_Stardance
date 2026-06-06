@@ -36,30 +36,31 @@ public class ShopItemSO : ScriptableObject
     [HideInInspector] public int stock;
     [HideInInspector] public int sell;
     [HideInInspector] public float randomness;
-    private float lastEvaluation;
-    public void EvaluateCurves(float value, int forcedStock = -1)
+    private int lastEvaluationLevel = -1;
+    public void EvaluateCurves(int level)
     {
-        if (value == lastEvaluation && value != 0f) return;
+        if (level == lastEvaluationLevel)
+        {
+            Debug.Log("Didnt evaluate item. LastEvaluationLevel: " + lastEvaluationLevel + ", Level: " +  level);
+            return;
+        }
 
-        randomness = randomnessCurve.Evaluate(value);
+        randomness = randomnessCurve.Evaluate(level);
 
-        probability = probabilityCurve.Evaluate(value) * (Random.value * randomness * 0.2f + 1f);
-        price = Mathf.RoundToInt(Mathf.Clamp(priceCurve.Evaluate(value) + (Random.value * randomness * 20f), 1f, float.MaxValue));
-        if (price > 20f)
+        probability = probabilityCurve.Evaluate(level) * (Random.value * randomness * 0.2f + 1f);
+        price = Mathf.RoundToInt(Mathf.Clamp(priceCurve.Evaluate(level) + (Random.value * randomness * 20f), 1f, float.MaxValue));
+        if (price > 20)
         {
             price = Mathf.RoundToInt(price / 5f) * 5;
         }
+        
+        sell = Mathf.RoundToInt(Mathf.Clamp(sellCurve.Evaluate(level) + (Random.value * randomness * 5f), 1f, price));
+        lastEvaluationLevel = level;
+    }
 
-        if (forcedStock != -1)
-        {
-            stock = Mathf.RoundToInt(Mathf.Clamp(stockCurve.Evaluate(value) * (Random.value * randomness * 1f + 1f), 1f,
-                float.MaxValue));
-            if (stock < 1)
-                stock = 1;
-        }
-        else stock = forcedStock;
-
-        sell = Mathf.RoundToInt(Mathf.Clamp(sellCurve.Evaluate(value) + (Random.value * randomness * 5f), 1f, price));
-        lastEvaluation = value;
+    public void EvaluateStock(int level)
+    {
+        stock = Mathf.RoundToInt(stockCurve.Evaluate(level) * (Random.value * randomness * 1f + 1f));
+        if(stock < 1) stock = 1;
     }
 }

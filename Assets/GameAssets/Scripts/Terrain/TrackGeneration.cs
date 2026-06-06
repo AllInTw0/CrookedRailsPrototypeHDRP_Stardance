@@ -67,7 +67,7 @@ public class TrackGeneration : MonoBehaviour
         for (int i = 0; i < nodePathList.Count; i++)
         {
             float length = nodePathList[i].length;
-            ThreadManager.AddMainThreadJob(delegate { Debug.Log("Sorred Path Length: " + length); });
+            //ThreadManager.AddMainThreadJob(delegate { Debug.Log("Sorred Path Length: " + length); });
         }
         if (count == 1)
             return new List<NodePath>() { nodePathList[0] };
@@ -77,7 +77,7 @@ public class TrackGeneration : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             int index = Mathf.Clamp(Mathf.FloorToInt(step * (float)i), 0, nodePathList.Count - 1);
-            ThreadManager.AddMainThreadJob(delegate { Debug.Log("Sorred Path Index: " + index); });
+            //ThreadManager.AddMainThreadJob(delegate { Debug.Log("Sorred Path Index: " + index); });
             chosenPathList.Add(nodePathList[index]);
         }
         return chosenPathList;

@@ -14,28 +14,28 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   nameOverride: 
   prefab: {fileID: 2535188616866658808, guid: ff11f3253f0757df18494c4dc409a462, type: 3}
-  description: Give you 2 telepporter stations to be later paired up and teleported
+  description: Give you 2 teleporter stations to be later paired up and teleported
     between.
   probabilityCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
+      value: 0
+      inSlope: 0.49202713
+      outSlope: 0.49202713
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0
+      outWeight: 0.33333334
     - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
+      time: 2.0057068
+      value: 0.9868622
+      inSlope: 0.49202713
+      outSlope: 0.49202713
       tangentMode: 34
       weightedMode: 0
-      inWeight: 0
+      inWeight: 0.33333334
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -44,8 +44,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: -0.0031249998
-      value: 441.3543
+      time: 0.004384092
+      value: 251.37938
       inSlope: 0
       outSlope: 0
       tangentMode: 34
@@ -53,8 +53,8 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.996875
-      value: 441.3543
+      time: 1.004384
+      value: 251.37938
       inSlope: 0
       outSlope: 0
       tangentMode: 34
@@ -68,8 +68,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: -0.0020833334
-      value: 3.0229998
+      time: 0.0027725452
+      value: 2.4920294
       inSlope: 0
       outSlope: 0
       tangentMode: 34
@@ -77,8 +77,8 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.99791664
-      value: 3.0229998
+      time: 1.0027726
+      value: 2.4920294
       inSlope: 0
       outSlope: 0
       tangentMode: 34
@@ -92,8 +92,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 0.047618985
+      time: -0.0019617341
+      value: 0.2639979
       inSlope: 0
       outSlope: 0
       tangentMode: 34
@@ -101,8 +101,8 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 1
-      value: 0.047618985
+      time: 0.9980383
+      value: 0.2639979
       inSlope: 0
       outSlope: 0
       tangentMode: 34
@@ -116,8 +116,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0
-      value: 349.5905
+      time: 0.0060672164
+      value: 104.67166
       inSlope: 0
       outSlope: 0
       tangentMode: 34
@@ -125,8 +125,8 @@ MonoBehaviour:
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 1
-      value: 349.5905
+      time: 1.0060673
+      value: 104.67166
       inSlope: 0
       outSlope: 0
       tangentMode: 34
@@ -138,8 +138,8 @@ MonoBehaviour:
     m_RotationOrder: 4
   neededBoughtItems: []
   maxCountBought: -1
-  offset: {x: 0.95, y: 0.5, z: 0.4}
-  origin: {x: 0, y: 0.3, z: 0}
+  offset: {x: 2.3, y: 2, z: -1.3}
+  origin: {x: 0, y: 1.4, z: 0}
   rotation: {x: 0, y: 0, z: 0}
   icon: {fileID: 2800000, guid: 02cc6ba94144fba39ad0436161a35130, type: 2}
   renderLayer:

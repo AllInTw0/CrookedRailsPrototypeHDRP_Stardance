@@ -2601,6 +2601,9 @@ MonoBehaviour:
   cargo: {fileID: 11400000, guid: 23169256550ddcd4fb51b0cb1ec03721, type: 2}
   enemy: {fileID: 11400000, guid: fb00dc0c533df4d4a9b006ca29b43a84, type: 2}
   item: {fileID: 11400000, guid: 04966b570f156e94f8df143d47a58ea2, type: 2}
+  shakeStrength: 1
+  shakeSpring: 1
+  shakeDamp: 1
 --- !u!1 &1531335417
 GameObject:
   m_ObjectHideFlags: 0
@@ -3358,6 +3361,10 @@ PrefabInstance:
     - target: {fileID: 6990801515761773473, guid: f9407f1451adfeff7a432b316835ff63, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 7926420339654637316, guid: f9407f1451adfeff7a432b316835ff63, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

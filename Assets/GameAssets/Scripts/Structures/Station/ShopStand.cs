@@ -33,6 +33,7 @@ public class ShopStand : AnimationPlayer
     private bool shopStandEnabled;
     private bool outOfStock;
     private ShopItem shopItem;
+    private Transform shopItemPreview;
     void Start()
     {
         nameText.text = "";
@@ -89,25 +90,26 @@ public class ShopStand : AnimationPlayer
     }
     public void Intialize(ShopItem shopItem)
     {
+        outOfStock = false;
         this.shopItem = shopItem;
 
         if (shopItem.itemInfo.prefab != null || missingPrefab != null)
         {
-            Transform copy = Instantiate(shopItem.itemInfo.prefab != null ? shopItem.itemInfo.prefab : missingPrefab, glow).transform;
+            shopItemPreview = Instantiate(shopItem.itemInfo.prefab != null ? shopItem.itemInfo.prefab : missingPrefab, glow).transform;
 
-            if (copy.TryGetComponent(out Item item)) item.enabled = false;
-            copy.gameObject.layer = 0;
+            if (shopItemPreview.TryGetComponent(out Item item)) item.enabled = false;
+            shopItemPreview.gameObject.layer = 0;
 
             //Set pos and scale based on box collider
-            BoxCollider boxCollider = copy.GetComponent<BoxCollider>();
+            BoxCollider boxCollider = shopItemPreview.GetComponent<BoxCollider>();
 
             float scale = Mathf.Max(Mathf.Sqrt(boxCollider.size.x * boxCollider.size.x + boxCollider.size.y * boxCollider.size.y), Mathf.Sqrt(boxCollider.size.x * boxCollider.size.x + boxCollider.size.z * boxCollider.size.z), Mathf.Sqrt(boxCollider.size.y * boxCollider.size.y + boxCollider.size.z * boxCollider.size.z));
             scale = Mathf.Clamp((glowRadius / scale) * 2f, 0f, 2.5f);
-            copy.localScale = Vector3.one * scale;
+            shopItemPreview.localScale = Vector3.one * scale;
 
-            copy.localPosition = -boxCollider.center * scale;
+            shopItemPreview.localPosition = -boxCollider.center * scale;
 
-            copy.localRotation = Quaternion.Euler(shopItem.itemInfo.rotation);
+            shopItemPreview.localRotation = Quaternion.Euler(shopItem.itemInfo.rotation);
         }
         nameText.text = shopItem.itemInfo.GetName();
         priceText.text = shopItem.price + "$";
@@ -117,4 +119,20 @@ public class ShopStand : AnimationPlayer
         onInteract.AddListener(() => { shopItem.linkedShop.SelectShopItem(shopItem); });
     }
 
+    public void ClearStand()
+    {
+        if (shopItemPreview != null)
+        {
+            Destroy(shopItemPreview.gameObject);
+        }
+        
+        nameText.text = "";
+        priceText.text = "";
+        
+        shopItem = null;
+        onInteract.RemoveAllListeners();
+        DisableStand();
+
+        outOfStock = false;
+    }
 }

@@ -39,8 +39,8 @@ public class BulletManager : MonoBehaviour
     
     public void ShootBullets(Vector3 start, Vector3 dir, int count,float bulletDamage, float spread, List<HealthType> healthTypeFilterList = null, ShooterType shooterType = ShooterType.Player)
     {
-        
-        SpawnBurstEffect(start,dir);
+
+        SpawnBurstEffect(start, dir, 2f, 4.5f);
         for (int i = 0; i < count; i++)
         {
             Vector3 spreadDir = dir + new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), Random.Range(-spread, spread));
@@ -78,7 +78,7 @@ public class BulletManager : MonoBehaviour
     public void ShootPrefab(Vector3 start, Vector3 dir, GameObject prefab, int count, float spread, ShooterType shooterType = ShooterType.Player)
     {
 
-        SpawnBurstEffect(start, dir);
+        SpawnBurstEffect(start, dir, 1f, 4f);
         for (int i = 0; i < count; i++)
         {
             Vector3 spreadDir = dir + new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), Random.Range(-spread, spread));
@@ -112,6 +112,8 @@ public class BulletManager : MonoBehaviour
 
     public void SpawnExplosion(Vector3 position, float damage, float range, float force, Transform hitTransform = null, List<HealthType> healthTypeFilterList = null, ShooterType shooterType = ShooterType.Player)
     {
+        PlayerCamera.active.ShakeFromPos(position, range * 5f, force * 0.01f);
+        
         GameObject explosion = Instantiate(explosionParticle);
         explosion.transform.position = position;
         Destroy(explosion, 10f);
@@ -162,8 +164,10 @@ public class BulletManager : MonoBehaviour
         }
     }
 
-    private void SpawnBurstEffect(Vector3 position, Vector3 dir)
+    private void SpawnBurstEffect(Vector3 position, Vector3 dir, float shakeStrength, float shakeDist)
     {
+        PlayerCamera.active.ShakeFromPos(position, shakeDist, shakeStrength);
+        
         GameObject burst = Instantiate(burstParticle);
         burst.transform.position = position;
         burst.transform.LookAt(position + dir);

@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Random = UnityEngine.Random;
 
 public class PlayerCamera : MonoBehaviour
 {
@@ -41,7 +42,13 @@ public class PlayerCamera : MonoBehaviour
     private Vector3 ragdollCamPos;
 
     private bool inThirdPerson;
-
+    
+    //camera shake
+    private Vector3 shakeOffset;
+    private Vector3 shakeVelocity;
+    private float shakeSpring;
+    private float shakeDamp;
+    
     //New Input Package
     private InputAction lookAction;
     private void Start()
@@ -80,6 +87,15 @@ public class PlayerCamera : MonoBehaviour
 
         CameraBob();
     }
+
+    private void FixedUpdate()
+    {
+        shakeOffset += shakeVelocity * Time.fixedDeltaTime;
+
+        shakeVelocity += -shakeOffset * shakeSpring;
+        shakeVelocity *= shakeDamp;
+    }
+
     private void LateUpdate()
     {
         if (GameOverScreen.IsGameOver())
@@ -124,9 +140,26 @@ public class PlayerCamera : MonoBehaviour
         bobX = Mathf.Lerp(bobX, Mathf.Cos(Time.time * bobSpeed * 0.5f) * bobAmountX * mult, Time.deltaTime * bobSmoothSpeed);
         bobY = Mathf.Lerp(bobY, Mathf.Sin(Time.time * bobSpeed ) * bobAmountY * mult, Time.deltaTime * bobSmoothSpeed);
 
-        transform.localPosition = new Vector3(bobX, bobY, 0);
+        transform.localPosition = new Vector3(bobX + shakeOffset.x, bobY + shakeOffset.y, shakeOffset.z);
     }
 
+    public void Shake(float strength, float spring = 8f, float damp = 0.8f)
+    {
+        shakeVelocity = Random.insideUnitSphere * (strength + Random.Range(-0.2f, 0.2f));
+        shakeSpring = spring;
+        shakeDamp = damp;
+    }
+    public void ShakeFromPos(Vector3 worldPos, float radius, float strength, float spring = 8f, float damp = 0.8f)
+    {
+        Vector3 dir = (transform.position - worldPos).normalized;
+        float dist = Vector3.Distance(worldPos, transform.position);
+
+        float range = Mathf.Clamp01(dist / radius);
+        
+        shakeVelocity = (dir + new Vector3(Random.Range(-0.2f,0.2f),Random.Range(-0.2f,0.2f),Random.Range(-0.2f,0.2f))) * (strength * (1f - Mathf.Clamp01(range * range)));
+        shakeSpring = spring;
+        shakeDamp = damp;
+    }
     public Vector3 GetRaycastPos()
     {
         if (Physics.Raycast(transform.position, transform.forward, out RaycastHit hit, 100f))

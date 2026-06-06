@@ -130,6 +130,6 @@ public class ItemGun : Item
 
     private Vector3 GetBulletOrigin()
     {
-        return PlayerAvatar.active.GetAnimationInfo().animatedObject.transform.position;
+        return PlayerAvatar.active.GetAnimationInfo().bulletSpawn.transform.position;
     }
 }
