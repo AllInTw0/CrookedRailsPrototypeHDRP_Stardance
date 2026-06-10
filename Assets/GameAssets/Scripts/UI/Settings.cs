@@ -138,10 +138,16 @@ public class Settings : MonoBehaviour
 
         sectionList = new List<RectTransform>();
     }
+
     private void Start()
     {
         Section graphicsSection = new Section("Graphics");
 
+        for (int i = 0; i < Display.displays.Length; i++)
+        {
+            Display.displays[i].Activate();
+        }
+        
         bool fullscreen = Screen.fullScreen;
         Resolution currentResolution = Screen.currentResolution;
         int currentResolutionIndex = 0;
@@ -200,7 +206,7 @@ public class Settings : MonoBehaviour
         });
 
 
-        Section soundsSection = new Section("Sounds");
+        Section soundsSection = new Section("Sound");
         void SoundSlider(string str, string visualStr)
         {
             float value = PlayerPrefs.GetFloat(str, 1f);

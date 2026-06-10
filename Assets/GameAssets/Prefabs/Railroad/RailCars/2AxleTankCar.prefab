@@ -156,6 +156,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7674135107175156082}
   - component: {fileID: 1388639694081001467}
+  - component: {fileID: 3678724268581104287}
   m_Layer: 13
   m_Name: Health
   m_TagString: Untagged
@@ -207,6 +208,29 @@ MonoBehaviour:
   - {fileID: 4286522354784893733}
   - {fileID: 8469920510596992759}
   - {fileID: 96734781215898356}
+  healthStateList: []
+--- !u!64 &3678724268581104287
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1350959393430657443}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 5763162114089103345, guid: 2c51589e50cebd347874b8ed507500c9, type: 3}
 --- !u!1 &1607065267389806274
 GameObject:
   m_ObjectHideFlags: 0
@@ -541,7 +565,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a32b359c9dace2742b786eb40287bd8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailCar
-  railCarSO: {fileID: 11400000, guid: e1b57eeabcc8afe4482d17364ce7a8b7, type: 2}
+  railCarSO: {fileID: 11400000, guid: 446e9a07baf0262498e27dc3cbee4289, type: 2}
   isPlayerRailCar: 0
   derailVisualAngle: 5
   derailVisualOffset: {x: 0.18, y: -0.09, z: 0}

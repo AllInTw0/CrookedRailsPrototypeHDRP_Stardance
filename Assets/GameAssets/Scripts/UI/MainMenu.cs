@@ -31,6 +31,10 @@ public class MainMenu : MonoBehaviour
 
         playButton.onClick.AddListener(() =>
         {  
+            MultiplayerManager.active.CreateOrJoinLobby();
+            return;
+            
+            
             if (gameStarting || mainMenuFade.GetAlphaChangeSpeed() < 0f) return;
             SoundManager.active.Play(clickSoundString);
             Debug.Log("Play");

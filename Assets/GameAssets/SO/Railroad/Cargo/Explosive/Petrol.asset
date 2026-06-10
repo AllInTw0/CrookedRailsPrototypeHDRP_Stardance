@@ -13,10 +13,13 @@ MonoBehaviour:
   m_Name: Petrol
   m_EditorClassIdentifier: Assembly-CSharp::CargoSO
   cargoName: Petrol
+  cargoPrefab: {fileID: 0}
+  weight: 0
   fittingCargo:
   - {fileID: 11400000}
   - {fileID: 11400000, guid: c7165577b5b2daf45a63c32b6e74982d, type: 2}
   dangerLevel: 1
   fittingRailCars:
-  - {fileID: 11400000, guid: 446e9a07baf0262498e27dc3cbee4289, type: 2}
-  - {fileID: 11400000, guid: eec3eb34338ceb048bbe66618626f75c, type: 2}
+  - {fileID: 11400000, guid: 56e8af232a5f402b1aa937f4db311341, type: 2}
+  payRange: {x: 0, y: 0}
+  iconList: []

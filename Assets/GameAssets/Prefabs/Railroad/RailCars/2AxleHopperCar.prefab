@@ -232,6 +232,7 @@ MonoBehaviour:
   - {fileID: 7109794540208525568}
   - {fileID: 6950278866754499239}
   - {fileID: 6164757503689939844}
+  healthStateList: []
 --- !u!1 &3080909024216410780
 GameObject:
   m_ObjectHideFlags: 0
@@ -365,7 +366,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a32b359c9dace2742b786eb40287bd8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailCar
-  railCarSO: {fileID: 11400000, guid: e1b57eeabcc8afe4482d17364ce7a8b7, type: 2}
+  railCarSO: {fileID: 11400000, guid: 0b9737e8447e9f34a8d8cf8704479988, type: 2}
   isPlayerRailCar: 0
   derailVisualAngle: 5
   derailVisualOffset: {x: 0.18, y: -0.09, z: 0}

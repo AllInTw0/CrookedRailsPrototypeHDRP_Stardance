@@ -26,7 +26,7 @@ public class BulletManager : MonoBehaviour
     [SerializeField]
     private string explosionSound;
     [SerializeField]
-    private GameObject explosionParticle;
+    private List<GameObject> explosionParticleList;
     [SerializeField]
     private LayerMask explosionLayerMask;
     [Header("force")]
@@ -110,13 +110,13 @@ public class BulletManager : MonoBehaviour
         return new RaycastHit();
     }
 
-    public void SpawnExplosion(Vector3 position, float damage, float range, float force, Transform hitTransform = null, List<HealthType> healthTypeFilterList = null, ShooterType shooterType = ShooterType.Player)
+    public void SpawnExplosion(Vector3 position, float damage, float range, float force, Transform hitTransform = null, List<HealthType> healthTypeFilterList = null, ShooterType shooterType = ShooterType.Player, int explosionParticleIndex = 0)
     {
         PlayerCamera.active.ShakeFromPos(position, range * 5f, force * 0.01f);
         
-        GameObject explosion = Instantiate(explosionParticle);
+        GameObject explosion = Instantiate(explosionParticleList[explosionParticleIndex]);
         explosion.transform.position = position;
-        Destroy(explosion, 10f);
+        Destroy(explosion, 15f);
 
         SoundManager.active.PlayAtPos(position, explosionSound);
 

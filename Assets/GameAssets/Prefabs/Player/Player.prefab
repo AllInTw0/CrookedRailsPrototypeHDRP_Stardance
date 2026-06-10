@@ -633,7 +633,7 @@ Camera:
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
-    m_Bits: 23920639
+    m_Bits: 57475071
   m_RenderingPath: -1
   m_TargetTexture: {fileID: 8400000, guid: 634d1afe0776d6a419b212364c98f7a8, type: 2}
   m_TargetDisplay: 0
@@ -1067,6 +1067,8 @@ GameObject:
   - component: {fileID: 4364363206151166149}
   - component: {fileID: 1402628642214359253}
   - component: {fileID: 2627708928625353186}
+  - component: {fileID: 5355815504628551388}
+  - component: {fileID: 9145969015855412601}
   m_Layer: 6
   m_Name: Player
   m_TagString: Untagged
@@ -1273,6 +1275,44 @@ MonoBehaviour:
   targetAlpha: 0.15
   fadeInDuration: 0.1
   fadeOutDuration: 0.2
+--- !u!114 &5355815504628551388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6990801515761773473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 1197044980
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &9145969015855412601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6990801515761773473}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a19b8d26ff18cf63a060aee0df65fa0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Player
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &7590116802795950647
 GameObject:
   m_ObjectHideFlags: 0
@@ -4928,7 +4968,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1228920825445947974, guid: 782f4982e0302534cbfb232cb026e6ca, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5440154182956739415, guid: 782f4982e0302534cbfb232cb026e6ca, type: 3}
       propertyPath: m_LocalScale.x
