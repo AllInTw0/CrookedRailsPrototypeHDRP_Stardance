@@ -51,22 +51,22 @@ public class InventoryUI : MonoBehaviour
 
     private void Update()
     {
-        if (itemSlots.Count < PlayerInventory.active.slotCount)
+        if (itemSlots.Count < Player.localPlayer.inventory.slotCount)
         {
             AddItemSlot();
         }
 
-        if (PlayerInventory.active.items.Count > 0 || PlayerInventory.active.tool != null)
+        if (Player.localPlayer.inventory.items.Count > 0 || Player.localPlayer.inventory.tool != null)
         {
             //Has Items
             if(!selector.gameObject.activeSelf)
                 selector.gameObject.SetActive(true);
             
             Vector3 targetPos;
-            if (PlayerInventory.active.selectIndex == 0)
+            if (Player.localPlayer.inventory.selectIndex == 0)
                 targetPos = toolImage.rectTransform.position;
             else
-                targetPos = itemIcons[PlayerInventory.active.selectIndex - 1].position;
+                targetPos = itemIcons[Player.localPlayer.inventory.selectIndex - 1].position;
             
             targetPos = new Vector3(targetPos.x, 0f, 0f);
             selector.position = Vector3.Lerp(selector.position, targetPos, Mathf.Clamp01(selectorSpeed * Time.deltaTime));
@@ -98,7 +98,7 @@ public class InventoryUI : MonoBehaviour
         itemIcons = new List<RectTransform>();
         
         int slotIndex = 0;
-        foreach (Item item in PlayerInventory.active.items)
+        foreach (Item item in Player.localPlayer.inventory.items)
         {
             RectTransform newItemIcon = Instantiate(imagePrefab, itemIconParent);
             
@@ -130,10 +130,10 @@ public class InventoryUI : MonoBehaviour
     }
     public void UpdateToolIcon()
     {
-        if (PlayerInventory.active.tool != null)
+        if (Player.localPlayer.inventory.tool != null)
         {
-            if(PlayerInventory.active.tool.itemInfo.icon != null)
-                toolImage.texture = PlayerInventory.active.tool.itemInfo.icon;
+            if(Player.localPlayer.inventory.tool.itemInfo.icon != null)
+                toolImage.texture = Player.localPlayer.inventory.tool.itemInfo.icon;
             else
                 toolImage.texture = itemIconTempSprite.texture;
             

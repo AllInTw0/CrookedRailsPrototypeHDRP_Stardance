@@ -4,7 +4,8 @@ using UnityEngine;
 public class ItemManager : MonoBehaviour
 {
     public static ItemManager active;
-
+    private static Dictionary<ushort, Item> itemDictionary = new Dictionary<ushort, Item>();
+    
     [SerializeField]
     private LayerMask _itemDropLayerMask;
     public static LayerMask itemDropLayerMask;
@@ -20,5 +21,20 @@ public class ItemManager : MonoBehaviour
         {
             shopItem.EvaluateCurves(0);
         }
+    }
+
+    public static Item GetItemByID(ushort networkBehaviourId)
+    {
+        return itemDictionary[networkBehaviourId];
+    }
+
+    public static void AddItem(Item item)
+    {
+        itemDictionary.Add(item.NetworkBehaviourId, item);
+    }
+
+    public static void RemoveItem(Item item)
+    {
+        itemDictionary.Remove(item.NetworkBehaviourId);
     }
 }

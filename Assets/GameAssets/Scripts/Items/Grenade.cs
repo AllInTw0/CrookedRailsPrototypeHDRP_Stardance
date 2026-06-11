@@ -26,8 +26,11 @@ public class Grenade : Bullet
 
     private ShooterType shooterType;
     private bool colliding = false;
-    public override void Initialize(ShooterType shooterType)
+    public override void Initialize(ShooterType shooterType, bool doDamage)
     {
+        if (doDamage == false)
+            damage = 0f;
+        
         rb.linearVelocity = transform.forward * velocity;
         this.shooterType = shooterType;
     }

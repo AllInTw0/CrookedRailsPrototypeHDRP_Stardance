@@ -13,7 +13,7 @@ public class HealthKit : Item
     private float time;
     private void Update()
     {
-        if (PlayerInventory.active.tool == this)
+        if (Player.localPlayer.inventory.tool == this)
         {
             if (InputManager.attackAction.IsPressed())
             {
@@ -23,7 +23,7 @@ public class HealthKit : Item
                 time += Time.deltaTime;
                 if(time >= useTime)
                 {
-                    PlayerInventory.active.UnEquipTool();
+                    Player.localPlayer.inventory.UnEquipTool();
                     healSoundSource.Stop();
                     PlayerHealth.active.TakeDamage(-healAmmount);
                     Destroy(gameObject);

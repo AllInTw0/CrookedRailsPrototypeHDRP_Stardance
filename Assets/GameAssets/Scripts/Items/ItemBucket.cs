@@ -14,11 +14,11 @@ public class ItemBucket : Item
     private string emptySound;
 
     private bool filled;
-    public override bool Interact()
+    public override bool TryEquipping(Player targetPlayer = null, bool sendRpc = true)
     {
-        bool equiped = base.Interact();
+        bool equiped = base.TryEquipping();
 
-        if (equiped && PlayerInventory.active.tool == this)
+        if (equiped && Player.localPlayer.inventory.tool == this)
         {
             ToolAnimationInfo toolAnimInfo = PlayerAvatar.active.GetAnimationInfo();
             toolAnimInfo.animatedObject.transform.GetChild(0).Find("BucketFluid").gameObject.SetActive(filled);

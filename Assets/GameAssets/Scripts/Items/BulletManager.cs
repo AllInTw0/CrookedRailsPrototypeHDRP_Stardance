@@ -37,9 +37,8 @@ public class BulletManager : MonoBehaviour
         active = this;
     }
     
-    public void ShootBullets(Vector3 start, Vector3 dir, int count,float bulletDamage, float spread, List<HealthType> healthTypeFilterList = null, ShooterType shooterType = ShooterType.Player)
+    public void ShootBullets(Vector3 start, Vector3 dir, int count,float bulletDamage, float spread, List<HealthType> healthTypeFilterList = null, ShooterType shooterType = ShooterType.Player, bool doDamage = true)
     {
-
         SpawnBurstEffect(start, dir, 2f, 4.5f);
         for (int i = 0; i < count; i++)
         {
@@ -51,17 +50,23 @@ public class BulletManager : MonoBehaviour
 
                 if (hit.transform.TryGetComponent(out Health healthScript) && (healthTypeFilterList == null || healthTypeFilterList.Contains(healthScript.healthType)))
                 {
-                    float damageDone = healthScript.TakeDamage(bulletDamage, spreadDir.normalized * (bulletDamage * forcePerDamage));
-                    HitSound.active.HandleHitSound(healthScript, damageDone, hit.point);
-                    SpawnImpactEffect(hit.point,hit.normal,true);
-                    if(damageDone > 0 && healthScript.health == 0)
+                    if (doDamage)
                     {
-                        Debug.Log("Killed! " + shooterType);
-                        if (shooterType == ShooterType.Player)
-                            GameStateManager.AddToStatistic("Kills (Player)", 1);
-                        else if (shooterType == ShooterType.Sentry)
-                            GameStateManager.AddToStatistic("Kills (Sentry)", 1);
+                        float damageDone = healthScript.TakeDamage(bulletDamage,
+                            spreadDir.normalized * (bulletDamage * forcePerDamage));
+                        HitSound.active.HandleHitSound(healthScript, damageDone, hit.point);
+
+                        if (damageDone > 0 && healthScript.health == 0)
+                        {
+                            Debug.Log("Killed! " + shooterType);
+                            if (shooterType == ShooterType.Player)
+                                GameStateManager.AddToStatistic("Kills (Player)", 1);
+                            else if (shooterType == ShooterType.Sentry)
+                                GameStateManager.AddToStatistic("Kills (Sentry)", 1);
+                        }
                     }
+
+                    SpawnImpactEffect(hit.point,hit.normal,true);
                 }
                 else
                 {
@@ -75,7 +80,7 @@ public class BulletManager : MonoBehaviour
         }
         
     }
-    public void ShootPrefab(Vector3 start, Vector3 dir, GameObject prefab, int count, float spread, ShooterType shooterType = ShooterType.Player)
+    public void ShootPrefab(Vector3 start, Vector3 dir, GameObject prefab, int count, float spread, ShooterType shooterType = ShooterType.Player, bool doDamage = true)
     {
 
         SpawnBurstEffect(start, dir, 1f, 4f);
@@ -85,7 +90,7 @@ public class BulletManager : MonoBehaviour
             GameObject copy = Instantiate(prefab);
             copy.transform.position = start;
             copy.transform.LookAt(start + spreadDir);
-            if (copy.TryGetComponent(out Bullet bulletScript)) bulletScript.Initialize(shooterType);
+            if (copy.TryGetComponent(out Bullet bulletScript)) bulletScript.Initialize(shooterType, doDamage);
         }
 
     }

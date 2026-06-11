@@ -206,9 +206,9 @@ public class Train : MonoBehaviour
                 if (debriColliders[i].TryGetComponent(out Item item) && item.IsPhysicsEnabled() == false)
                 {
                     if (Random.Range(0f, 1f) >= 0.5f)
-                        item.EnablePhysics(consist[0].transform.forward * (speed * 1.5f) + consist[0].transform.right * Random.Range(2f, 4f) + consist[0].transform.up * Random.Range(5f, 6f));
+                        item.EnablePhysicsRpc(consist[0].transform.forward * (speed * 1.5f) + consist[0].transform.right * Random.Range(2f, 4f) + consist[0].transform.up * Random.Range(5f, 6f));
                     else
-                        item.EnablePhysics(consist[0].transform.forward * (speed * 1.5f) + consist[0].transform.right * Random.Range(-4f, -2f) + consist[0].transform.up * Random.Range(5f, 6f));
+                        item.EnablePhysicsRpc(consist[0].transform.forward * (speed * 1.5f) - consist[0].transform.right * Random.Range(2f, 4f) + consist[0].transform.up * Random.Range(5f, 6f));
 
                     if (Random.Range(0f, 1f) <= TrainUpgradeHandler.active.GetStatValue(debriDerailChance))
                     {

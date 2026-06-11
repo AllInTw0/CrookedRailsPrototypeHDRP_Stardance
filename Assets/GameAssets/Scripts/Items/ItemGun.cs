@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class ItemGun : Item
@@ -37,7 +38,7 @@ public class ItemGun : Item
         if (coolDown > 0f)
             coolDown -= Time.deltaTime;
         
-       if(PlayerInventory.active.tool == this && coolDown <= 0f && Time.timeScale != 0f)
+       if(Player.localPlayer.inventory.tool == this && coolDown <= 0f && Time.timeScale != 0f)
        {
            if ((InputManager.attackAction.IsPressed() && clip > 0) ||(InputManager.attackAction.triggered && clip == 0))
            {
@@ -54,63 +55,67 @@ public class ItemGun : Item
        UpdateItem();
     }
 
-    public void Shoot(bool ingoreClipSize = false, Transform bulletSpawnOverride = null, ShooterType shooterType = ShooterType.Player)
+    public void Shoot()
     {
-        if ((clip > 0 || ingoreClipSize) && coolDown <= 0f)
+        if ((clip > 0) && coolDown <= 0f)
         {
-            Vector3 startPos;
-            Vector3 dir;
-            if (bulletSpawnOverride == null)
-            {
-                //Triggered by player
-                startPos = GetBulletOrigin();
-                dir = (PlayerCamera.active.GetRaycastPos() - startPos).normalized;
-                PlayerAvatar.active.animator.SetTrigger("Shoot");
-            }
-            else
-            {
-                //Triggered by sentry
-                startPos = bulletSpawnOverride.position;
-                dir = bulletSpawnOverride.forward;
-            }
-
-            if (bulletPrefab == null)
-                BulletManager.active.ShootBullets(startPos, dir, bulletCount, bulletDamage, spread, healthTypeFilter, shooterType);
-            else
-                BulletManager.active.ShootPrefab(startPos, dir, bulletPrefab, bulletCount, spread, shooterType);
-
-            SoundManager.active.PlayAtPos(startPos, shootSound);   
-
-            coolDown = shootCoolDown;
-            clip--;
+            ShootRpc(Player.localPlayer.camera.GetRaycastPos());
         }
         else if(coolDown <= 0f)
         {
-            if(bulletSpawnOverride == null)
-                //Triggered by player
-                SoundManager.active.PlayAtPos(GetBulletOrigin(), failedSound);
-            else
-                //Triggered by sentry
-                SoundManager.active.PlayAtPos(bulletSpawnOverride.position, failedSound);
-
-            coolDown = shootCoolDown;
+            EmptyClipRpc();
         }
     }
 
-    public void Reload(int ammoCountOverride = -1, Transform bulletSpawnOverride = null)
+    [Rpc(SendTo.Everyone)]
+    private void ShootRpc(Vector3 aimPos, RpcParams rpcParams = default)
     {
-        int itemCountRemoved = ammoCountOverride;
-        if (ammoCountOverride > 0 || PlayerInventory.active.RemoveItem(ammoItem, out itemCountRemoved, clipSize - clip))
+        GetBulletDefiningVariables(aimPos, out Vector3 bulletOrigin, out Vector3 direction);
+        ShooterType shooterType = ShooterType.Player;
+        
+        if (NetworkManager.Singleton.LocalClientId == rpcParams.Receive.SenderClientId)
         {
-            if (bulletSpawnOverride)
-                //Triggered by sentry
-                SoundManager.active.PlayAtPos(bulletSpawnOverride.position, reloadSound);
+            //Damage will be done by gun shooter client
+            if (bulletPrefab == null)
+                BulletManager.active.ShootBullets(bulletOrigin, direction, bulletCount, bulletDamage, spread, healthTypeFilter, shooterType);
             else
-            {
-                //Triggered by player
-                SoundManager.active.PlayAtPos(GetBulletOrigin(), reloadSound);
-                PlayerAvatar.active.animator.SetTrigger("Reload");
-            }
+                BulletManager.active.ShootPrefab(bulletOrigin, direction, bulletPrefab, bulletCount, spread, shooterType);
+        }
+        else
+        {
+            //Damage isn't done. Spawn only visuals
+            if (bulletPrefab == null)
+                BulletManager.active.ShootBullets(bulletOrigin, direction, bulletCount, bulletDamage, spread, healthTypeFilter, shooterType,false);
+            else
+                BulletManager.active.ShootPrefab(bulletOrigin, direction, bulletPrefab, bulletCount, spread, shooterType,false);
+        }
+        
+        SoundManager.active.PlayAtPos(bulletOrigin, shootSound);   
+        playerWhoHasItem.avatar.animator.SetTrigger("Shoot");
+        
+        coolDown = shootCoolDown;
+        clip--;
+    }
+    [Rpc(SendTo.Everyone)]
+    private void EmptyClipRpc()
+    {
+        SoundManager.active.PlayAtPos(GetBulletOrigin(), failedSound);
+        coolDown = shootCoolDown;
+    }
+    
+    public void Reload()
+    {
+        ReloadRpc();
+    }
+    
+    [Rpc(SendTo.Everyone)]
+    private void ReloadRpc()
+    {
+        if (playerWhoHasItem.inventory.RemoveItem(ammoItem, out int itemCountRemoved, clipSize - clip))
+        {
+            SoundManager.active.PlayAtPos(GetBulletOrigin(), reloadSound);
+            playerWhoHasItem.avatar.animator.SetTrigger("Reload");
+            
             coolDown = reloadCoolDown;
             clip += itemCountRemoved;
         }
@@ -130,6 +135,11 @@ public class ItemGun : Item
 
     private Vector3 GetBulletOrigin()
     {
-        return PlayerAvatar.active.GetAnimationInfo().bulletSpawn.transform.position;
+        return playerWhoHasItem.avatar.GetAnimationInfo().bulletSpawn.transform.position;
+    }
+    private void GetBulletDefiningVariables(Vector3 aimPos, out Vector3 bulletOrigin, out Vector3 direction)
+    {
+        bulletOrigin = GetBulletOrigin();
+        direction = (aimPos - bulletOrigin).normalized;
     }
 }

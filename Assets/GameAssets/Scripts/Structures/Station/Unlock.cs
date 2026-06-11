@@ -21,8 +21,8 @@ public class Unlock : MonoBehaviour
     {
         List<ShopItemSO> playerItemList = new List<ShopItemSO>();
 
-        if(PlayerInventory.active.tool != null) playerItemList.Add(PlayerInventory.active.tool.itemInfo);
-        foreach (Item item in PlayerInventory.active.items)
+        if(Player.localPlayer.inventory.tool != null) playerItemList.Add(Player.localPlayer.inventory.tool.itemInfo);
+        foreach (Item item in Player.localPlayer.inventory.items)
         {
             if(playerItemList.Contains(item.itemInfo) == false)
             {

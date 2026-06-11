@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-public class PlayerInventory : MonoBehaviour
+public class PlayerInventory : NetworkBehaviour
 {
-    public static PlayerInventory active;
-    
+   
     [NonSerialized]
     public Item tool; //The hand held item
     [NonSerialized]
@@ -17,13 +17,15 @@ public class PlayerInventory : MonoBehaviour
     
     [NonSerialized]
     public int selectIndex;
-    private void Start()
-    {
-        active = this;
-    }
+
+    [NonSerialized] 
+    public Player player;
 
     private void Update()
     {
+        if(IsOwner == false)
+            return;
+        
         //index range is 0/1 to items.Count
         // 0 if tool is equipped
         // 1 if no tool is equipped
@@ -32,12 +34,18 @@ public class PlayerInventory : MonoBehaviour
         //Debug.Log("Current selectIndex: "+selectIndex);
         
         //Dropping Items
-        if (InputManager.dropAction.triggered && (PlayerInventory.active.items.Count > 0 || PlayerInventory.active.tool != null))
+        if (InputManager.dropAction.triggered && (items.Count > 0 || tool != null))
         {
             if (selectIndex == 0)
-                UnEquipTool();
+            {
+                Item item = UnEquipTool();
+                item.UnEquipItemServerRpc();
+            }
             else
-                UnEquipItem(selectIndex - 1);
+            {
+                Item item = UnEquipItem(items[selectIndex - 1]);
+                item.UnEquipItemServerRpc();
+            }
         }
 
         //Swaping Tools
@@ -46,12 +54,12 @@ public class PlayerInventory : MonoBehaviour
             if(selectIndex > 0 && items.Count > 0 && items[selectIndex - 1].itemInfo.isTool)
             {
                 Item toolRefrence = tool == null ? null : UnEquipTool();
-                Item newTool = UnEquipItem(selectIndex - 1);
+                Item newTool = UnEquipItem(items[selectIndex - 1]);
 
                 if (newTool != null)
-                    newTool.Interact();
-                if(toolRefrence != null)
-                    toolRefrence.Interact();
+                    newTool.TryEquipping();
+                if (toolRefrence != null)
+                    toolRefrence.TryEquipping();
 
                 //TryEquipping(newTool);
                 //TryEquipping(toolRefrence);
@@ -97,11 +105,13 @@ public class PlayerInventory : MonoBehaviour
         tool = item;
         item.transform.SetParent(null);
         item.BecomeInvisible();
-        PlayerAvatar.active.EquipTool(item);
+        player.avatar.EquipTool(item);
         Debug.Log(item + " Equipped As Tool");
-
+        
         MovingPlatformManager.active.RemoveEntry(item.transform);
         InventoryUI.active.UpdateToolIcon();
+
+        item.playerWhoHasItem = player;
     }
     private void EquipAsItem(Item item)
     {
@@ -114,17 +124,21 @@ public class PlayerInventory : MonoBehaviour
 
         MovingPlatformManager.active.RemoveEntry(item.transform);
         InventoryUI.active.UpdateItemIcons();
+        
+        item.playerWhoHasItem = player;
     }
 
     private void EquipStackableItem(Item equippedItem, Item item)
     {
+        Debug.Log(item + " Equipped As Stackable Item");
+        
         int sum = equippedItem.count + item.count;
         if (sum <= equippedItem.itemInfo.maxCount)
         {
             equippedItem.count = sum;
             item.count = 0;
             MovingPlatformManager.active.RemoveEntry(item.transform);
-            PlayerInteract.active.StopInteracting();
+            if(IsOwner) PlayerInteract.active.StopInteracting();
             Destroy(item.gameObject);
         }
         else
@@ -135,8 +149,9 @@ public class PlayerInventory : MonoBehaviour
             item.count = leftover;
             
             InteractIcon.active.Refresh();//Update the item.count on the interact icon
+            
+            item.playerWhoHasItem = player;
         }
-        Debug.Log(item + " Equipped As Stackable Item");
         InventoryUI.active.UpdateItemIcons();
     }
     public Item UnEquipTool()
@@ -144,7 +159,7 @@ public class PlayerInventory : MonoBehaviour
         if (tool == null)
             return null;
 
-        ToolAnimationInfo animInfo = PlayerAvatar.active.GetAnimationInfo();
+        ToolAnimationInfo animInfo = player.avatar.GetAnimationInfo();
         
         Quaternion rot = Quaternion.identity;
         Vector3 pos = transform.position + Vector3.up;
@@ -157,20 +172,21 @@ public class PlayerInventory : MonoBehaviour
         tool.BecomeVisible();
         tool.transform.rotation = rot;
         tool.DropFromPos(pos);
-
-        Item refrence = tool;
+        
+        tool.playerWhoHasItem = null;
+        
+        Item reference = tool;
 
         tool = null;
         UpdateSelectIndexInterval();
-        PlayerAvatar.active.UnEquipTool();
+        player.avatar.UnEquipTool();
         InventoryUI.active.UpdateToolIcon();
 
-        return refrence;
+        return reference;
     }
-    private Item UnEquipItem(int index)
+    public Item UnEquipItem(Item item)
     {
-        Item item = items[index];
-        items.RemoveAt(index);
+        items.Remove(item);
         filledSlots -= item.itemInfo.slotCount;
         
         item.BecomeVisible();
@@ -180,6 +196,8 @@ public class PlayerInventory : MonoBehaviour
         item.transform.rotation = Quaternion.Euler(Random.Range(-90f, 90f), itemInfo.randomYRot ? Random.Range(0f, 360f) : orientation.eulerAngles.y, Random.Range(-90f, 90f));
         item.DropFromPos(transform.position + Vector3.up + orientation.forward * itemInfo.dropOffset.z + orientation.up * itemInfo.dropOffset.y + orientation.right * itemInfo.dropOffset.x);
 
+        item.playerWhoHasItem = null;
+        
         if(selectIndex > items.Count)
             selectIndex--;
         UpdateSelectIndexInterval();
@@ -251,7 +269,11 @@ public class PlayerInventory : MonoBehaviour
                 selectIndex = 1; 
         }
     }
-
+    [Rpc(SendTo.Everyone)]
+    public void ModifySlotCountRpc(int amount)
+    {
+        slotCount = amount;
+    }
     public void UnEquipAll()
     {
         if (tool != null)
@@ -261,7 +283,7 @@ public class PlayerInventory : MonoBehaviour
 
         while ( items.Count > 0)
         {
-            UnEquipItem(0);
+            UnEquipItem(items[0]);
         }
     }
 }

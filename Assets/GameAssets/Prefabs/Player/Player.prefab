@@ -91,6 +91,7 @@ Transform:
   - {fileID: 7933770473522661470}
   - {fileID: 3732277903965636462}
   - {fileID: 7298179882124779590}
+  - {fileID: 3780506874080565139}
   m_Father: {fileID: 3850321401319036190}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2053588682231139725
@@ -804,7 +805,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4ef2839503fde04eb61b3388ab218d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCamera
-  player: {fileID: 5018052482369340482}
+  player: {fileID: 9145969015855412601}
   minRotX: -70
   maxRotX: 80
   bobSpeed: 12
@@ -1205,10 +1206,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7610a804494b7c24bb99d7f33c52004a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAvatar
-  player: {fileID: 2088618178098245348}
   animator: {fileID: 7746188033853546143}
   speedMult: 1
   armIKParent: {fileID: 7298179882124779590}
+  headIKParent: {fileID: 3780506874080565139}
+  clientPlayerMesh: {fileID: -6877816283630326564, guid: 570fdb8929e420d48bd415b9282e1fc7, type: 3}
+  defaultPlayerMesh: {fileID: 6622264641530768373, guid: 91e0ef49ca958284dba2d0e771c74853, type: 3}
   skinRenderer: {fileID: 7915291372044119656}
   toolAnimationInfo:
   - itemName: Shotgun
@@ -1243,6 +1246,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 864bacecef8a39540b5a81d2f265e3ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInventory
+  ShowTopMostFoldoutHeaderGroup: 1
   slotCount: 4
 --- !u!114 &2627708928625353186
 MonoBehaviour:
@@ -1287,10 +1291,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1197044980
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 865576419
+  InScenePlacedSourceGlobalObjectIdHash: 1247024865
   DeferredDespawnTick: 0
-  Ownership: 1
+  Ownership: 2
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -1313,6 +1317,56 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   ShowTopMostFoldoutHeaderGroup: 1
+  orientation: {fileID: 5018052482369340482}
+  gravityForce: 18
+  rotSmoothTime: 0.2
+  maxPositionDistanceError: 0.1
+  velocityImpactOnError: 0.75
+--- !u!1 &7210116391051118702
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3780506874080565139}
+  - component: {fileID: 5457075832165588271}
+  m_Layer: 0
+  m_Name: CameraTransform_HeadOnly
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3780506874080565139
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7210116391051118702}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.6, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 4949630924337889925}
+  m_Father: {fileID: 7941984947482982545}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5457075832165588271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7210116391051118702}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 48948dfe9d76b07488dacd46a7955fa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Animation.Rigging::UnityEngine.Animations.Rigging.RigTransform
 --- !u!1 &7590116802795950647
 GameObject:
   m_ObjectHideFlags: 0
@@ -1434,6 +1488,92 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &8400792248110243588
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4949630924337889925}
+  - component: {fileID: 3377529905049669677}
+  m_Layer: 0
+  m_Name: HeadIK
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4949630924337889925
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8400792248110243588}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3780506874080565139}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3377529905049669677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8400792248110243588}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3c430f382484144e925c097c2d33cfe, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Animation.Rigging::UnityEngine.Animations.Rigging.MultiAimConstraint
+  m_Weight: 1
+  m_Data:
+    m_ConstrainedObject: {fileID: 7677397852347794429}
+    m_SourceObjects:
+      m_Length: 1
+      m_Item0:
+        transform: {fileID: 4949630924337889925}
+        weight: 1
+      m_Item1:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item2:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item3:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item4:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item5:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item6:
+        transform: {fileID: 0}
+        weight: 0
+      m_Item7:
+        transform: {fileID: 0}
+        weight: 0
+    m_Offset: {x: 20, y: 0, z: 0}
+    m_MinLimit: -180
+    m_MaxLimit: 180
+    m_AimAxis: 4
+    m_UpAxis: 2
+    m_WorldUpType: 0
+    m_WorldUpObject: {fileID: 0}
+    m_WorldUpAxis: 2
+    m_MaintainOffset: 0
+    m_ConstrainedAxes:
+      x: 1
+      y: 1
+      z: 1
 --- !u!1 &8569418918060733466
 GameObject:
   m_ObjectHideFlags: 0
@@ -2800,7 +2940,7 @@ PrefabInstance:
     - target: {fileID: -2843909369972686622, guid: 91e0ef49ca958284dba2d0e771c74853, type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: -6877816283630326564, guid: 570fdb8929e420d48bd415b9282e1fc7, type: 3}
+      objectReference: {fileID: 6622264641530768373, guid: 91e0ef49ca958284dba2d0e771c74853, type: 3}
     - target: {fileID: -2843909369972686622, guid: 91e0ef49ca958284dba2d0e771c74853, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 

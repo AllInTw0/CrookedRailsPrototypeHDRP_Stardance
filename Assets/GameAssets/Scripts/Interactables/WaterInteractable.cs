@@ -13,8 +13,8 @@ public class WaterInteractable : Interactable
     private Collider interactableCollider;
     void Update()
     {
-        if (PlayerInventory.active.tool != null)
-            interactableCollider.enabled = PlayerInventory.active.tool.itemInfo == bucketItem;
+        if (Player.localPlayer.inventory.tool != null)
+            interactableCollider.enabled = Player.localPlayer.inventory.tool.itemInfo == bucketItem;
         else
             interactableCollider.enabled = false;
 
@@ -24,7 +24,7 @@ public class WaterInteractable : Interactable
     {
         base.Interact(); //Sound
 
-        ItemBucket bucketScript = (ItemBucket)PlayerInventory.active.tool;
+        ItemBucket bucketScript = (ItemBucket)Player.localPlayer.inventory.tool;
         if (fillItem)
         {
             if (bucketScript.IsFilled() == false)

@@ -426,8 +426,10 @@ public class PlayerMovement : GroundMovement
                 distanceToWaypoint = d;
             }
         }
-        
-        float trainDist = Train.playerTrain.GetClosestDistanceToPos(worldPos);
+
+        float trainDist = 0f;
+        if(Train.playerTrain != null)
+            trainDist = Train.playerTrain.GetClosestDistanceToPos(worldPos);
 
         return trainDist < maxDistanceFromTrain || (closestWaypoint != null && distanceToWaypoint < closestWaypoint.maxDistance);
     }

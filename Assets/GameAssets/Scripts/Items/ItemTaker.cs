@@ -35,7 +35,7 @@ public class ItemTaker : Interactable
             }
         }
 
-        if(PlayerInventory.active.RemoveItem(itemInfo,out int itemCountRemoved, removeCount))
+        if(Player.localPlayer.inventory.RemoveItem(itemInfo,out int itemCountRemoved, removeCount))
         {
             if (linkedHealth != null) linkedHealth.TakeDamage(-healthPerItem * itemCountRemoved);
             SetActionNameOverride();

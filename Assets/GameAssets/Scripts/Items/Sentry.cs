@@ -74,10 +74,10 @@ public class Sentry : Item
         {
             if (equipedGun == null)
             {
-                if (PlayerInventory.active.tool && PlayerInventory.active.tool is ItemGun)
+                if (Player.localPlayer.inventory.tool && Player.localPlayer.inventory.tool is ItemGun)
                 {
                     //Equip Tool
-                    ItemGun tool = (ItemGun)PlayerInventory.active.UnEquipTool();
+                    ItemGun tool = (ItemGun)Player.localPlayer.inventory.UnEquipTool();
                     tool.BecomeInvisible();
                     foreach (GunVisual visual in gunVisualList)
                     {
@@ -99,7 +99,7 @@ public class Sentry : Item
             else
             {
 
-                if (PlayerInventory.active.TryEquipping(equipedGun))
+                if (Player.localPlayer.inventory.TryEquipping(equipedGun))
                 {
                     //UnEquip Tool
                     foreach (GunVisual visual in gunVisualList)
@@ -123,7 +123,7 @@ public class Sentry : Item
         ammoFillInteractable.interactEvent.AddListener(() =>
         {
             int targetCount = Mathf.Clamp(maxAmmoCount - ammoCount, 0, equipedGun.ammoItem.maxCount / 2);
-            if (targetCount > 0 && PlayerInventory.active.RemoveItem(equipedGun.ammoItem, out int itemCountRemoved, targetCount))
+            if (targetCount > 0 && Player.localPlayer.inventory.RemoveItem(equipedGun.ammoItem, out int itemCountRemoved, targetCount))
             {
                 SoundManager.active.PlayAtPos(ammoFillInteractable.transform.position, ammoRefillString);
                 ammoCount += itemCountRemoved;
@@ -169,19 +169,6 @@ public class Sentry : Item
             ammoCount -= count;
         }
     }
-    public override bool Interact()
-    {
-        SoundManager.active.PlayAtPos(iconPosition != null ? iconPosition.position : transform.position, interactSound);
-
-        bool success = PlayerInventory.active.TryEquipping(this);
-        if (success)
-        {
-            falling = false;
-            DisablePhysics();
-            MovingPlatformManager.active.RemoveEntry(transform);
-        }
-        return success;
-    }
     void Update()
     {
         UpdateItem();
@@ -214,21 +201,21 @@ public class Sentry : Item
                 helperTransform.rotation = Quaternion.Euler(targetRot.x, targetRot.y, 0f);
                 if (equipedGun.HasAmmoInClip())
                 {
-                    if (Vector3.Angle(rotXTransform.forward, helperTransform.forward) <= maxAngleDiff)
-                        equipedGun.Shoot(false, equipedGunVisual.bulletSpawn, ShooterType.Sentry);
+                    //if (Vector3.Angle(rotXTransform.forward, helperTransform.forward) <= maxAngleDiff)
+                        //equipedGun.Shoot(false, equipedGunVisual.bulletSpawn, ShooterType.Sentry);
                 }
                 else
                 {
                     int count = Mathf.Clamp(ammoCount, 0, equipedGun.clipSize);
                     if (count > 0)
                     {
-                        equipedGun.Reload(count, equipedGunVisual.bulletSpawn);
+                        //equipedGun.Reload(count, equipedGunVisual.bulletSpawn);
                         ammoCount -= count;
                     }
                     else
                     {
                         //Produce SFX
-                        equipedGun.Shoot(false, equipedGunVisual.bulletSpawn, ShooterType.Sentry);
+                        //equipedGun.Shoot(false, equipedGunVisual.bulletSpawn, ShooterType.Sentry);
                     }
                 }
                 UpdateAmmoLights();

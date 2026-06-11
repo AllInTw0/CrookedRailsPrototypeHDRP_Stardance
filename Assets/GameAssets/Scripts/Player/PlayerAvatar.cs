@@ -6,14 +6,22 @@ public class PlayerAvatar : MonoBehaviour
 {
     public static PlayerAvatar active;
     
-    [SerializeField] 
-    private PlayerMovement player;
+    [NonSerialized] 
+    public Player player;
     [SerializeField] 
     public Animator animator;
     [SerializeField] 
     private float speedMult;
     [SerializeField] 
     private Transform armIKParent;
+    [SerializeField] 
+    private Transform headIKParent;
+    
+    [Header("Model")] 
+    [SerializeField] 
+    private Mesh clientPlayerMesh;
+    [SerializeField] 
+    private Mesh defaultPlayerMesh;
     [SerializeField] 
     private SkinnedMeshRenderer skinRenderer;
     
@@ -35,27 +43,28 @@ public class PlayerAvatar : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (player.rb.linearVelocity.magnitude > 0.1f)
+        if (player.movement.rb.linearVelocity.magnitude > 0.1f)
         {
             animator.SetBool("Walking",true);
-            animator.SetFloat("SpeedMult", player.rb.linearVelocity.magnitude * speedMult);
+            animator.SetFloat("SpeedMult", player.movement.rb.linearVelocity.magnitude * speedMult);
         }
         else
         {
             animator.SetBool("Walking",false);
         }
         
-        animator.SetBool("Jumping", player.grounded);
-        animator.SetBool("Crouching", player.crouched);
+        animator.SetBool("Jumping", player.movement.grounded);
+        animator.SetBool("Crouching", player.movement.crouched);
         
         if (equippedTool != null)
         {
-            armIKParent.localRotation = Quaternion.Euler(PlayerCamera.active.rotationX,0,0);
+            armIKParent.localRotation = Quaternion.Euler(player.GetRotX(),0,0);
         }
         else
         {
             armIKParent.localRotation = Quaternion.identity;
         }
+        headIKParent.localRotation = Quaternion.Euler(player.GetRotX(),0,0);
         
     }
 
@@ -102,6 +111,11 @@ public class PlayerAvatar : MonoBehaviour
     public void UnHide()
     {
         skinRenderer.enabled = true;
+    }
+
+    public void SetPlayerMesh(bool isOwner)
+    {
+        skinRenderer.sharedMesh = isOwner ? clientPlayerMesh : defaultPlayerMesh;
     }
 }
 

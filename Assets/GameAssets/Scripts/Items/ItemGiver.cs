@@ -23,11 +23,11 @@ public class ItemGiver : Interactable
         {
             Item item = Item.SpawnItem(itemInfo, Vector3.zero, Quaternion.identity, Mathf.Min(maxGiveCount, itemCount));
 
-            sucessfull = PlayerInventory.active.TryEquipping(item);
+            sucessfull = Player.localPlayer.inventory.TryEquipping(item);
 
             int countGiven = maxGiveCount;
-            Debug.Log(PlayerInventory.active.items.Contains(item) + ": " + item.count);
-            if (PlayerInventory.active.items.Contains(item) == false)
+            Debug.Log(Player.localPlayer.inventory.items.Contains(item) + ": " + item.count);
+            if (Player.localPlayer.inventory.items.Contains(item) == false)
             {
                 countGiven -= item.count;
                 Destroy(item.gameObject);

@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    public virtual void Initialize(ShooterType shooterType = ShooterType.Player)
+    public virtual void Initialize(ShooterType shooterType = ShooterType.Player, bool doDamage = true)
     {
 
     }

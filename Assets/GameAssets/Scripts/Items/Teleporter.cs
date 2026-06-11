@@ -31,13 +31,17 @@ public class Teleporter : Item
     private float cooldown;
     private Teleporter pairedTeleporter;
 
-    void Awake()
+    public override void Awake()
     {
+        base.Awake();
+        
         teleportParticles.Stop();
         lightFlickerer.TurnOff();
     }
-    void Start()
+    public override void Start()
     {
+        base.Start();
+        
         activeTeleporterList.Add(this);
         
         onDroppedOnGround.AddListener(() =>

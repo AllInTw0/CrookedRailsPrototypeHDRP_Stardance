@@ -1,4 +1,5 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using Random = UnityEngine.Random;
@@ -8,7 +9,7 @@ public class PlayerCamera : MonoBehaviour
     public static PlayerCamera active;
     //Variables
     [SerializeField]
-    public Transform player;
+    public Player player;
     [SerializeField]
     private float minRotX,maxRotX;
     [SerializeField]
@@ -38,7 +39,7 @@ public class PlayerCamera : MonoBehaviour
     [NonSerialized]
     public float rotationX;
     private float bobX, bobY;
-    private Camera camera;
+    private new Camera camera;
     private Vector3 ragdollCamPos;
 
     private bool inThirdPerson;
@@ -62,7 +63,7 @@ public class PlayerCamera : MonoBehaviour
     }
     private void Update()
     {
-        float speed = new Vector3(PlayerMovement.active.rb.linearVelocity.x,0,PlayerMovement.active.rb.linearVelocity.z).magnitude;
+        float speed = new Vector3(player.movement.rb.linearVelocity.x,0,player.movement.rb.linearVelocity.z).magnitude;
         speed = Mathf.Clamp((speed - responsiveFOVSpeedRange.x)/responsiveFOVSpeedRange.y, 0, 1);
         currentResponsiveFOV = Mathf.Lerp(currentResponsiveFOV, speed * responsiveFOVAddition, Time.deltaTime * responsiveFOVSmoothness);
         
@@ -82,7 +83,7 @@ public class PlayerCamera : MonoBehaviour
             rotationX = Mathf.Clamp(rotationX, minRotX, maxRotX);
             transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
 
-            player.rotation *= Quaternion.Euler(0, Settings.invertedX ? -lookInput.x * Settings.sensitivity : lookInput.x * Settings.sensitivity, 0);
+            player.orientation.rotation *= Quaternion.Euler(0, Settings.invertedX ? -lookInput.x * Settings.sensitivity : lookInput.x * Settings.sensitivity, 0);
         }
 
         CameraBob();
@@ -135,7 +136,7 @@ public class PlayerCamera : MonoBehaviour
     }
     private void CameraBob()
     {
-        float mult = Mathf.Clamp01(PlayerMovement.active.rb.linearVelocity.magnitude  * 0.3f);
+        float mult = Mathf.Clamp01(player.movement.rb.linearVelocity.magnitude  * 0.3f);
         
         bobX = Mathf.Lerp(bobX, Mathf.Cos(Time.time * bobSpeed * 0.5f) * bobAmountX * mult, Time.deltaTime * bobSmoothSpeed);
         bobY = Mathf.Lerp(bobY, Mathf.Sin(Time.time * bobSpeed ) * bobAmountY * mult, Time.deltaTime * bobSmoothSpeed);

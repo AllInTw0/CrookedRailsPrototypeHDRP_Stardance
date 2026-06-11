@@ -1,10 +1,12 @@
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
+using Unity.Netcode.Components;
 using UnityEngine;
 using UnityEngine.Events;
 using Random = UnityEngine.Random;
 
-public class Item : Interactable
+public class Item : NetworkBehaviour
 {
     [NonSerialized] 
     public UnityEvent onDroppedOnGround;
@@ -16,14 +18,17 @@ public class Item : Interactable
     [Header("Item")]
     public ItemSO itemInfo;
 
-    [SerializeField] 
-    private List<MeshRenderer> meshRenderers;
-    [SerializeField] 
+    //[SerializeField] 
+    private MeshRenderer[] meshRenderers;
+    //[SerializeField] 
+    [NonSerialized]
     public Collider interactableCollider;
 
     public int count = 1;
 
     //Run time
+    private EventInteractable eventInteractable;
+    
     [HideInInspector]
     public bool falling;
     private float targetY;
@@ -32,56 +37,151 @@ public class Item : Interactable
     private float rotVelocity;
 
     private Rigidbody rb;
+    private NetworkTransform networkTransform;
+    private NetworkRigidbody networkRigidbody;
     private bool physicsEnabled;
     private bool dropSilently;
-    private void Awake()
+
+    [NonSerialized] 
+    public Player playerWhoHasItem = null;
+    public override void OnNetworkSpawn()
+    {
+        //ItemManager.AddItem(this);
+    }
+
+    public virtual void Awake()
     {
         onDroppedOnGround = new UnityEvent();
         onPickedUp = new UnityEvent();
         onPhysicsEnabled = new UnityEvent();
+
+        meshRenderers = GetComponentsInChildren<MeshRenderer>();
+        interactableCollider = GetComponent<BoxCollider>();
         
-        if (TryGetComponent(out Rigidbody rigidbody))
+
+        rb = gameObject.GetComponent<Rigidbody>();
+        rb.isKinematic = true;
+        
+        networkRigidbody = GetComponent<NetworkRigidbody>();
+        networkRigidbody.enabled = false;
+        networkTransform = GetComponent<NetworkTransform>();
+        networkTransform.enabled = false;
+        
+    }
+    
+    public virtual void Start()
+    {
+        DropFromPos(transform.position);
+        
+        eventInteractable = GetComponent<EventInteractable>();
+        eventInteractable.interactEvent.AddListener(() =>
         {
-            rb = rigidbody;
+            if (TryEquipping())
+            {
+                Debug.Log("Item Equipped");
+            }
+            else
+            {
+                eventInteractable.InteractionFailed();
+                Debug.Log("Cant Equip Item");
+            }
+        });
+    }
+    
+    public virtual bool TryEquipping(Player targetPlayer = null, bool sendRpc = true)
+    {
+        if (targetPlayer == null)
+            targetPlayer = Player.localPlayer;
+        
+        if (targetPlayer.inventory.TryEquipping(this))
+        {
+            falling = false;
+            DisablePhysics();
+            onPickedUp.Invoke();
+            MovingPlatformManager.active.RemoveEntry(transform);
+            if (sendRpc && targetPlayer == Player.localPlayer)
+            {
+                EquipItemServerRpc();
+            }
+            return true;
+        }
+        return false;
+    }
+    //Equipping Multiplayer
+    [Rpc(SendTo.Server)]
+    private void EquipItemServerRpc(RpcParams receiveParams = default)
+    {
+        Player senderPlayer = Player.GetPlayerByClientID(receiveParams.Receive.SenderClientId);
+        if (playerWhoHasItem == senderPlayer || TryEquipping(senderPlayer, false))
+        {
+            EquipItemClientRpc(receiveParams.Receive.SenderClientId);
+            Debug.Log("[Item Server] Server Agrees On Equip");
         }
         else
         {
-            rb = gameObject.AddComponent<Rigidbody>();
-            rb.isKinematic = true;
+            Debug.Log("[Item Server] Server Disagrees On Equip");
         }
     }
-    void Start()
+    [Rpc(SendTo.NotServer)]
+    private void EquipItemClientRpc(ulong clientID)
     {
-        DropFromPos(transform.position);
-    }
-
-    public override bool Interact()
-    {
-        bool success = PlayerInventory.active.TryEquipping(this);
-        if (success)
+        Player targetPlayer = Player.GetPlayerByClientID(clientID);
+        if (playerWhoHasItem == targetPlayer || TryEquipping(targetPlayer,false))
         {
-            falling = false;
-            DisablePhysics();  
-            onPickedUp.Invoke();
+            Debug.Log("[Item Client] Client Agrees On Equip");
         }
-        Debug.Log("Item Equipped Successfully: " + success);
-
-        base.Interact();
-        return success;
-    }
-
-    public override string GetName()
-    {
-        if (itemInfo.maxCount > 1)
+        else
         {
-            return objectName + " [" + count + "]";
+            Debug.Log("[Item Client] Client Disagrees On Equip");
         }
-        //else
-        return objectName;
+    }
+    //Dropping Multiplayer
+    [Rpc(SendTo.Server)]
+    public void UnEquipItemServerRpc(RpcParams receiveParams = default)
+    {
+        Player senderPlayer = Player.GetPlayerByClientID(receiveParams.Receive.SenderClientId);
+        if (playerWhoHasItem == null || playerWhoHasItem == senderPlayer)
+        {
+            UnEquipItemClientRpc(receiveParams.Receive.SenderClientId);
+            if (playerWhoHasItem == senderPlayer)
+            {
+                if (playerWhoHasItem.inventory.tool == this)
+                    playerWhoHasItem.inventory.UnEquipTool();
+                else
+                    playerWhoHasItem.inventory.UnEquipItem(this);
+            }
+            Debug.Log("[Item Server] Server Agrees On UnEquip");
+        }
+        else
+        {
+            Debug.Log("[Item Server] Server Disagrees On UnEquip");
+        }
+    }
+    [Rpc(SendTo.NotServer)]
+    private void UnEquipItemClientRpc(ulong clientID)
+    {
+        Player targetPlayer = Player.GetPlayerByClientID(clientID);
+        if (playerWhoHasItem == null || playerWhoHasItem == targetPlayer)
+        {
+            if (playerWhoHasItem == targetPlayer)
+            {
+                if (playerWhoHasItem.inventory.tool == this)
+                    playerWhoHasItem.inventory.UnEquipTool();
+                else
+                    playerWhoHasItem.inventory.UnEquipItem(this);
+            }
+            Debug.Log("[Item Client] Client Agrees On UnEquip");
+        }
+        else
+        {
+            Debug.Log("[Item Client] Client Disagrees On UnEquip");
+        }
     }
     private void Update()
     {
         UpdateItem();
+        if (itemInfo.maxCount > 1)
+            eventInteractable.SetObjectNameOverride(eventInteractable.objectName + " [" + count + "]");
     }
 
     public void UpdateItem()
@@ -89,9 +189,26 @@ public class Item : Interactable
         if (physicsEnabled)
         {
             falling = false;
-            if(rb.linearVelocity.magnitude <= 0.1f)
+            if(IsServer)
             {
-                DropFromPos(transform.position);
+                if (rb.linearVelocity.magnitude <= 0.1f)
+                {
+                    DropFromPosRpc(transform.position);
+                }
+                else if (transform.position.y < -10f) // Safety net if item falls out of world
+                {
+                    if (Physics.Raycast(new Vector3(transform.position.x, 100f, transform.position.z), Vector3.down,
+                            out RaycastHit hit, 115f, ItemManager.itemDropLayerMask))
+                    {
+                        Debug.LogWarning("Item fell out of world. Teleporting to surface");
+                        DropFromPosRpc(hit.point + Vector3.up * 0.25f);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Cant get item back. Teleporting to player");
+                        DropFromPosRpc(Player.localPlayer.transform.position + Vector3.up * 0.25f);
+                    }
+                }
             }
         }
         else
@@ -118,6 +235,11 @@ public class Item : Interactable
                 onDroppedOnGround.Invoke();
             }
         }
+    }
+    [Rpc(SendTo.Everyone)]
+    private void DropFromPosRpc(Vector3 startPos)
+    {
+        DropFromPos(startPos);
     }
     public void DropFromPos(Vector3 startPos, bool hasSound = true)
     {
@@ -163,16 +285,25 @@ public class Item : Interactable
         }
         interactableCollider.enabled = true;
     }
-    public void EnablePhysics(Vector3 velocity)
+    //Physics
+    [Rpc(SendTo.Everyone)]
+    public void EnablePhysicsRpc(Vector3 velocity)
+    {
+        EnablePhysics(velocity);
+    }
+    private void EnablePhysics(Vector3 velocity)
     {
         if (interactableCollider.enabled == false) return;
-
+        
         MovingPlatformManager.active.RemoveEntry(transform);
         rb.isKinematic = false;
         falling = false;
         physicsEnabled = true;
         rb.linearVelocity = velocity;
         rb.angularVelocity = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f));
+
+        networkRigidbody.enabled = true;
+        networkTransform.enabled = true;
         
         onPhysicsEnabled.Invoke();
     }
@@ -180,14 +311,22 @@ public class Item : Interactable
     {
         if(physicsEnabled == false)
         {
-            EnablePhysics(Vector3.zero);
+            EnablePhysicsRpc(Vector3.zero);
         }
         rb.AddExplosionForce(force, explosionPos, range);
     }
-    public void DisablePhysics()
+    [Rpc(SendTo.Everyone)]
+    private void DisablePhysicsRpc()
+    {
+        DisablePhysics();
+    }
+    private void DisablePhysics()
     {
         rb.isKinematic = true;
         physicsEnabled = false;
+        
+        networkRigidbody.enabled = false;
+        networkTransform.enabled = false;
     }
     public bool IsPhysicsEnabled()
     {
@@ -203,5 +342,10 @@ public class Item : Interactable
         item.count = Mathf.Clamp(stackCount, 1, item.itemInfo.maxCount);
 
         return item;
+    }
+
+    public override void OnDestroy()
+    {
+        //ItemManager.RemoveItem(this);
     }
 }

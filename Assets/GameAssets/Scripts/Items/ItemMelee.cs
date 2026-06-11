@@ -20,7 +20,7 @@ public class ItemMelee : Item
 
     public void UpdateMelee()
     {
-        if(PlayerInventory.active.tool == this && coolDown <= 0f)
+        if(Player.localPlayer.inventory.tool == this && coolDown <= 0f)
         {
             if (InputManager.attackAction.IsPressed())
             {

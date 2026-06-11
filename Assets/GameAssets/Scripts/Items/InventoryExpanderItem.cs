@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class InventoryExpanderItem : Item
 {
-    public override bool Interact()
+    public override bool TryEquipping(Player targetPlayer = null, bool sendRpc = true)
     {
-        PlayerInventory.active.slotCount++;
+        Player.localPlayer.inventory.ModifySlotCountRpc(1);
         Destroy(gameObject);
         return true;
     }

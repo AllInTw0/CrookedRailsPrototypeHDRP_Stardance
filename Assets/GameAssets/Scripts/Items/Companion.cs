@@ -328,11 +328,11 @@ public class Companion : MonoBehaviour
                     {
                         if (gun.HasAmmoInClip())
                         {
-                            gun.Shoot(false, gunEnd, ShooterType.Sentry);
+                            //gun.Shoot(false, gunEnd, ShooterType.Sentry);
                         }
                         else
                         {
-                            gun.Reload(gun.clipSize, gunEnd);
+                            //gun.Reload(gun.clipSize, gunEnd);
                         }
                     }
                 }
