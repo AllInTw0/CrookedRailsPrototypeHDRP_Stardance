@@ -309,11 +309,17 @@ public class Item : NetworkBehaviour
     }
     public void AddExplosionForce(Vector3 explosionPos, float force, float range)
     {
+        AddExplosionForceServerRpc(explosionPos, (short)force, (short)range);
+    }
+
+    [Rpc(SendTo.Server)]
+    private void AddExplosionForceServerRpc(Vector3 explosionPos, short force, short range)
+    {
         if(physicsEnabled == false)
         {
             EnablePhysicsRpc(Vector3.zero);
+            rb.AddExplosionForce(force, explosionPos, range);
         }
-        rb.AddExplosionForce(force, explosionPos, range);
     }
     [Rpc(SendTo.Everyone)]
     private void DisablePhysicsRpc()

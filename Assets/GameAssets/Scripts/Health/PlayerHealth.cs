@@ -8,21 +8,15 @@ public class PlayerHealth : Health
     [Header("Player")] 
     [SerializeField] 
     private GameObject ragdollPrefab;
-    [SerializeField] 
-    private PlayerAvatar playerAvatar;
-    [SerializeField] 
-    private PlayerMovement playerMovement;
-    [SerializeField] 
-    private PlayerCamera playerCamera;
-    [SerializeField] 
-    private PlayerInventory playerInventory;
+    [NonSerialized] 
+    public Player player;
     [Header("Water")]
     [SerializeField]
     private float drowningDelay;
     [SerializeField]
-    private float drowningDammageDelay;
+    private float drowningDamageDelay;
     [SerializeField]
-    private float drowningDammage;
+    private float drowningDamage;
     [Header("HitEffect")]
     [SerializeField]
     private float targetAlpha;
@@ -43,8 +37,8 @@ public class PlayerHealth : Health
         active = this;
         isAlive = true;
         AddHealthToGlobalList();
-        onTakeDamage.AddListener((float dammage, Vector3 force) => {
-            if(dammage > 0)
+        onTakeDamage.AddListener((float damage, Vector3 force) => {
+            if(damage > 0)
             {
                 Fade.hitFade.FadeTo(targetAlpha, fadeInDuration, 0);
                 Fade.hitFade.FadeTo(0f, fadeOutDuration, fadeInDuration);
@@ -54,18 +48,23 @@ public class PlayerHealth : Health
 
     private void Update()
     {
-        StatUI.active.UpdateHealth(health,maxHealth);
         UpdateCall();
-        if (playerMovement.IsSubmergedInWater())
+        
+        if(IsOwner == false)
+            return;
+        
+        StatUI.active.UpdateHealth(health,maxHealth);
+        
+        if (player.movement.IsSubmergedInWater())
         {
             timeUnderWater += Time.deltaTime;
 
             if(timeUnderWater >= drowningDelay)
             {
                 timeSinceDammageTick += Time.deltaTime;
-                if(timeSinceDammageTick >= drowningDammageDelay)
+                if(timeSinceDammageTick >= drowningDamageDelay)
                 {
-                    TakeDamage(drowningDammage, Vector3.up);
+                    TakeDamage(drowningDamage, Vector3.up);
                     SoundManager.active.PlayAtPos(transform.position, "Water - Bubbles");
                     timeSinceDammageTick = 0f;
                 }
@@ -80,10 +79,10 @@ public class PlayerHealth : Health
 
     public override void HealthReachedZero(Vector3 force = default)
     {
-        ragdoll = SpawnRagdoll(playerAvatar.animator.gameObject, ragdollPrefab, force);
-        playerInventory.UnEquipAll();
-        playerMovement.EnableNoclip();
-        playerAvatar.Hide();
+        ragdoll = SpawnRagdoll(player.avatar.animator.gameObject, ragdollPrefab, force);
+        player.inventory.UnEquipAll();
+        player.movement.EnableNoclip();
+        player.avatar.Hide();
         
         InventoryUI.active.Hide();
         SpectateUI.active.Enable();

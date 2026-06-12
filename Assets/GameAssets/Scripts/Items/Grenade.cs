@@ -26,11 +26,10 @@ public class Grenade : Bullet
 
     private ShooterType shooterType;
     private bool colliding = false;
+    private bool doDamage = true;
     public override void Initialize(ShooterType shooterType, bool doDamage)
     {
-        if (doDamage == false)
-            damage = 0f;
-        
+        this.doDamage = doDamage;
         rb.linearVelocity = transform.forward * velocity;
         this.shooterType = shooterType;
     }
@@ -63,7 +62,7 @@ public class Grenade : Bullet
     }
     private void Explode(Transform hitTransform = null)
     {
-        BulletManager.active.SpawnExplosion(transform.position, damage, range, force, hitTransform, healthTypeFilter, shooterType);
+        BulletManager.active.SpawnExplosion(transform.position,damage, range, force, hitTransform, healthTypeFilter, shooterType, doDamage: doDamage);
         Destroy(gameObject);
     }
 }

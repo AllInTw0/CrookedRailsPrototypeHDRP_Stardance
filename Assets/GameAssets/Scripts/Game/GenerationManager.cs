@@ -2,12 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 using static Util;
 using Random = UnityEngine.Random;
 
-public class GenerationManager : MonoBehaviour
+public class GenerationManager : NetworkBehaviour
 {
     public static GenerationManager active;
 
@@ -397,7 +398,7 @@ public class GenerationManager : MonoBehaviour
         GameStateManager.currentLevel = 0;
 
         TerrainGeneration.Chunk chunk = terrainGeneration.FindFittingChunk(0.5f, 0.6f, 3f, -2f, Vector2Int.zero, 5);
-
+ 
         Vector3 pos = chunk.GetWorldPos(0.5f, 1f);
         if (pos.y < 0f)
             pos.y = 0f;

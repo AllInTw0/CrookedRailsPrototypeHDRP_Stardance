@@ -51,6 +51,7 @@ public class Player : NetworkBehaviour
         inventory = GetComponent<PlayerInventory>();
         inventory.player = this;
         health = GetComponent<PlayerHealth>();
+        health.player = this;
         rb = GetComponent<Rigidbody>();
 
         //Destroy components that are client side only

@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -11,7 +12,7 @@ public enum HealthType
     Robot
 }
 
-public class Health : MonoBehaviour
+public class Health : NetworkBehaviour
 {
     [Header("Health")]
     public HealthType healthType;

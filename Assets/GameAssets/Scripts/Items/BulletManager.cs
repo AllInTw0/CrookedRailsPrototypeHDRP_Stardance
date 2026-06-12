@@ -115,55 +115,63 @@ public class BulletManager : MonoBehaviour
         return new RaycastHit();
     }
 
-    public void SpawnExplosion(Vector3 position, float damage, float range, float force, Transform hitTransform = null, List<HealthType> healthTypeFilterList = null, ShooterType shooterType = ShooterType.Player, int explosionParticleIndex = 0)
+    public void SpawnExplosion(Vector3 position, float damage, float range, float force, Transform hitTransform = null, List<HealthType> healthTypeFilterList = null, ShooterType shooterType = ShooterType.Player, int explosionParticleIndex = 0, bool doDamage = true)
     {
         PlayerCamera.active.ShakeFromPos(position, range * 5f, force * 0.01f);
         
         GameObject explosion = Instantiate(explosionParticleList[explosionParticleIndex]);
         explosion.transform.position = position;
         Destroy(explosion, 15f);
-
+        
         SoundManager.active.PlayAtPos(position, explosionSound);
-
-        Collider[] colliderArray = Physics.OverlapSphere(position, range, explosionLayerMask);
-
-        foreach (Collider collider in colliderArray)
+        
+        if (doDamage)
         {
-            Vector3 dir = collider.transform.position - position;
-            if (collider.TryGetComponent(out Health health) && (healthTypeFilterList == null || healthTypeFilterList.Contains(health.healthType)))
+            Collider[] colliderArray = Physics.OverlapSphere(position, range, explosionLayerMask);
+
+            foreach (Collider collider in colliderArray)
             {
-                float dist = 0f;
-                if (hitTransform != collider.transform) {
-                    if (collider.TryGetComponent(out Enemy enemy))
-                        dist = Vector3.Distance(position, enemy.centerTransform.position);
-                    else
-                        dist = Vector3.Distance(position, collider.transform.position) - 2f;
-                }
-                dist = Mathf.Clamp(dist, 0f, range * 0.9f);
-                float distDamage = Mathf.Round(damage - (dist / range) * damage);
-                float damageDone = health.TakeDamage(distDamage, dir.normalized * (distDamage * forcePerDamage) + Vector3.up * ((distDamage * forcePerDamage)));
-                HitSound.active.HandleHitSound(health, damageDone, collider.transform.position);
-                if (damageDone > 0 && health.health == 0)
+                Vector3 dir = collider.transform.position - position;
+                if (collider.TryGetComponent(out Health health) &&
+                    (healthTypeFilterList == null || healthTypeFilterList.Contains(health.healthType)))
                 {
-                    Debug.Log("Killed! " + shooterType);
-                    if (shooterType == ShooterType.Player)
-                        GameStateManager.AddToStatistic("Kills (Player)", 1);
-                    else if (shooterType == ShooterType.Sentry)
-                        GameStateManager.AddToStatistic("Kills (Sentry)", 1);
-                }
-            }
-            if (collider.TryGetComponent(out Rigidbody rb))
-            {
-                if (rb.isKinematic)
-                {
-                    if (collider.TryGetComponent(out Item item))
+                    float dist = 0f;
+                    if (hitTransform != collider.transform)
                     {
-                        item.AddExplosionForce(position - Vector3.down * 0.5f, force, range + 0.5f);
+                        if (collider.TryGetComponent(out Enemy enemy))
+                            dist = Vector3.Distance(position, enemy.centerTransform.position);
+                        else
+                            dist = Vector3.Distance(position, collider.transform.position) - 2f;
+                    }
+
+                    dist = Mathf.Clamp(dist, 0f, range * 0.9f);
+                    float distDamage = Mathf.Round(damage - (dist / range) * damage);
+                    float damageDone = health.TakeDamage(distDamage,
+                        dir.normalized * (distDamage * forcePerDamage) + Vector3.up * ((distDamage * forcePerDamage)));
+                    HitSound.active.HandleHitSound(health, damageDone, collider.transform.position);
+                    if (damageDone > 0 && health.health == 0)
+                    {
+                        Debug.Log("Killed! " + shooterType);
+                        if (shooterType == ShooterType.Player)
+                            GameStateManager.AddToStatistic("Kills (Player)", 1);
+                        else if (shooterType == ShooterType.Sentry)
+                            GameStateManager.AddToStatistic("Kills (Sentry)", 1);
                     }
                 }
-                else
+
+                if (collider.TryGetComponent(out Rigidbody rb))
                 {
-                    rb.AddExplosionForce(force, position - Vector3.down * 0.5f, range + 0.5f);
+                    if (rb.isKinematic)
+                    {
+                        if (collider.TryGetComponent(out Item item))
+                        {
+                            item.AddExplosionForce(position - Vector3.down * 0.5f, force, range + 0.5f);
+                        }
+                    }
+                    else
+                    {
+                        rb.AddExplosionForce(force, position - Vector3.down * 0.5f, range + 0.5f);
+                    }
                 }
             }
         }

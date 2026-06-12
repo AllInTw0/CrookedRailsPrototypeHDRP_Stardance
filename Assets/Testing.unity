@@ -3020,6 +3020,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Managers
       objectReference: {fileID: 0}
+    - target: {fileID: 7886977643950884988, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2903999600
+      objectReference: {fileID: 0}
+    - target: {fileID: 7886977643950884988, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 229873088
+      objectReference: {fileID: 0}
     - target: {fileID: 8913509636914769489, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
       propertyPath: m_LocalPosition.x
       value: -1.04098

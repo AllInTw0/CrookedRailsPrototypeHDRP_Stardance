@@ -1,12 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.AI.Navigation;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 using static TerrainGeneration;
 using static Util;
 
-public class TerrainGeneration : MonoBehaviour
+public class TerrainGeneration : NetworkBehaviour
 {
     public static TerrainGeneration active;
 
@@ -65,16 +66,21 @@ public class TerrainGeneration : MonoBehaviour
     [SerializeField]
     private bool randomSeed;
 
+    private NetworkVariable<int> networkSeed = new (writePerm: NetworkVariableWritePermission.Server);
+    
     [Header("Editor Previews")]
     [SerializeField]
     public bool autoUpdate;
     //Runtime
     private Dictionary<Vector2Int, Chunk> chunkDictionary = new Dictionary<Vector2Int, Chunk>();
-    
-    private void Start()
+    public override void OnNetworkSpawn()
     {
-        if (randomSeed)
-            seed = Random.Range(0, 10000);
+        if (IsServer)
+        {
+            if (randomSeed)
+                seed = Random.Range(0, 10000);
+            networkSeed.Value = seed;
+        }
         SetValues();
     }
     private void Update()
@@ -100,7 +106,7 @@ public class TerrainGeneration : MonoBehaviour
         foliageProbabilityList = new ProbabilityList<FoliageData>(foliageProbabilityElementList);
 
         chunkDictionary = new Dictionary<Vector2Int, Chunk>();
-        Noise.Initialize(seed, noiseSettingsList);
+        Noise.Initialize(networkSeed.Value, noiseSettingsList);
     }
     public void SetUpdateRenderDistance(bool value)
     {

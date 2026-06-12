@@ -2157,6 +2157,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Managers
       objectReference: {fileID: 0}
+    - target: {fileID: 7886977643950884988, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 1708868192
+      objectReference: {fileID: 0}
+    - target: {fileID: 7886977643950884988, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 229873088
+      objectReference: {fileID: 0}
     - target: {fileID: 8913509636914769489, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2196,10 +2204,6 @@ PrefabInstance:
     - target: {fileID: 8913509636914769489, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9211701987499465262, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
-      propertyPath: player
-      value: 
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
