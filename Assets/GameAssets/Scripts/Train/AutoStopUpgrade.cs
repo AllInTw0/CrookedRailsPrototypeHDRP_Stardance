@@ -33,11 +33,14 @@ public class AutoStopUpgrade : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if(targetTrain.IsInitialized() == false)
+            return;
+        
         AutoStopFilter currentFilter;
         if (leverInteractable != null)
         {
-            currentFilter = notchAutoStopFilterList[leverInteractable.currentNotch];
-            int nextNotch = leverInteractable.currentNotch + 1;
+            currentFilter = notchAutoStopFilterList[leverInteractable.GetCurrentNotch()];
+            int nextNotch = leverInteractable.GetCurrentNotch() + 1;
             if (nextNotch >= notchAutoStopFilterList.Count)
                 nextNotch = 0;
             leverInteractable.SetActionNameOverride("Set To " + notchAutoStopFilterList[nextNotch].name);

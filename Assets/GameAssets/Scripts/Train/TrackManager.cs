@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -33,6 +34,8 @@ public class AutoStop
 }
 public class TrackSection
 {
+    private static int nextID = 0;
+    
     public Point pointA;
     public Point pointB;
     public List<PathPoint> path;
@@ -41,6 +44,8 @@ public class TrackSection
 
     public AutoStop autoStop;
 
+    public int sectionID;
+    
     public float length
     {
         get
@@ -54,6 +59,9 @@ public class TrackSection
         this.pointA = pointA;
         this.pointB = pointB;
         this.path = path;
+
+        sectionID = nextID;
+        nextID++;
     }
 
     public List<GameObject> associatedObjects = new List<GameObject>();
@@ -78,11 +86,15 @@ public class TrackSection
     }
     public void SetNextSection(TrackSection section)
     {
+        if (section == null) return;
+        
         nextSection = section;
         section.previousSection = this;
     }
     public void SetPreviousSection(TrackSection section)
     {
+        if (section == null) return;
+        
         previousSection = section;
         section.nextSection = this;
     }
@@ -101,7 +113,7 @@ public class TrackSection
         autoStop.stopType = type;
     }
 }
-public class TrackManager : MonoBehaviour
+public class TrackManager : NetworkBehaviour
 {
     public static TrackManager active;
     //Run Time
@@ -109,9 +121,71 @@ public class TrackManager : MonoBehaviour
     public List<TrackSection> trackSectionList = new List<TrackSection>();
     [NonSerialized] 
     public float progressOffset = 0f;
+    
+    private struct TrackSectionNetworkData : INetworkSerializable
+    {
+        public int sectionID;
+        public int previousSectionID;
+        public int nextSectionID;
+        
+        public Vector3 pointAPos;
+        public Vector3 pointAHandleForward;
+        //private Vector3 pointAHandleBackward;
+    
+        public Vector3 pointBPos;
+        //private Vector3 pointBHandleForward;
+        public Vector3 pointBHandleBackward;
+        
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref sectionID);
+            serializer.SerializeValue(ref previousSectionID);
+            serializer.SerializeValue(ref nextSectionID);
+            serializer.SerializeValue(ref pointAPos);
+            serializer.SerializeValue(ref pointAHandleForward);
+            //serializer.SerializeValue(ref pointAHandleBackward);
+            serializer.SerializeValue(ref pointBPos);
+            //serializer.SerializeValue(ref pointBHandleForward);
+            serializer.SerializeValue(ref pointBHandleBackward);
+        }
+
+        public TrackSectionNetworkData(TrackSection section)
+        {
+            sectionID = section.sectionID;
+            nextSectionID = -1;
+            if (section.nextSection != null) nextSectionID = section.nextSection.sectionID;
+            previousSectionID = -1;
+            if(section.previousSection != null) previousSectionID = section.previousSection.sectionID;
+
+            pointAPos = section.pointA.position;
+            pointAHandleForward = section.pointA.handleForward;
+            
+            pointBPos = section.pointB.position;
+            pointBHandleBackward = section.pointB.handleBackward;
+        }
+    }
     private void Awake()
     {
         active = this;
+        
+    }
+
+    private void Start()
+    {
+        NetworkManager.Singleton.OnConnectionEvent += OnConnection;
+    }
+
+    private void OnConnection(NetworkManager networkManager, ConnectionEventData connectionEventData)
+    {
+        if (IsServer && connectionEventData.ClientId != NetworkManager.Singleton.LocalClientId)
+        {
+            //Client connected. Send track data
+            Debug.Log("Sending track data to client");
+            foreach (TrackSection section in trackSectionList)
+            {
+                CreateTrackSectionFromNetworkDataRpc(new TrackSectionNetworkData(section),RpcTarget.Single(connectionEventData.ClientId, RpcTargetUse.Temp));
+            }
+        }
     }
     //Track Section Functions
     public TrackSection CreateTrackSection(Point pointA,Point pointB)
@@ -123,7 +197,7 @@ public class TrackManager : MonoBehaviour
         
         CalculatePath(pointA,pointB,Spline.CalculateSplineLenght(pointA, pointB),out List<PathPoint> path);
         CalculatePath(path,out List<PathPoint> newPath,1,true, 0.0175f);
-        Debug.Log("OldPathLenght: " + path[^1].distance + " NewPathLenght: " + newPath[^1].distance);
+        //Debug.Log("OldPathLenght: " + path[^1].distance + " NewPathLenght: " + newPath[^1].distance);
         DEBUG_DrawPath(path);
         DEBUG_DrawPath(newPath);
         
@@ -134,6 +208,32 @@ public class TrackManager : MonoBehaviour
         trackSectionList.Add(section);
         
         return section;
+    }
+    //Multiplayer
+    [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
+    private void CreateTrackSectionFromNetworkDataRpc(TrackSectionNetworkData networkData, RpcParams rpcParams = default)
+    {
+        Point pointA = Spline.CreatePoint(networkData.pointAPos,networkData.pointAHandleForward,true);
+        Point pointB = Spline.CreatePoint(networkData.pointBPos,networkData.pointBHandleBackward,false);
+
+        TrackSection section = CreateTrackSection(pointA, pointB);
+        section.sectionID = networkData.sectionID;
+        
+        if(networkData.nextSectionID >= 0)
+            section.SetNextSection(FindTrackSectionByID(networkData.nextSectionID));
+        if(networkData.previousSectionID >= 0)
+            section.SetPreviousSection(FindTrackSectionByID(networkData.nextSectionID));
+    }
+    
+    public TrackSection FindTrackSectionByID(int sectionID)
+    {
+        for (int i = 0; i < trackSectionList.Count; i++)
+        {
+            if (trackSectionList[i].sectionID == sectionID)
+                return trackSectionList[i];
+        }
+
+        return null;
     }
     //Functions with trackSectionList
     public void GetTrackPositionFromProgress(float sectionProgress, TrackSection section, out Vector3 position)

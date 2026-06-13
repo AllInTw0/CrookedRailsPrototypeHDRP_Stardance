@@ -36,6 +36,8 @@ public class Player : NetworkBehaviour
     [SerializeField] private float velocityImpactOnError = 0.75f;
     private float rotYVelocity;
     private float rotXVelocity, rotX;
+    
+    private RigidbodyInterpolation rbStartInterpolation;
     void Start()
     {
         //Add to static variables
@@ -53,7 +55,8 @@ public class Player : NetworkBehaviour
         health = GetComponent<PlayerHealth>();
         health.player = this;
         rb = GetComponent<Rigidbody>();
-
+        rbStartInterpolation = rb.interpolation;
+        
         //Destroy components that are client side only
         if (IsOwner == false)
         {
@@ -67,11 +70,6 @@ public class Player : NetworkBehaviour
         //Set player mesh
         avatar.SetPlayerMesh(IsOwner);
         
-        //Teleport to starting location
-        if(FindFirstObjectByType<TeleportOnStart>() != null)
-            movement.Teleport(FindFirstObjectByType<TeleportOnStart>().transform.position);
-        
-        
         //Position Networking
         if(IsOwner == false)
             playerNetworkData.OnValueChanged += StateUpdate;
@@ -82,18 +80,39 @@ public class Player : NetworkBehaviour
             playerIDNetworkVariable.Value = nextPlayerID;
             nextPlayerID++;
         }
+        
+        //Teleport to starting location
+        if(TeleportOnStart.active != null)
+            TeleportOnStart.active.Teleport();
     }
 
     private void Update()
     {
         if (IsOwner)
         {
+            byte movingPlatformID = 0;
+            Vector3 position = transform.position;
+            if (movement.IsOnRailCar(out RailCar railCar))
+            {
+                List<RailCar> railCarList = Train.playerTrain.GetConsist();
+                for (int i = 0; i < railCarList.Count; i++)
+                {
+                    if (railCarList[i] == railCar)
+                    {
+                        movingPlatformID = (byte)(i + 1);
+                        position = railCar.transform.InverseTransformPoint(position);
+                        break;
+                    }
+                }
+            }
+            
             playerNetworkData.Value = new PlayerNetworkData()
             {
-                position = transform.position,
+                position = position,
                 velocity = rb.linearVelocity,
                 yRot = (short)orientation.eulerAngles.y,
-                xRot = (short)camera.rotationX
+                xRot = (short)camera.rotationX,
+                movingPlatformID = movingPlatformID
             };
         }
         else
@@ -114,8 +133,21 @@ public class Player : NetworkBehaviour
     private void StateUpdate(PlayerNetworkData previous, PlayerNetworkData current)
     {
         //Debug.Log("Max Error: " + maxPositionDistanceError * (current.velocity.magnitude * velocityImpactOnError)+", dist: " + Vector3.Distance(transform.position,current.position) +", vel: " + current.velocity.magnitude);
-        if(Vector3.Distance(transform.position,current.position) > maxPositionDistanceError * (current.velocity.magnitude * velocityImpactOnError))
-            rb.position = current.position;
+        MovingPlatformManager.active.RemoveEntry(transform);
+        Vector3 targetWorldPos = current.position;
+        Debug.Log("Moving PlatformID: " + current.movingPlatformID);
+        if (current.movingPlatformID != 0)
+        {
+            int index = current.movingPlatformID - 1;
+            Transform platform = Train.playerTrain.GetConsist()[index].transform;
+            MovingPlatformManager.active.AddEntry(rb,transform,platform,true,rbStartInterpolation);
+            Debug.Log("Pos Before: " + targetWorldPos);
+            targetWorldPos = platform.TransformPoint(targetWorldPos);
+            Debug.Log("Pos  After: " + targetWorldPos);
+        }
+        
+        if(Vector3.Distance(transform.position,targetWorldPos) > maxPositionDistanceError * (current.velocity.magnitude * velocityImpactOnError))
+            rb.position = targetWorldPos;
         rb.linearVelocity = current.velocity;
     }
 
@@ -130,6 +162,7 @@ public class Player : NetworkBehaviour
         public Vector3 position;
         public Vector3 velocity;
         public short yRot, xRot;
+        public byte movingPlatformID; // 0-255 (0 - not on platform)
         
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
@@ -137,6 +170,7 @@ public class Player : NetworkBehaviour
             serializer.SerializeValue(ref velocity);
             serializer.SerializeValue(ref yRot);
             serializer.SerializeValue(ref xRot);
+            serializer.SerializeValue(ref movingPlatformID);
         }
     }
     public override void OnDestroy()

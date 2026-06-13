@@ -1,5 +1,7 @@
+using System;
 using System.Collections;
 using System.IO;
+using Unity.Netcode;
 using UnityEngine;
 
 public class TerrainModifier : StructureGenerator
@@ -7,11 +9,15 @@ public class TerrainModifier : StructureGenerator
     public BoxCollider boxCollider;
     public AnimationCurve shapeBasedOnDistance;
     public float influenceDistance;
+    
+    private void Awake()
+    {
+        if(boxCollider) boxCollider.enabled = false;
+    }
+    
     public override IEnumerator Generate(StructureMaster structureMaster)
     {
         ModifyGround(transform.position, influenceDistance, shapeBasedOnDistance, boxCollider);
-        if(boxCollider != null)
-            boxCollider.enabled = false;
         yield break;
     }
 
@@ -50,5 +56,4 @@ public class TerrainModifier : StructureGenerator
             }
         }
     }
-
 }

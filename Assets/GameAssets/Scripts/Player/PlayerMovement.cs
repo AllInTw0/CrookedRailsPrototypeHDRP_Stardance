@@ -85,7 +85,6 @@ public class PlayerMovement : GroundMovement
         
         colliderStandingHeight = capsuleCollider.height;
         cameraStandingHeight = cameraTransform.localPosition.y;
-        Debug.Log("Compile!!");
     }
 
     public override float GetTargetSpeed()

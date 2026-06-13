@@ -18,7 +18,7 @@ public class WaterInteractable : Interactable
         else
             interactableCollider.enabled = false;
 
-        UpdateInetractable();
+        UpdateInteractable();
     }
     public override bool Interact()
     {

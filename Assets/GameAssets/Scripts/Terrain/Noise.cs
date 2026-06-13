@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class Noise
 {
-    public static List<NoiseSettings> settingsList;
+    public static List<NoiseSettings> settingsList = null;
     public static void Initialize(int seed, List<NoiseSettings> noiseSettingList)
     {
         settingsList = noiseSettingList;

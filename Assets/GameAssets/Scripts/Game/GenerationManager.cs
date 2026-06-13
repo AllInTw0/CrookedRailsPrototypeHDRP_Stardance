@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.AI.Navigation;
 using Unity.Netcode;
 using UnityEngine;
@@ -101,13 +102,38 @@ public class GenerationManager : NetworkBehaviour
     
     //Navigation
     private Vector4 navigationMeshBoundsVector;
+
     private void Start()
     {
         active = this;
-
-        GenerateStart();
+    }
+    public override void OnNetworkSpawn()
+    {
+        Debug.Log("Is Server: " + IsServer);
+        if (IsServer)
+            WaitForScripts();
     }
 
+    private async void WaitForScripts()
+    {
+        try
+        {
+            while (true)
+            {
+                if (Noise.settingsList != null)
+                {
+                    GenerateStart();
+                    return;
+                }
+                await Task.Delay(100);
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
     //Generation functions
     public void GenerateTillNextStation()
     {
@@ -377,13 +403,16 @@ public class GenerationManager : NetworkBehaviour
     }
     private void SpawnStructureNearTrack(float sectionProgress, TrackSection section, StructureSO structureInfo)
     {
+        //Ran only on server
         TrackManager.active.GetTrackPositionAndDirVectorFromProgress(sectionProgress, section, out Vector3 position, out Vector3 dir);
 
         GameObject structure = Instantiate(structureInfo.structurePrefab);
         
         structure.transform.position = position;
         structure.transform.LookAt(position + (structureInfo.onlyRotateY ? new Vector3(dir.x, 0, dir.z) : dir));
-
+    
+        structure.GetComponent<NetworkObject>().Spawn();
+        
         section.AddObject(structure); //Adds it for deletion when track section is deleted
 
         //Initialize structure generation
@@ -394,6 +423,8 @@ public class GenerationManager : NetworkBehaviour
     }
     private void GenerateStart()
     {
+        //Ran only on server
+        
         //GameStateManager.isStartingLocationSpawned = true;
         GameStateManager.currentLevel = 0;
 
@@ -410,7 +441,7 @@ public class GenerationManager : NetworkBehaviour
         currentGeneratedDistance += section.length;
 
         SpawnStructureNearTrack(section.length, section, startingLocationSO);
-
+        
         playerTrain.Initialize(playerTrain.GetConsistLenght() + 1.2f, section);
 
         lastPoint = pointB;

@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-public class Train : MonoBehaviour
+public class Train : NetworkBehaviour
 {
     public static Train playerTrain;
 
@@ -58,11 +61,28 @@ public class Train : MonoBehaviour
     public float speed;
     [HideInInspector]
     public TrackSection frontTrackSection;
+    public bool IsInitialized() { return frontTrackSection != null;}
     [HideInInspector]
     public float sectionProgress;
     private float consistLength;
 
     private float playerDistFromTrain;
+    
+    //Multiplayer
+    private NetworkVariable<TrainNetworkData> trainNetworkData = new(writePerm: NetworkVariableWritePermission.Server);
+    private struct TrainNetworkData : INetworkSerializable
+    {
+        public int sectionID;
+        public float sectionProgress;
+        public float speed;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref sectionID);
+            serializer.SerializeValue(ref sectionProgress);
+            serializer.SerializeValue(ref speed);
+        }
+    }
     private void Awake()
     {
         if (isPlayerTrain)
@@ -71,15 +91,30 @@ public class Train : MonoBehaviour
         RecalculateConsistLength();
     }
 
+    public override void OnNetworkSpawn()
+    {
+        trainNetworkData.OnValueChanged += SyncTrainClient;
+    }
+
+    private void SyncTrainClient(TrainNetworkData previous, TrainNetworkData current)
+    {
+        frontTrackSection = TrackManager.active.FindTrackSectionByID(current.sectionID);
+        sectionProgress = current.sectionProgress;
+        speed = current.speed;
+    }
     private void Update()
     {
         //Debug.Log(deceleration);
-        if(frontTrackSection == null)
+        if(IsInitialized() == false)
         {
             Debug.LogWarning("No track section assigned!");
+            if (IsClient)
+            {
+                SyncTrainClient(trainNetworkData.Value, trainNetworkData.Value);
+            }
             return;
         }
-
+        
         //Player dist
         if (PlayerMovement.active != null && GameStateManager.gameStarted)
         {
@@ -223,6 +258,17 @@ public class Train : MonoBehaviour
                     }
                 }
             }
+        }
+        
+        if (IsServer)
+        {
+            trainNetworkData.Value = new TrainNetworkData()
+            {
+                
+                sectionID = frontTrackSection.sectionID,
+                sectionProgress = sectionProgress,
+                speed = speed
+            };
         }
     }
     public void SetAcceleration(float value)

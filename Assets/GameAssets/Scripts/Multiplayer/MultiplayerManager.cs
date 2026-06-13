@@ -36,18 +36,25 @@ public class MultiplayerManager : MonoBehaviour
     [Header("Local Testing")]
     [SerializeField] private bool hostLocally = true;
     [SerializeField] private string hostLocalTargetScene = "Testing";
+    [SerializeField] private bool editorIsClient = false;
     private async void Start()
     {
         if (hostLocally)
         {
             if (Application.isEditor)
             {
-                NetworkManager.Singleton.StartHost();
+                if(editorIsClient)
+                    NetworkManager.Singleton.StartClient();
+                else
+                    NetworkManager.Singleton.StartHost();
             }
             else
             {
                 await SceneManager.LoadSceneAsync(hostLocalTargetScene);
-                NetworkManager.Singleton.StartClient();
+                if(editorIsClient)
+                    NetworkManager.Singleton.StartHost();
+                else
+                    NetworkManager.Singleton.StartClient();
             }
             return;
         }

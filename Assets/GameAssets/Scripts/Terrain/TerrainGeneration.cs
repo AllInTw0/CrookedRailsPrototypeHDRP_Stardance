@@ -51,8 +51,6 @@ public class TerrainGeneration : NetworkBehaviour
     private ProbabilityList<FoliageData> foliageProbabilityList;
     [Header("Render Distance")]
     [SerializeField]
-    private Transform player;
-    [SerializeField]
     private float renderDistanceMeters;
     [SerializeField]
     private float foliageRenderDistanceMeters;
@@ -130,8 +128,8 @@ public class TerrainGeneration : NetworkBehaviour
     private void UpdateRenderDistance(bool regenerateHeightMesh = false, bool createMesh = false, bool alwaysUpdate = false, bool threadHeightMapGen = false)
     {
         Vector2Int chunk = Vector2Int.zero;
-        if(player != null)
-            chunk = GetChunkCoord(player.position);
+        if(Player.localPlayer)
+            chunk = GetChunkCoord(Player.localPlayer.transform.position);
 
         if (alwaysUpdate || (updateRenderDistance && chunk != lastUpdateCoord))
         {

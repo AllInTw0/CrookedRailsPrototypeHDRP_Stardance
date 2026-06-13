@@ -14,7 +14,7 @@ public class ItemTaker : Interactable
     private float healthPerItem;
     private void Update()
     {
-        UpdateInetractable();
+        UpdateInteractable();
     }
     public override bool Interact()
     {

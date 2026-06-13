@@ -1,6 +1,7 @@
+using Unity.Netcode;
 using UnityEngine;
 
-public class Interactable : MonoBehaviour
+public class Interactable : NetworkBehaviour
 {
     public string objectName;
     public string actionName;
@@ -20,9 +21,9 @@ public class Interactable : MonoBehaviour
     private float actionNameOverrideTime;
     private void Update()
     {
-        UpdateInetractable();
+        UpdateInteractable();
     }
-    public void UpdateInetractable()
+    public void UpdateInteractable()
     {
         if (objectNameOverride != "")
         {

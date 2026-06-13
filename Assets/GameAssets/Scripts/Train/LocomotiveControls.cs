@@ -40,20 +40,20 @@ public class LocomotiveControls : MonoBehaviour
     public bool onSetOffTriggerGenerationReset;
     private void Start()
     {
-        onSetOffTriggerGenerationReset = true;
+        //onSetOffTriggerGenerationReset = true;
     }
     private void LateUpdate()
     {
         if (currentState == State.locked)
         {
-            throttle.currentNotch = throttleNotch;
-            locoBreaks.currentNotch = locoBreaksNotch;
-            reverser.currentNotch = reverserNotch;
+            throttle.SetCurrentNotch(throttleNotch);
+            locoBreaks.SetCurrentNotch(locoBreaksNotch);
+            reverser.SetCurrentNotch(reverserNotch);
             return;
         }
         else if (currentState == State.supersonic)
         {
-            if (throttle.currentNotch > 0)
+            if (throttle.GetCurrentNotch() > 0)
             {
                 throttleNotch = throttle.notches;
             }
@@ -67,14 +67,14 @@ public class LocomotiveControls : MonoBehaviour
 
                 if(onSetOffTriggerGenerationReset && (HaulingJobMonitorHandler.active != null && HaulingJobMonitorHandler.haulingJobPicked == false))
                 {
-                    //throttle.SetActionNameOverride("Pick a job first!");
-                    throttle.currentNotch = throttleNotch;
+                    throttle.SetActionNameOverride("Pick a job first!");
+                    throttle.SetCurrentNotch(throttleNotch);
                     throttleNotch = 0;
 
-                    locoBreaks.currentNotch = 0;
+                    locoBreaks.SetCurrentNotch(0);
                     locoBreaksNotch = 0;
 
-                    reverser.currentNotch = 0;
+                    reverser.SetCurrentNotch(0);
                     reverserNotch = 0;
                     return;
                 }
@@ -85,12 +85,12 @@ public class LocomotiveControls : MonoBehaviour
                     PlayerMovement.active.Freeze(Train.playerTrain.GetRailCarAtIndex(0));
                 }
                 throttle.SetActionNameOverride("");
-                throttle.currentNotch = throttleNotch;
+                throttle.SetCurrentNotch(throttleNotch);
 
-                locoBreaks.currentNotch = 0;
+                locoBreaks.SetCurrentNotch(0);
                 locoBreaksNotch = 0;
 
-                reverser.currentNotch = 0;
+                reverser.SetCurrentNotch(0);
                 reverserNotch = 0;
 
                 train.SetMaxSpeed(supersonicSpeed);
@@ -119,7 +119,7 @@ public class LocomotiveControls : MonoBehaviour
             {
                 throttle.SetActionNameOverride("No " + depletedFuelSourceName + "!");
                 throttle.SetLocked(true);
-                throttle.currentNotch = 0;
+                throttle.SetCurrentNotch(0);
                 currentState = State.depletedFuel;
             }
 
@@ -140,11 +140,11 @@ public class LocomotiveControls : MonoBehaviour
     }
     public void UpdateThrottle()
     {
-        if (throttleNotch != throttle.currentNotch)
+        if (throttleNotch != throttle.GetCurrentNotch())
         {
-            throttleNotch = throttle.currentNotch;
+            throttleNotch = throttle.GetCurrentNotch();
 
-            locoBreaks.currentNotch = 0;
+            locoBreaks.SetCurrentNotch(0);
             locoBreaksNotch = 0;
 
             train.SetMaxSpeed((throttleNotch / (float)throttle.notches) * TrainUpgradeHandler.active.GetStatValue(TrainStatType.Speed));
@@ -158,11 +158,11 @@ public class LocomotiveControls : MonoBehaviour
     }
     public void UpdateBreaks()
     {
-        if (locoBreaksNotch != locoBreaks.currentNotch)
+        if (locoBreaksNotch != locoBreaks.GetCurrentNotch())
         {
-            locoBreaksNotch = locoBreaks.currentNotch;
+            locoBreaksNotch = locoBreaks.GetCurrentNotch();
 
-            throttle.currentNotch = 0;
+            throttle.SetCurrentNotch(0);
             throttleNotch = 0;
 
             train.SetMaxSpeed(0f);
@@ -172,9 +172,9 @@ public class LocomotiveControls : MonoBehaviour
     }
     public void UpdateReverser()
     {
-        if (reverserNotch != reverser.currentNotch)
+        if (reverserNotch != reverser.GetCurrentNotch())
         {
-            reverserNotch = reverser.currentNotch;
+            reverserNotch = reverser.GetCurrentNotch();
 
             if (throttleNotch == 0)
                 train.SetAcceleration(0f);
@@ -184,10 +184,10 @@ public class LocomotiveControls : MonoBehaviour
     }
     public void Break()
     {
-        throttle.currentNotch = 0;
+        throttle.SetCurrentNotch(0);
         throttleNotch = 0;
 
-        locoBreaks.currentNotch = 1;
+        locoBreaks.SetCurrentNotch(1);
         locoBreaksNotch = 1;
 
         train.SetMaxSpeed(0f);
@@ -212,7 +212,7 @@ public class LocomotiveControls : MonoBehaviour
         Break();
 
         currentState = State.locked; //locked = true;   
-        reverser.currentNotch = 0;
+        reverser.SetCurrentNotch(0);
         reverserNotch = 0;
 
         throttle.SetLocked(true);
@@ -241,10 +241,10 @@ public class LocomotiveControls : MonoBehaviour
     }
     public void SetFullThrottle()
     {
-        throttle.currentNotch = throttle.notches;
+        throttle.SetCurrentNotch(throttle.notches);
         UpdateThrottle();
 
-        locoBreaks.currentNotch = 0;
+        locoBreaks.SetCurrentNotch(0);
         UpdateBreaks();
     }
 

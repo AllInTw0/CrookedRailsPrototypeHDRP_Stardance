@@ -1,11 +1,24 @@
+using System;
+using Unity.Netcode;
 using UnityEngine;
 
-public class TeleportOnStart : MonoBehaviour
+public class TeleportOnStart : NetworkBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public static TeleportOnStart active;
+
+    private void Awake()
     {
-        PlayerMovement.active.Teleport(transform.position);
+        active = this;
     }
 
+    public override void OnNetworkSpawn()
+    {
+        Teleport();
+    }
+
+    public void Teleport()
+    {
+        if(Player.localPlayer)
+            Player.localPlayer.movement.Teleport(transform.position);
+    }
 }

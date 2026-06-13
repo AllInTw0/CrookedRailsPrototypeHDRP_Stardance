@@ -496,6 +496,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4686b0a124828dc40be835af4287fa23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrackManager
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &4263706271355839886
 GameObject:
   m_ObjectHideFlags: 0
@@ -709,8 +710,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1379297847
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 229873088
+  InScenePlacedSourceGlobalObjectIdHash: 229873088
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
@@ -1232,7 +1233,6 @@ MonoBehaviour:
   foliageSpawnLayerMask:
     serializedVersion: 2
     m_Bits: 524288
-  player: {fileID: 0}
   renderDistanceMeters: 160
   foliageRenderDistanceMeters: 80
   navMeshLayerMask:
@@ -1460,6 +1460,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MultiplayerManager
   hostLocally: 1
-  hostLocalTargetScene: Testing
+  hostLocalTargetScene: Game
+  editorIsClient: 0
   manuallySetRegion: 1
   region: europe-north1

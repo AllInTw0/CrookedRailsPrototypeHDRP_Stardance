@@ -50,6 +50,7 @@ public class GroundMovement : MonoBehaviour
     
     [NonSerialized]
     public bool grounded = true;
+    private RailCar onRailCar;
 
     private float groundAngle;
     [NonSerialized]
@@ -226,15 +227,22 @@ public class GroundMovement : MonoBehaviour
                 grounded = true;
                 
                 if(hit.transform.CompareTag("Moving"))
+                {
                     MovingPlatformManager.active.AddEntry(rb,transform,hit.transform,true,rbStartInterpolation);
+                    onRailCar = hit.transform.GetComponentInParent<RailCar>();
+                }
                 else
+                {
                     MovingPlatformManager.active.RemoveEntry(transform);
+                    onRailCar = null;
+                }
             }
             else
             {
                 grounded = false;
                 groundNormal = Vector3.up;
                 MovingPlatformManager.active.RemoveEntry(transform);
+                onRailCar = null;
             }
         }
         else
@@ -242,9 +250,15 @@ public class GroundMovement : MonoBehaviour
             grounded = false;
             groundNormal = Vector3.up;
             MovingPlatformManager.active.RemoveEntry(transform);
+            onRailCar = null;
         }
     }
 
+    public bool IsOnRailCar(out RailCar railCar)
+    {
+        railCar = onRailCar;
+        return railCar != null;
+    }
     public void Freeze(RailCar lockToRailCar = null)
     {
         rb.constraints = RigidbodyConstraints.FreezeAll;
