@@ -123,6 +123,8 @@ public class TrackGeneration : MonoBehaviour
                 }
                 allPathPoints.AddRange(trackSection.path);
                 lastTrackSection = trackSection;
+                
+                TrackManager.active.SyncTrackSection(trackSection);
             }
             lastSplinePoint = newPoint;
         }

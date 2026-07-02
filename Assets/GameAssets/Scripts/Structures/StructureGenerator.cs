@@ -1,7 +1,8 @@
 using System.Collections;
+using Unity.Netcode;
 using UnityEngine;
 
-public class StructureGenerator : MonoBehaviour
+public class StructureGenerator : NetworkBehaviour
 {
     public virtual IEnumerator Generate(StructureMaster structureMaster)
     {

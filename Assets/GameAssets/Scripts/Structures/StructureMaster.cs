@@ -1,8 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 public enum LengthType
@@ -55,9 +58,25 @@ public class GenerationEntry
     [Header("Other")]
     public bool obligatory;
 }
-public class StructureMaster : MonoBehaviour
+public class StructureMaster : NetworkBehaviour
 {
-    public List<StructureGenerator> structureList;
+    public static int nextStructureID = 0;
+    public static List<StructureMaster> structureMasterList = new List<StructureMaster>();
+    private NetworkVariable<int> structureID = new(writePerm: NetworkVariableWritePermission.Server);
+    public int GetStructureID(){return structureID.Value;}
+    public static StructureMaster GetStructureById(int structureID)
+    {
+        foreach (StructureMaster structure in structureMasterList)
+        {
+            if (structure.GetStructureID() == structureID)
+                return structure;
+        }
+        Debug.LogWarning("Didnt find structure with ID: " + structureID);
+        return null;
+    }
+    
+    [FormerlySerializedAs("structureList")] 
+    public List<StructureGenerator> structureGeneratorList;
     public StructureType structureType;
     public Connection startConnection;
     public LayerMask overlapCheckLayerMask;
@@ -80,14 +99,47 @@ public class StructureMaster : MonoBehaviour
     private StructureSO structureSO;
     private float sectionProgress;
     private TrackSection section;
+
+    private bool IsSynced = false;
+    
     public void Generate(float sectionProgress = 0f, TrackSection section = null, StructureSO structureSO = null)
     {
         this.sectionProgress = sectionProgress;
         this.section = section;
         this.structureSO = structureSO;
-
+        
         generatingStructures++;
+        
+        //Multiplayer
+        if (TryGetComponent(out NetworkObject networkObject))
+        {
+            IsSynced = true;
+            networkObject.Spawn(true);
+        }
+
         GenerateStructure();
+    }
+
+    private void Start()
+    {
+        structureMasterList.Add(this);
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer)
+        {
+            structureID.Value = nextStructureID;
+            nextStructureID++;
+            
+            GeneratingStructureRpc();
+        }
+    }
+
+    [Rpc(SendTo.NotServer)]
+    private void GeneratingStructureRpc()
+    {
+        generatingStructures++;
     }
     private void GenerateStructure()
     {
@@ -110,24 +162,24 @@ public class StructureMaster : MonoBehaviour
     {
         //Debug.Log("Running!");
         bool added = false;
-        foreach (StructureGenerator structure in structureList)
+        foreach (StructureGenerator structure in structureGeneratorList)
         {
             yield return StartCoroutine(structure.Generate(this));
             if (structure is BasicStructureGenerator && added == false)
             {
-                FinnishedGenerating();
+                FinishedGenerating();
                 added = true;
             }
         }
         if (added == false)
         {
-            FinnishedGenerating();
+            FinishedGenerating();
         }
         yield break;
     }
-    private void FinnishedGenerating()
+    private void FinishedGenerating()
     {
-        //Finnished generating!
+        //Finished generating!
         finnishedStructures++;
         if (section != null && structureSO != null)
         {
@@ -136,6 +188,46 @@ public class StructureMaster : MonoBehaviour
                 section.SetAutoStop(sectionProgress, structureSO.stopType);
             }
         }
+        
+        if (IsSynced)
+        {
+            Debug.Log("Syncing Structure To Clients: " + gameObject.name);
+            int syncedSectionCount = 0;
+            foreach (Section section in structureSectionList)
+            {
+                if (section.SyncToClient())
+                    syncedSectionCount++;
+            }
+            
+            FinishedGeneratingClientRpc(syncedSectionCount);
+        }
+        else
+        {
+            Debug.LogWarning("Not Syncing Structure To Clients: " + gameObject.name);
+        }
+    }
+    [Rpc(SendTo.NotServer)]
+    private void FinishedGeneratingClientRpc(int sectionCount)
+    {
+        FinishedGeneratingClient(sectionCount);
+    }
+
+    private async void FinishedGeneratingClient(int sectionCount)
+    {
+        //Wait for all sections to sync
+        Debug.Log("FinishedGeneratingClient");
+        while (sectionCount != structureSectionList.Count)
+        {
+            Debug.Log("Waiting For Sections " + structureSectionList.Count + "/" + sectionCount);
+            await Task.Delay(100);
+        }
+        
+        foreach (Section sectionScript in structureSectionList)
+        {
+            ConnectNearbyConnections(sectionScript);
+        }
+        SpawnEndPrefabs();
+        finnishedStructures++;
     }
     public void OnDestroy()
     {
@@ -156,7 +248,7 @@ public class StructureMaster : MonoBehaviour
         retryCount++;
         Debug.LogWarning("Restarting Generation: " + transform.name);
         StopAllCoroutines();
-        foreach (StructureGenerator structure in structureList)
+        foreach (StructureGenerator structure in structureGeneratorList)
         {
             structure.StopGenerating();
         }
@@ -198,12 +290,13 @@ public class StructureMaster : MonoBehaviour
             Transform copy = null;
             if((connection.connectedConnection == null || connection.connectedConnection == startConnection) && endList.Count > 0)
             {
-                copy = Instantiate(endList[Random.Range(0, endList.Count)]).transform;
-
+                int randomIndex = Util.SeedToRandomIndex(Mathf.Round(connection.connectionTransform.position.magnitude), endList.Count - 1);
+                copy = Instantiate(endList[randomIndex]).transform;
             } 
             else if (connectedList.Count > 0)
             {
-                copy = Instantiate(connectedList[Random.Range(0, connectedList.Count)]).transform;
+                int randomIndex = Util.SeedToRandomIndex(Mathf.Round(connection.connectionTransform.position.magnitude), connectedList.Count - 1);
+                copy = Instantiate(connectedList[randomIndex]).transform;
             }
             else 
                 continue;
@@ -219,7 +312,7 @@ public class StructureMaster : MonoBehaviour
         Transform sectionTransform = sectionObject.transform;
         Section sectionScript = sectionObject.GetComponent<Section>();
 
-        sectionScript.Initialize();
+        sectionScript.Initialize(this);
 
         //Get all valid connections
         List<Connection> sectionConnectionList = new List<Connection>();
@@ -253,12 +346,15 @@ public class StructureMaster : MonoBehaviour
 
 
             //Set position
-            sectionTransform.SetParent(otherSectionConnection.connectionTransform);
-            sectionTransform.localRotation = Quaternion.identity;
-            sectionTransform.localPosition = -sectionConnection.connectionTransform.localPosition;
+            //sectionTransform.SetParent(otherSectionConnection.connectionTransform);
+            //sectionTransform.localRotation = Quaternion.identity;
+            //sectionTransform.localPosition = -sectionConnection.connectionTransform.localPosition;
+            //sectionTransform.RotateAround(sectionConnection.connectionTransform.position, Vector3.up, otherSectionConnection.connectionTransform.eulerAngles.y - sectionConnection.connectionTransform.eulerAngles.y + 180f);
+            //sectionTransform.SetParent(transform);
+            sectionTransform.rotation = otherSectionConnection.connectionTransform.rotation;
+            sectionTransform.position = otherSectionConnection.connectionTransform.TransformPoint(-sectionConnection.connectionTransform.localPosition);
             sectionTransform.RotateAround(sectionConnection.connectionTransform.position, Vector3.up, otherSectionConnection.connectionTransform.eulerAngles.y - sectionConnection.connectionTransform.eulerAngles.y + 180f);
-            sectionTransform.SetParent(transform);
-
+            
             //Reset overlapping bool
             sectionScript.isOverlapping = false;
 
@@ -319,26 +415,36 @@ public class StructureMaster : MonoBehaviour
 
 
         //Connect connections close to each other
-        foreach (Connection connection in sectionScript.GetAllConnectionList())
-        {
-            //connect
-            foreach (Connection connectionB in structureConnectionList)
-            {
-                if (Vector3.Distance(connection.connectionTransform.position, connectionB.connectionTransform.position) < 0.01f)
-                {
-                    if (connectionB.dontConnect == false)
-                        connection.connectedConnection = connectionB;
-                    if (connection.dontConnect == false)
-                        connectionB.connectedConnection = connection;
-                }
-            }
-        }
+        ConnectNearbyConnections(sectionScript);
 
         structureConnectionList.AddRange(sectionScript.GetAllConnectionList());
         structureSectionList.Add(sectionScript);
 
 
         onSectionAdded.Invoke(sectionScript); //return sectionScript;
+    }
+
+    private void ConnectNearbyConnections(Section sectionScript)
+    {
+        //Connect connections close to each other
+        foreach (Connection connection in sectionScript.GetAllConnectionList())
+        {
+            //connect
+            foreach (Connection connectionB in structureConnectionList)
+            {
+                if (sectionScript.GetAllConnectionList().Contains(connectionB) == false)
+                {
+                    if (Vector3.Distance(connection.connectionTransform.position,
+                            connectionB.connectionTransform.position) < 0.05f)
+                    {
+                        if (connectionB.dontConnect == false)
+                            connection.connectedConnection = connectionB;
+                        if (connection.dontConnect == false)
+                            connectionB.connectedConnection = connection;
+                    }
+                }
+            }
+        }
     }
     public List<Connection> GetValidConnectionsForConnection(Connection connection)
     {

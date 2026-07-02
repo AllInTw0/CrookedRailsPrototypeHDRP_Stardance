@@ -1,13 +1,16 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Section : MonoBehaviour
+public class Section : NetworkBehaviour
 {
+    private NetworkVariable<int> structureID = new (writePerm: NetworkVariableWritePermission.Server);
+    
     public List<GameObject> globalEndPrefabList;
     public List<GameObject> globalConnectedPrefabList;
     [SerializeField]
     private List<Connection> connectionList;
-    public void AddTranfromToConnections(Transform transform)
+    public void AddTransformToConnections(Transform transform)
     {
         if (connectionList == null) connectionList = new List<Connection>();
 
@@ -28,12 +31,15 @@ public class Section : MonoBehaviour
     public bool isOverlapping;
 
     private BoxCollider[] boxColliderArray;
+    private StructureMaster structureMaster;
     private void Awake()
     {
         //Initialize()
     }
-    public void Initialize()
+    public void Initialize(StructureMaster structureMaster)
     {
+        this.structureMaster = structureMaster;
+        
         //Sort connections
         connectingConnectionList = new List<Connection>();
         nonConnectingConnectionList = new List<Connection>();
@@ -53,6 +59,35 @@ public class Section : MonoBehaviour
 
         boxColliderArray = GetComponents<BoxCollider>();
     }
+
+    public bool SyncToClient()
+    {
+        structureID.Value = structureMaster.GetStructureID();
+
+        if (TryGetComponent(out NetworkObject networkObject))
+        {
+            transform.SetParent(null);
+            networkObject.Spawn(true);
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer == false)
+        {
+            structureMaster = StructureMaster.GetStructureById(structureID.Value);
+            Initialize(structureMaster);
+            
+            structureMaster.structureSectionList.Add(this);
+            structureMaster.structureConnectionList.AddRange(GetAllConnectionList());
+        }
+    }
+
     public List<Connection> GetConnectingConnectionList()
     {
         return connectingConnectionList;
@@ -65,6 +100,19 @@ public class Section : MonoBehaviour
     {
         return connectionList;
     }
+
+    public Connection GetConnectionByTransform(Transform t)
+    {
+        foreach (Connection connection in connectionList)
+        {
+            if (connection.connectionTransform == t)
+            {
+                return connection;
+            }
+        }
+        return null;
+    }
+    
     public float GetLength()
     {
         return length;

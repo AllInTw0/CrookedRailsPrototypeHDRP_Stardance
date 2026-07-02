@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Shotgun
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   nameOverride: 
-  prefab: {fileID: 8552301811495896911, guid: 5166261b2c101814f83c91faaf5f472b, type: 3}
+  prefab: {fileID: 5241752616072774263, guid: de470bedf717fe5c4b88f7e81669a7d5, type: 3}
   description: A powerfull starter weapon.
   probabilityCurve:
     serializedVersion: 2
@@ -145,11 +145,11 @@ MonoBehaviour:
   renderLayer:
     serializedVersion: 2
     m_Bits: 256
-  probability: 1
-  price: 1
+  probability: 0.9999496
+  price: 300
   stock: 1
-  sell: 0
-  randomness: 0
+  sell: 200
+  randomness: -0.002012968
   slotCount: 2
   maxCount: 1
   randomYRot: 1

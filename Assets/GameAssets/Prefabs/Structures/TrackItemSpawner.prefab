@@ -93,7 +93,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13bffc8333ee6fe4b9088a6d76711fc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StructureMaster
-  structureList:
+  ShowTopMostFoldoutHeaderGroup: 1
+  structureGeneratorList:
   - {fileID: 3023825391315765784}
   structureType: 0
   startConnection:
@@ -126,6 +127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a3c8c104c80568a4882428dba72f1878, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemSpawner
+  ShowTopMostFoldoutHeaderGroup: 1
   itemSpawnEntryList:
   - element:
       item: {fileID: 11400000, guid: fba5de258cb318342bb90a8d0b6bf548, type: 2}
@@ -133,10 +135,12 @@ MonoBehaviour:
     probability: 5
     maxCount: -1
     pickCount: 0
+    enabled: 0
   - element:
       item: {fileID: 11400000, guid: 37b28eef436127340b96cf8afef5fc0a, type: 2}
       minMaxStackCount: {x: 3, y: 5}
     probability: 0.5
     maxCount: -1
     pickCount: 0
+    enabled: 0
   minMaxCount: {x: 1, y: 1}

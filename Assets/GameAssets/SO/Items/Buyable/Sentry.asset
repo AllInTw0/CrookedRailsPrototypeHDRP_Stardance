@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Sentry
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   nameOverride: 
-  prefab: {fileID: 6084939545742296178, guid: 8a32b1946ed3f9f48bae7c32ea95048e, type: 3}
+  prefab: {fileID: 1519333654433458071, guid: 1c07fa69f91abe68f9647f115d87afde, type: 3}
   description: Sentry.
   probabilityCurve:
     serializedVersion: 2

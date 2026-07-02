@@ -222,7 +222,14 @@ public class TrackManager : NetworkBehaviour
         if(networkData.nextSectionID >= 0)
             section.SetNextSection(FindTrackSectionByID(networkData.nextSectionID));
         if(networkData.previousSectionID >= 0)
-            section.SetPreviousSection(FindTrackSectionByID(networkData.nextSectionID));
+            section.SetPreviousSection(FindTrackSectionByID(networkData.previousSectionID));
+    }
+    public void SyncTrackSection(TrackSection section)
+    {
+        if(IsServer)
+            CreateTrackSectionFromNetworkDataRpc(new TrackSectionNetworkData(section));
+        else
+            Debug.LogWarning("Client calling a server function");
     }
     
     public TrackSection FindTrackSectionByID(int sectionID)

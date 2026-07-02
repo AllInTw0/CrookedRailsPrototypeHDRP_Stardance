@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using static Util;
 
@@ -21,8 +22,8 @@ public class PropSpawner : StructureGenerator
 
         ProbabilityList<GameObject> probabilityList = new ProbabilityList<GameObject>(propProbabilityList);
 
-        PropSpawnBoundingBox[] propSpawnArray = transform.GetComponentsInChildren<PropSpawnBoundingBox>();
-
+        PropSpawnBoundingBox[] propSpawnArray = GetPropSpawnBoundingBoxArray(structureMaster);
+        
         while (spawnTries < maxSpawnTries && spawnedPropCount < maxPropCount && probabilityList.HasItemsLeft())
         {
             //Spawn prop
@@ -130,6 +131,10 @@ public class PropSpawner : StructureGenerator
 
                     spawnedPropCount++;
                     targetBoundingBoxScript.AddBoundingBox(propBoundingBox);
+                    
+                    //Sync to client
+                    propCopy.transform.eulerAngles = new Vector3(0, (int)propCopy.transform.eulerAngles.y, 0);
+                    SpawnPropClientRpc(GetPropIndex(chosenProp), propCopy.transform.position, (int)propCopy.transform.eulerAngles.y);
                 }
             }
 
@@ -139,7 +144,7 @@ public class PropSpawner : StructureGenerator
 
         yield break;
     }
-
+    
     public bool DoseBoxFitInBox(BoxCollider bounds, BoxCollider box)
     {
         if (box.size.y > bounds.size.y) return false;
@@ -160,5 +165,31 @@ public class PropSpawner : StructureGenerator
             }
         }
         return false;
+    }
+    private PropSpawnBoundingBox[] GetPropSpawnBoundingBoxArray(StructureMaster structureMaster)
+    {
+        List<PropSpawnBoundingBox> list = new List<PropSpawnBoundingBox>();
+        list.AddRange(GetComponents<PropSpawnBoundingBox>());
+        for (int i = 0; i < structureMaster.structureSectionList.Count; i++)
+        {
+            list.AddRange(structureMaster.structureSectionList[i].GetComponentsInChildren<PropSpawnBoundingBox>());
+        }
+        return list.ToArray();
+    }
+    private byte GetPropIndex(GameObject propGameObject)
+    {
+        for (int i = 0; i < propProbabilityList.Count; i++)
+        {
+            if (propProbabilityList[i].element == propGameObject)
+                return (byte)i;
+        }
+        Debug.LogError("Did not find prop index");
+        return 0;
+    }
+    [Rpc(SendTo.NotServer)]
+    private void SpawnPropClientRpc(byte index, Vector3 position, int rotationY)
+    {
+        GameObject propCopy = Instantiate(propProbabilityList[index].element, position, Quaternion.Euler(0, rotationY, 0));
+        propCopy.transform.SetParent(transform);
     }
 }

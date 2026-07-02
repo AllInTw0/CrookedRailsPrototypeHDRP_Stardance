@@ -13,21 +13,22 @@ public class TerrainGeneration : NetworkBehaviour
 
     [Header("Size params")]
     [SerializeField]
-    private int _chunkSize; public static int chunkSize;
+    public int chunkSize;
     [SerializeField]
-    private int _chunkVertBorderCount; public static int chunkVertBorderCount; public static float vertSpacing;
+    private int chunkVertBorderCount; 
+    private float vertSpacing;
 
     [Header("Material")]
     [SerializeField]
-    private Material _terrainMaterial; public static Material terrainMaterial;
+    public Material terrainMaterial;
 
     [Header("Terrain Params")]
     [SerializeField]
     private List<NoiseSettings> noiseSettingsList;
     [SerializeField]
-    private int _terrainLayer; public static int terrainLayer;
+    public int terrainLayer;
     [SerializeField]
-    private RenderingLayerMask _terrainRenderingLayerMask; public static RenderingLayerMask terrainRenderingLayerMask;
+    public RenderingLayerMask terrainRenderingLayerMask;
     [System.Serializable]
     private class FoliageData
     {
@@ -38,16 +39,19 @@ public class TerrainGeneration : NetworkBehaviour
     }
     [Header("Foliage")]
     [SerializeField]
+    private List<NoiseSettings> foliageNoiseSettingsList;
+    [SerializeField]
     private List<ProbabilityListElement<FoliageData>> foliageProbabilityElementList = new List<ProbabilityListElement<FoliageData>>();
     [SerializeField]
-    private int _foliageDensity; public static int foliageDensity;
+    private int foliageDensity;
     [SerializeField]
     private AnimationCurve foliageSpawnProbability_DistanceFromTrack;
     [SerializeField]
     private LayerMask foliageRaycastLayerMask;
     [SerializeField]
     private LayerMask foliageSpawnLayerMask;
-
+    
+    private Vector2 foliageNoiseOffset;
     private ProbabilityList<FoliageData> foliageProbabilityList;
     [Header("Render Distance")]
     [SerializeField]
@@ -71,12 +75,15 @@ public class TerrainGeneration : NetworkBehaviour
     public bool autoUpdate;
     //Runtime
     private Dictionary<Vector2Int, Chunk> chunkDictionary = new Dictionary<Vector2Int, Chunk>();
+
+    public static Noise terrainNoise;
+    public static Noise foliageNoise;
     public override void OnNetworkSpawn()
     {
         if (IsServer)
         {
             if (randomSeed)
-                seed = Random.Range(0, 10000);
+                seed = Random.Range(0, 999999999);
             networkSeed.Value = seed;
         }
         SetValues();
@@ -88,14 +95,8 @@ public class TerrainGeneration : NetworkBehaviour
     private void SetValues()
     {
         active = this;
-        chunkSize = _chunkSize;
-        chunkVertBorderCount = _chunkVertBorderCount;
         vertSpacing = (float)chunkSize / (float)chunkVertBorderCount;
-        terrainMaterial = _terrainMaterial;
-        foliageDensity = _foliageDensity;
-        terrainLayer = _terrainLayer;
         lastUpdateCoord = new Vector2Int(-1000000, -1000000);
-        terrainRenderingLayerMask = _terrainRenderingLayerMask;
 
         foreach (ProbabilityListElement<FoliageData> entry in foliageProbabilityElementList)
         {
@@ -104,7 +105,12 @@ public class TerrainGeneration : NetworkBehaviour
         foliageProbabilityList = new ProbabilityList<FoliageData>(foliageProbabilityElementList);
 
         chunkDictionary = new Dictionary<Vector2Int, Chunk>();
-        Noise.Initialize(networkSeed.Value, noiseSettingsList);
+        
+        System.Random rng = new System.Random(networkSeed.Value);
+        foliageNoiseOffset = new Vector2(rng.Next(-10000,10000), rng.Next(-10000,10000));
+        
+        terrainNoise = new Noise(networkSeed.Value, noiseSettingsList);
+        foliageNoise = new Noise(networkSeed.Value, foliageNoiseSettingsList);
     }
     public void SetUpdateRenderDistance(bool value)
     {
@@ -295,7 +301,7 @@ public class TerrainGeneration : NetworkBehaviour
         }
         else
         {
-            return Noise.SampleNoise(worldPosX, worldPosZ);
+            return terrainNoise.SampleNoise(worldPosX, worldPosZ);
         }
     }
     public Color GetColor(float worldPosX, float worldPosZ)
@@ -335,7 +341,7 @@ public class TerrainGeneration : NetworkBehaviour
         public Chunk(Vector2Int coord, bool threadHeightMapGen = false)
         {
             this.coord = coord;
-            worldPos = coord * chunkSize;
+            worldPos = coord * active.chunkSize;
             poolDictionary = new Dictionary<ObjectPool, List<GameObject>>();
             if (threadHeightMapGen)
                 GenerateHeightMapThreaded();
@@ -354,15 +360,15 @@ public class TerrainGeneration : NetworkBehaviour
         }
         public object GenerateHeightMapThread()
         {
-            float[,] heightMap = new float[chunkVertBorderCount + 1, chunkVertBorderCount + 1];
+            float[,] heightMap = new float[active.chunkVertBorderCount + 1, active.chunkVertBorderCount + 1];
             heightAverage = 0f;
             heightMax = float.MinValue;
             heightMin = float.MaxValue;
-            for (int x = 0; x < chunkVertBorderCount + 1; x++)
+            for (int x = 0; x < active.chunkVertBorderCount + 1; x++)
             {
-                for (int y = 0; y < chunkVertBorderCount + 1; y++)
+                for (int y = 0; y < active.chunkVertBorderCount + 1; y++)
                 {
-                    float height = Noise.SampleNoise(worldPos.x + x * vertSpacing, worldPos.y + y * vertSpacing);
+                    float height = terrainNoise.SampleNoise(worldPos.x + x * active.vertSpacing, worldPos.y + y * active.vertSpacing);
                     heightMap[x, y] = height;
                     if (height < heightMin)
                         heightMin = height;
@@ -371,7 +377,7 @@ public class TerrainGeneration : NetworkBehaviour
                     heightAverage += height;
                 }
             }
-            heightAverage = heightAverage / ((chunkVertBorderCount + 1) * (chunkVertBorderCount + 1));
+            heightAverage = heightAverage / ((active.chunkVertBorderCount + 1) * (active.chunkVertBorderCount + 1));
             return heightMap;
         }
         public void GenerateHeightMap()
@@ -415,12 +421,12 @@ public class TerrainGeneration : NetworkBehaviour
                     }
                     else
                     {
-                        extendedHeightMap[x, y] = active.GetHeight(worldPos.x + (x - 1) * vertSpacing, worldPos.y + (y - 1) * vertSpacing);
-                        extendedColorMap[x, y] = active.GetColor(worldPos.x + (x - 1) * vertSpacing, worldPos.y + (y - 1) * vertSpacing);
+                        extendedHeightMap[x, y] = active.GetHeight(worldPos.x + (x - 1) * active.vertSpacing, worldPos.y + (y - 1) * active.vertSpacing);
+                        extendedColorMap[x, y] = active.GetColor(worldPos.x + (x - 1) * active.vertSpacing, worldPos.y + (y - 1) * active.vertSpacing);
                     }
                 }
             }
-            return MeshGenerator.GenerateTerrainMesh(extendedHeightMap, extendedColorMap, vertSpacing);
+            return MeshGenerator.GenerateTerrainMesh(extendedHeightMap, extendedColorMap, active.vertSpacing);
         }
         private void OnMeshRecieved(object meshDataObj)
         {
@@ -441,10 +447,10 @@ public class TerrainGeneration : NetworkBehaviour
             foliageSpawned = true;
             yield return new WaitForSeconds(1f);
 
-            float increment = chunkSize / foliageDensity;
-            for (int x = 0; x < foliageDensity; x++)
+            float increment = active.chunkSize / active.foliageDensity;
+            for (int x = 0; x < active.foliageDensity; x++)
             {
-                for (int y = 0; y < foliageDensity; y++)
+                for (int y = 0; y < active.foliageDensity; y++)
                 {
                     if (coord.y > 3)
                         yield return new WaitForSeconds(0.05f);
@@ -458,12 +464,12 @@ public class TerrainGeneration : NetworkBehaviour
             //Check distance from track
             TrackManager.active.GetClosestTrackSection(pos, out TrackSection trackSection, out float distance);
             float dist = TrackManager.active.GetDistanceFromPath(trackSection.path, pos);
-            if (Random.Range(0f, 1f) > active.foliageSpawnProbability_DistanceFromTrack.Evaluate(dist))
+            if (foliageNoise.SampleNoise(pos.x,pos.z) > active.foliageSpawnProbability_DistanceFromTrack.Evaluate(dist))
                 return;
 
             //Debug.DrawLine(pos, pos + Vector3.up * 20f, Color.coral, 60f);
             Vector2 randomDir = Random.insideUnitCircle;
-            pos += new Vector3(randomDir.x * foliageDensity, 0, randomDir.y * foliageDensity);
+            pos += new Vector3(randomDir.x * active.foliageDensity, 0, randomDir.y * active.foliageDensity);
 
             if (Physics.SphereCast(new Vector3(pos.x, 50f, pos.z), 2.5f, Vector3.down, out RaycastHit hit, 75f, active.foliageRaycastLayerMask))
             {
@@ -513,7 +519,7 @@ public class TerrainGeneration : NetworkBehaviour
 
         public Vector2Int GetVertex(Vector3 pos)
         {
-            return new Vector2Int(Mathf.FloorToInt((pos.x - worldPos.x) / vertSpacing), Mathf.FloorToInt((pos.z - worldPos.y) / vertSpacing));
+            return new Vector2Int(Mathf.FloorToInt((pos.x - worldPos.x) / active.vertSpacing), Mathf.FloorToInt((pos.z - worldPos.y) / active.vertSpacing));
         }
         //public Vector3 GetNormal()
         //{
@@ -521,11 +527,11 @@ public class TerrainGeneration : NetworkBehaviour
         //}
         public Vector3 GetVertexWorldPos(int x, int y)
         {
-            return new Vector3(x * vertSpacing + worldPos.x, heightMap[Mathf.Clamp(x,0, heightMap.GetLength(0) - 1), Mathf.Clamp(y, 0, heightMap.GetLength(1) - 1)], y * vertSpacing + worldPos.y);
+            return new Vector3(x * active.vertSpacing + worldPos.x, heightMap[Mathf.Clamp(x,0, heightMap.GetLength(0) - 1), Mathf.Clamp(y, 0, heightMap.GetLength(1) - 1)], y * active.vertSpacing + worldPos.y);
         }
         public Vector3 GetWorldPos(float timeX, float timeZ)
         {
-            return new Vector3(worldPos.x + timeX * chunkSize, GetVertexWorldPos(Mathf.FloorToInt(timeX * (heightMap.GetLength(0)-1f)), Mathf.FloorToInt(timeZ * (heightMap.GetLength(1) - 1f))).y, worldPos.y + timeZ * chunkSize); 
+            return new Vector3(worldPos.x + timeX * active.chunkSize, GetVertexWorldPos(Mathf.FloorToInt(timeX * (heightMap.GetLength(0)-1f)), Mathf.FloorToInt(timeZ * (heightMap.GetLength(1) - 1f))).y, worldPos.y + timeZ * active.chunkSize); 
         }
         public void Destroy()
         {

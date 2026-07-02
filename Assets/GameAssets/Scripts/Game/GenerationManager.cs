@@ -120,7 +120,7 @@ public class GenerationManager : NetworkBehaviour
         {
             while (true)
             {
-                if (Noise.settingsList != null)
+                if (TerrainGeneration.terrainNoise != null)
                 {
                     GenerateStart();
                     return;
@@ -137,27 +137,45 @@ public class GenerationManager : NetworkBehaviour
     //Generation functions
     public void GenerateTillNextStation()
     {
+        if(IsServer == false)
+            return;
+        
         LoadingScreen.active.Enable("Generating");
         
         navigationMeshBoundsVector = Vector4.zero;
         
         if (GameStateManager.currentHaulingJob == null)
         {
+            GenerateStartRpc(false);
             FindPathsRequest(9, 3, 0.4f, OnFindPaths);
         }
         else
         {
-            //Destroy sections behind
-            TrackSection section = playerTrain.frontTrackSection.previousSection.previousSection;
-            while (section != null)
-            {
-                TrackSection refrence = section;
-                section = section.previousSection;
-
-                TrackManager.active.DestroyTrackSection(refrence);
-            }
+            GenerateStartRpc(true);
+            DestroySectionsBehindTrain();
             //Generate
             OnFindPaths(GameStateManager.currentHaulingJob.linkedTrainTrackPath);
+        }
+    }
+    [Rpc(SendTo.NotServer)]
+    private void GenerateStartRpc(bool destroySectionsBehind)
+    {
+        LoadingScreen.active.Enable("Generating");
+        LoadingScreen.active.SetProgress(0, "Waiting For Host");
+
+        if(destroySectionsBehind) DestroySectionsBehindTrain();
+    }
+
+    private void DestroySectionsBehindTrain()
+    {
+        //Destroy sections behind
+        TrackSection section = playerTrain.frontTrackSection.previousSection.previousSection;
+        while (section != null)
+        {
+            TrackSection refrence = section;
+            section = section.previousSection;
+
+            TrackManager.active.DestroyTrackSection(refrence);
         }
     }
     public void FindPathsRequest(int searchCount, int returnCount, float loadingBarTime, Action<object> callBack)
@@ -165,7 +183,7 @@ public class GenerationManager : NetworkBehaviour
         List<int> pathSeeds = new List<int>();
         for (int i = 0; i < searchCount; i++)
         {
-            pathSeeds.Add(Random.Range(0, 10000));
+            pathSeeds.Add(Random.Range(0, 999999));
         }
         ThreadManager.AddThreadJob(() => FindPathThread(pathSeeds, returnCount, loadingBarTime), callBack);
     }
@@ -228,7 +246,7 @@ public class GenerationManager : NetworkBehaviour
         while (StructureMaster.generatingStructures != StructureMaster.finnishedStructures)
         {
             LoadingScreen.active.SetProgress(0.55f + (StructureMaster.finnishedStructures / (float)StructureMaster.generatingStructures) * 0.25f, $"Generating Structures {StructureMaster.finnishedStructures}/{StructureMaster.generatingStructures}");
-            yield return new WaitForSecondsRealtime(0.1f);
+            yield return null;
         }
 
         LoadingScreen.active.SetProgress(0.9f, "Modifying Ground");
@@ -305,8 +323,8 @@ public class GenerationManager : NetworkBehaviour
         navMeshSurface.transform.SetParent(transform);
         navMeshSurface.transform.position = Vector3.zero;
 
-        navMeshSurface.size = new Vector3(xSize * TerrainGeneration.chunkSize, 40f, ySize * TerrainGeneration.chunkSize);
-        navMeshSurface.center = new Vector3(xCenter * TerrainGeneration.chunkSize, 10f, yCenter * TerrainGeneration.chunkSize);
+        navMeshSurface.size = new Vector3(xSize * TerrainGeneration.active.chunkSize, 40f, ySize * TerrainGeneration.active.chunkSize);
+        navMeshSurface.center = new Vector3(xCenter * TerrainGeneration.active.chunkSize, 10f, yCenter * TerrainGeneration.active.chunkSize);
         
         navMeshSurface.agentTypeID = NavMesh.GetSettingsByIndex(1).agentTypeID;//enemy
 
@@ -358,11 +376,52 @@ public class GenerationManager : NetworkBehaviour
         //Generate
         navMeshSurface.BuildNavMesh();
         
-        yield return new WaitForSecondsRealtime(1f);
-        FinishGeneration();
+        WaitForClients();
     }
 
-    public void FinishGeneration()
+    private int clientsFinishedGenerating = 0;
+    private async void WaitForClients()
+    {
+        try
+        {
+            ServerFinishedGeneratingRpc();
+            LoadingScreen.active.SetProgress(1f, "Waiting For Clients");
+            while (clientsFinishedGenerating < NetworkManager.Singleton.ConnectedClients.Count-1)
+            {
+                LoadingScreen.active.SetProgress(1f, $"Waiting For Clients {clientsFinishedGenerating}/{NetworkManager.Singleton.ConnectedClients.Count-1}");
+                await Task.Delay(50);
+            }
+
+            FinishGenerationRpc();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+        }
+    }
+    [Rpc(SendTo.NotServer)]
+    private void ServerFinishedGeneratingRpc()
+    {
+        ClientFinishedGeneratingRpc();
+        //Move this to when the client is waiting for structures to finish generating
+        TrackSection section = Train.playerTrain.frontTrackSection;
+        List<PathPoint> generatedPath = new List<PathPoint>();
+
+        while (section.nextSection != null)
+        {
+            generatedPath.AddRange(section.nextSection.path);
+            section = section.nextSection;
+        }
+        LoadingScreen.active.SetProgress(0.9f, "Modifying Ground");
+        ThreadManager.AddThreadJob(delegate { trackGeneration.ModifyTerrainToFollowPath(generatedPath, true); }, delegate { ClientFinishedGeneratingRpc(); });
+    }
+    [Rpc(SendTo.Server)]
+    private void ClientFinishedGeneratingRpc()
+    {
+        clientsFinishedGenerating++;
+    }
+    [Rpc(SendTo.Everyone)]
+    public void FinishGenerationRpc()
     {
         GameStateManager.gameStarted = true;
         EnemySpawner.ResetWaveValues(5f);
@@ -410,8 +469,6 @@ public class GenerationManager : NetworkBehaviour
         
         structure.transform.position = position;
         structure.transform.LookAt(position + (structureInfo.onlyRotateY ? new Vector3(dir.x, 0, dir.z) : dir));
-    
-        structure.GetComponent<NetworkObject>().Spawn();
         
         section.AddObject(structure); //Adds it for deletion when track section is deleted
 
@@ -466,16 +523,19 @@ public class GenerationManager : NetworkBehaviour
 
         //Pre Station Track
         TrackSection generatedSection = GenerateStraightSection(playerTrain.GetConsistLenght() + 12.5f);
+        TrackManager.active.SyncTrackSection(generatedSection);
         SpawnStructureNearTrack(generatedSection.length, generatedSection, preStationSO);
         //generatedSection.SetAutoStop(generatedSection.length - 2.5f,AutoStopType.Front);
 
         //Speed Track Enter
         generatedSection = GenerateStraightSection(stationSpeedTrackDistance);
+        TrackManager.active.SyncTrackSection(generatedSection);
         ListOfPathPoints.AddRange(generatedSection.path);
 
         //Station Track
         float startionTrackLength = playerTrain.GetConsistLenght() + 10f;
         generatedSection = GenerateStraightSection(startionTrackLength,110f);
+        TrackManager.active.SyncTrackSection(generatedSection);
         ListOfPathPoints.AddRange(generatedSection.path);
         SpawnStructureNearTrack(generatedSection.length - 2, generatedSection, stationSO);
         Vector3 middlePos = TrackManager.GetPathPosition(generatedSection.path, generatedSection.length * 0.5f);
@@ -515,6 +575,7 @@ public class GenerationManager : NetworkBehaviour
         currentGeneratedDistance += generatedSection.length;
 
         lastSection.SetNextSection(generatedSection);
+        TrackManager.active.SyncTrackSection(generatedSection);
         lastSection = generatedSection;
         lastPoint = point;
         

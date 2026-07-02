@@ -135,15 +135,12 @@ public class Player : NetworkBehaviour
         //Debug.Log("Max Error: " + maxPositionDistanceError * (current.velocity.magnitude * velocityImpactOnError)+", dist: " + Vector3.Distance(transform.position,current.position) +", vel: " + current.velocity.magnitude);
         MovingPlatformManager.active.RemoveEntry(transform);
         Vector3 targetWorldPos = current.position;
-        Debug.Log("Moving PlatformID: " + current.movingPlatformID);
         if (current.movingPlatformID != 0)
         {
             int index = current.movingPlatformID - 1;
             Transform platform = Train.playerTrain.GetConsist()[index].transform;
             MovingPlatformManager.active.AddEntry(rb,transform,platform,true,rbStartInterpolation);
-            Debug.Log("Pos Before: " + targetWorldPos);
             targetWorldPos = platform.TransformPoint(targetWorldPos);
-            Debug.Log("Pos  After: " + targetWorldPos);
         }
         
         if(Vector3.Distance(transform.position,targetWorldPos) > maxPositionDistanceError * (current.velocity.magnitude * velocityImpactOnError))

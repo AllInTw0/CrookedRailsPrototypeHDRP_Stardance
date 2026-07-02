@@ -111,24 +111,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ad331f5a68fffd4d8d156ddabca93c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Section
+  ShowTopMostFoldoutHeaderGroup: 1
+  globalEndPrefabList: []
+  globalConnectedPrefabList: []
   connectionList:
   - connectionTransform: {fileID: 1962629740313221069}
     validConnectionNameList:
     - wire*
     endPrefabList: []
     connectedPrefabList: []
+    useGlobalEnds: 0
     dontConnect: 1
     ignoreConnections: 0
+    section: {fileID: 0}
   - connectionTransform: {fileID: 5261917249753620942}
     validConnectionNameList:
     - wire*
     endPrefabList: []
     connectedPrefabList: []
+    useGlobalEnds: 0
     dontConnect: 1
     ignoreConnections: 0
+    section: {fileID: 0}
   length: 0
   connectingConnectionList: []
   nonConnectingConnectionList: []
+  isOverlapping: 0
 --- !u!114 &4985826642899316826
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -141,7 +149,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f97fa88ceb5893438d74763f353fbb2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SplineGenerator
+  ShowTopMostFoldoutHeaderGroup: 1
   linkedSection: {fileID: 8676157649310614569}
+  startConnectionTransform: {fileID: 1962629740313221069}
+  endConnectionTransform: {fileID: 5261917249753620942}
   splineVisualizerList:
   - {fileID: 460510754363611988}
   minMaxHandleLenghtMult: {x: 0.6, y: 0.9}
@@ -212,11 +223,21 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   noiseFrequency: 7
-  noiseStepBasedOnDistance: 0.0015
   minMaxTargetOffset: {x: 1.5, y: 2.5}
   minMaxDistanceForward: {x: 0, y: 0}
   minMaxDistanceRight: {x: 0, y: 0}
   minMaxRotOffset: {x: 0, y: 0}
+  sphereCheckRadius: -1
+  sphereCheckOffset: {x: 0, y: 0, z: 0}
+  followTerrain: 0
+  checkForTerrainHeight: 0
+  chunkAverageHeigthMinMax: {x: 0, y: 0}
+  heightMinMax: {x: 0, y: 0}
+  modifyGround: 0
+  allowedHeightInterval: {x: 0, y: 0}
+  checkDistanceToTrack: 0
+  minDistanceFromTrack: 0
+  minLength: -1
 --- !u!114 &460510754363611988
 MonoBehaviour:
   m_ObjectHideFlags: 0

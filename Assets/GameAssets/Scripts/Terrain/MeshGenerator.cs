@@ -71,15 +71,15 @@ public class MeshData
     {
         meshObject = new GameObject("Terrain");
         meshObject.transform.SetParent(TerrainGeneration.active.transform);
-        meshObject.layer = TerrainGeneration.terrainLayer;
+        meshObject.layer = TerrainGeneration.active.terrainLayer;
         MeshFilter meshFilter = meshObject.AddComponent<MeshFilter>();
         MeshRenderer meshRenderer = meshObject.AddComponent<MeshRenderer>();
-        meshRenderer.renderingLayerMask = TerrainGeneration.terrainRenderingLayerMask;
+        meshRenderer.renderingLayerMask = TerrainGeneration.active.terrainRenderingLayerMask;
         MeshCollider meshCollider = meshObject.AddComponent<MeshCollider>();
         meshFilter.sharedMesh = mesh;
         meshCollider.sharedMesh = mesh;
 
-        meshRenderer.material = TerrainGeneration.terrainMaterial;
+        meshRenderer.material = TerrainGeneration.active.terrainMaterial;
 
         meshObject.transform.position = new Vector3(worldPos.x, 0, worldPos.y);
 

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SentryScrap
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   nameOverride: 
-  prefab: {fileID: 2316488650685252420, guid: d67dfca9665719e4894e93e8b1eb2a66, type: 3}
+  prefab: {fileID: 4202837722654965728, guid: 0bf1b7e4bc5a7f6acb84b9807b89e271, type: 3}
   description: A Destroyed Sentry.
   probabilityCurve:
     serializedVersion: 2

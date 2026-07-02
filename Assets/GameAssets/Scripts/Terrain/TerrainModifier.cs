@@ -25,7 +25,7 @@ public class TerrainModifier : StructureGenerator
     {
         Vector2Int chunkCoord = TerrainGeneration.active.GetChunkCoord(worldPos);
 
-        int exploreDist = Mathf.RoundToInt(influenceDistance / TerrainGeneration.chunkSize + 0.5f);
+        int exploreDist = Mathf.RoundToInt(influenceDistance / TerrainGeneration.active.chunkSize + 0.5f);
         if (exploreDist < 1)
             exploreDist = 1;
 

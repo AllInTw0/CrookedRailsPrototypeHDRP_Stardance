@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Bucket
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   nameOverride: 
-  prefab: {fileID: 4029657645876044969, guid: 3a53d566f5e7f2d42a691d8c1bfde19e, type: 3}
+  prefab: {fileID: 4648843730417903834, guid: 40f8d6272962d0c67aab93757a358458, type: 3}
   description: Manually refill the water of the tender.
   probabilityCurve:
     serializedVersion: 2
@@ -144,11 +144,11 @@ MonoBehaviour:
   renderLayer:
     serializedVersion: 2
     m_Bits: 256
-  probability: 0
-  price: 1
+  probability: 0.09676366
+  price: 75
   stock: 1
-  sell: 1
-  randomness: 0
+  sell: 41
+  randomness: 0.007142842
   slotCount: 2
   maxCount: 1
   randomYRot: 1

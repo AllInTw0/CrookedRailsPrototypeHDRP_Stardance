@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Whrench
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   nameOverride: 
-  prefab: {fileID: 564337330547355037, guid: 2606460a6214a0d47a33147017b7eb86, type: 3}
+  prefab: {fileID: 3368950294815579411, guid: 3002c173764db7483bb382a808172421, type: 3}
   description: Repair broken train parts or build a sentry to defend your train.
     Can be used as a melee weapon.
   probabilityCurve:
@@ -74,9 +74,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   probability: 0
-  price: 0
+  price: 1
   stock: 0
-  sell: 0
+  sell: 1
   randomness: 0
   slotCount: 2
   maxCount: 1

@@ -19,19 +19,13 @@ public class PrefabSplineVisualizer : SplineVisualizer
     public override void Visualize(List<PathPoint> path)
     {
         float pathLength = path[^1].distance;
-        float distance = 0f;
+        
+        float distance = Util.O1RangeToVector2Range(Mathf.PerlinNoise1D(Mathf.Round(TrackManager.GetPathPosition(path, 0f).magnitude)), minMaxStartDistance);
+        distance = Mathf.Clamp(distance, minMaxStartDistance.x, pathLength);
 
-        if (pathLength < distance)
+        while (distance <= pathLength)
         {
-            Debug.LogWarning("Path to short to place prefab");
-            return;
-        }
-
-        distance = Random.Range(minMaxStartDistance.x, minMaxStartDistance.y);
-
-        while (distance < pathLength)
-        {
-            PrefabEntry prefabEntry = prefabList[Random.Range(0, prefabList.Count)];
+            PrefabEntry prefabEntry = prefabList[Util.SeedToRandomIndex(Mathf.Round(TrackManager.GetPathPosition(path, distance).magnitude),prefabList.Count-1)];
             GameObject copy = Instantiate(prefabEntry.prefab, transform);
 
             Vector3 dirVector = TrackManager.GetPathDirectionVector(path, distance);
@@ -39,7 +33,7 @@ public class PrefabSplineVisualizer : SplineVisualizer
             copy.transform.LookAt(copy.transform.position + dirVector);
             copy.transform.rotation *= Quaternion.Euler(prefabEntry.rotation);
 
-            distance += Random.Range(minMaxRepeatingDistance.x, minMaxRepeatingDistance.y);
+            distance += Util.O1RangeToVector2Range(Mathf.PerlinNoise1D(Mathf.Round(TrackManager.GetPathPosition(path, distance).magnitude)), minMaxRepeatingDistance);
         }
     }
 }

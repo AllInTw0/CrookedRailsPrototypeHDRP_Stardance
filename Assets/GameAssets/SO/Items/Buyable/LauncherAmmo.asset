@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: LauncherAmmo
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   nameOverride: 
-  prefab: {fileID: 6153546570169836682, guid: a73b97cfa6a210c45bea00860957688f, type: 3}
+  prefab: {fileID: 443408006868671661, guid: 40f546bdb3f42e164abf9dfa5821b6aa, type: 3}
   description: Ammo for the Grenade Launcher.
   probabilityCurve:
     serializedVersion: 2
@@ -144,11 +144,11 @@ MonoBehaviour:
   renderLayer:
     serializedVersion: 2
     m_Bits: 256
-  probability: 0
-  price: 1
+  probability: 0.37719777
+  price: 30
   stock: 1
-  sell: 1
-  randomness: 0
+  sell: 16
+  randomness: 0.4047619
   slotCount: 1
   maxCount: 20
   randomYRot: 1

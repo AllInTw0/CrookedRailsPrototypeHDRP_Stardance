@@ -237,9 +237,9 @@ public class Item : NetworkBehaviour
         }
     }
     [Rpc(SendTo.Everyone)]
-    private void DropFromPosRpc(Vector3 startPos)
+    private void DropFromPosRpc(Vector3 startPos, bool hasSound = true)
     {
-        DropFromPos(startPos);
+        DropFromPos(startPos, hasSound);
     }
     public void DropFromPos(Vector3 startPos, bool hasSound = true)
     {
@@ -338,14 +338,23 @@ public class Item : NetworkBehaviour
     {
         return physicsEnabled;
     }
+    [Rpc(SendTo.Everyone)]// Could be temp. Might need to convert count to a NetworkVariable with client side prediction if it somehow goes of sync
+    private void SetCountRpc(int value)
+    {
+        count = value;
+    }
     public static Item SpawnItem(ItemSO itemSO, Vector3 pos, Quaternion rot, int stackCount = 1, bool dropSound = true)
     {
         
         Transform copy = Instantiate(itemSO.prefab,pos,rot).transform;
 
         Item item = copy.GetComponent<Item>();
-        item.DropFromPos(pos, dropSound);
-        item.count = Mathf.Clamp(stackCount, 1, item.itemInfo.maxCount);
+        
+        NetworkObject networkObject = copy.GetComponent<NetworkObject>();
+        networkObject.Spawn(true);
+        
+        item.DropFromPosRpc(pos, dropSound);
+        item.SetCountRpc(Mathf.Clamp(stackCount, 1, item.itemInfo.maxCount));
 
         return item;
     }

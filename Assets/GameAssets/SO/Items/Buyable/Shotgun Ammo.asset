@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Shotgun Ammo
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   nameOverride: 
-  prefab: {fileID: 6153546570169836682, guid: 6dcda7e325502854ba28300c1ffedd06, type: 3}
+  prefab: {fileID: 8549184695684560683, guid: 28626b283788467a4916c07053561563, type: 3}
   description: Ammo for the shotgun.
   probabilityCurve:
     serializedVersion: 2
@@ -144,11 +144,11 @@ MonoBehaviour:
   renderLayer:
     serializedVersion: 2
     m_Bits: 256
-  probability: 0
-  price: 1
+  probability: 0.36498594
+  price: 20
   stock: 1
-  sell: 1
-  randomness: 0
+  sell: 11
+  randomness: 0.4047619
   slotCount: 1
   maxCount: 20
   randomYRot: 1

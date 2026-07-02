@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Firewood
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   nameOverride: Firewood
-  prefab: {fileID: 7598475369353874153, guid: f96bed87790e06249b755e8d0ed7fd85, type: 3}
+  prefab: {fileID: 1678035819796515951, guid: 6e4b753de64de76f9a213f86a7571bee, type: 3}
   description: Fuel for the loco
   probabilityCurve:
     serializedVersion: 2
@@ -73,9 +73,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   probability: 0
-  price: 0
+  price: 1
   stock: 0
-  sell: 0
+  sell: 1
   randomness: 0
   slotCount: 1
   maxCount: 5

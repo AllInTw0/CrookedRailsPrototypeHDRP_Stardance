@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5094900258736667153}
   - component: {fileID: 8798747483908194654}
+  - component: {fileID: 3734135970922372023}
   - component: {fileID: 5979637673435595457}
   m_Layer: 20
   m_Name: CoalingTower
@@ -51,6 +52,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ad331f5a68fffd4d8d156ddabca93c2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Section
+  ShowTopMostFoldoutHeaderGroup: 1
   globalEndPrefabList: []
   globalConnectedPrefabList: []
   connectionList:
@@ -100,6 +102,31 @@ MonoBehaviour:
   connectingConnectionList: []
   nonConnectingConnectionList: []
   isOverlapping: 0
+--- !u!114 &3734135970922372023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 152029324503992919}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 1484793852
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!65 &5979637673435595457
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -310,6 +337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: abbb8c2125c85d14bb916a9caf68384d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TerrainModifier
+  ShowTopMostFoldoutHeaderGroup: 1
   boxCollider: {fileID: 4212783096258923660}
   shapeBasedOnDistance:
     serializedVersion: 2

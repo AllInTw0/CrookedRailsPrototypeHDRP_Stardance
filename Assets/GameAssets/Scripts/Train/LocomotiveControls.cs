@@ -40,7 +40,7 @@ public class LocomotiveControls : MonoBehaviour
     public bool onSetOffTriggerGenerationReset;
     private void Start()
     {
-        //onSetOffTriggerGenerationReset = true;
+        onSetOffTriggerGenerationReset = true;
     }
     private void LateUpdate()
     {

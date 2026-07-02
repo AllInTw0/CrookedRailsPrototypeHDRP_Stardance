@@ -44,6 +44,10 @@ PrefabInstance:
       propertyPath: minMaxDistanceForward.y
       value: 30
       objectReference: {fileID: 0}
+    - target: {fileID: 3973033685552063138, guid: e93dada4af911784181fb895afa1ee55, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 2303947624
+      objectReference: {fileID: 0}
     - target: {fileID: 4452313495642695704, guid: e93dada4af911784181fb895afa1ee55, type: 3}
       propertyPath: m_Name
       value: pathBranchS

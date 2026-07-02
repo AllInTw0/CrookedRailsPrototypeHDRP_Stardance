@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class SplineGenerator : StructureGenerator
@@ -7,6 +8,10 @@ public class SplineGenerator : StructureGenerator
     [Header("Spline Generator")]
     [SerializeField]
     private Section linkedSection;
+    [SerializeField]
+    private Transform startConnectionTransform;
+    [SerializeField]
+    private Transform endConnectionTransform;
     [SerializeField]
     List<SplineVisualizer> splineVisualizerList;
     [Header("Path Shape Randomness")]
@@ -53,107 +58,157 @@ public class SplineGenerator : StructureGenerator
     [Header("Min Length")]
     [SerializeField]
     private float minLength = -1f;
+    
+    //Multiplayer
+    private NetworkVariable<SplineNetworkData> networkData = new NetworkVariable<SplineNetworkData>();
+    private struct SplineNetworkData : INetworkSerializable
+    {
+        public Vector3 startConnectionPosition;
+        public Vector3 startConnectionRotation;
+        public Vector3 startConnectionPointHandle;
+        
+        public Vector3 endConnectionPosition;
+        public Vector3 endConnectionRotation;
+        public Vector3 endConnectionPointHandle;
+        
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref startConnectionPosition);
+            serializer.SerializeValue(ref startConnectionRotation);
+            serializer.SerializeValue(ref startConnectionPointHandle);
+            serializer.SerializeValue(ref endConnectionPosition);
+            serializer.SerializeValue(ref endConnectionRotation);
+            serializer.SerializeValue(ref endConnectionPointHandle);
+        }
+    }
+    public Connection GetStartConnection()
+    {
+        return linkedSection.GetConnectionByTransform(startConnectionTransform);
+    }
+    public Connection GetEndConnection()
+    {
+        return linkedSection.GetConnectionByTransform(endConnectionTransform);
+    }
     public override IEnumerator Generate(StructureMaster structureMaster)
     {
-        Connection startConnection = null;
-        foreach (Connection connection in linkedSection.GetConnectingConnectionList())
+        Connection startConnection = GetStartConnection();
+        Connection endConnection = GetEndConnection();
+
+        List<Connection> validConnections = structureMaster.GetValidConnectionsForConnection(endConnection);
+        validConnections.Remove(startConnection.connectedConnection);
+
+        if (validConnections.Count > 0)
         {
-            if(connection.connectedConnection != null)
-            {
-                startConnection = connection;
-                break;
-            }
+            //Connect
+            Connection targetEndConnection = validConnections[Random.Range(0, validConnections.Count)];
+            endConnection.connectionTransform.position = targetEndConnection.connectionTransform.position;
+            endConnection.connectionTransform.rotation = Quaternion.Euler(0f, targetEndConnection.connectionTransform.eulerAngles.y - 180f, 0f);
         }
-
-        foreach (Connection endConnection in linkedSection.GetAllConnectionList())
+        else
         {
-            if (endConnection == startConnection) continue;
-
-            List<Connection> validConnections = structureMaster.GetValidConnectionsForConnection(endConnection);
-            validConnections.Remove(startConnection.connectedConnection);
-
-            if (validConnections.Count > 0)
+            //Random
+            Vector3 GetRandomOffset()
             {
-                //Connect
-                Connection targetEndConnection = validConnections[Random.Range(0, validConnections.Count)];
-                endConnection.connectionTransform.position = targetEndConnection.connectionTransform.position;
-                endConnection.connectionTransform.rotation = Quaternion.Euler(0f, targetEndConnection.connectionTransform.eulerAngles.y - 180f, 0f);
+                return startConnection.connectionTransform.position + -startConnection.connectionTransform.forward * Random.Range(minMaxDistanceForward.x, minMaxDistanceForward.y) + startConnection.connectionTransform.right * Random.Range(minMaxDistanceRight.x, minMaxDistanceRight.y);
             }
-            else
+            Vector3 endPos = Vector3.zero;
+            int saftey = 50;
+            while (saftey > 0)
             {
-                //Random
-                Vector3 GetRandomOffset()
+                bool passed = true;
+                endPos = GetRandomOffset();
+                Debug.DrawLine(startConnection.connectionTransform.position, endPos, Color.green, 30f);
+                Debug.DrawLine(startConnection.connectionTransform.position, endPos, Color.yellow, 30f);
+                if (checkForTerrainHeight)
                 {
-                    return startConnection.connectionTransform.position + -startConnection.connectionTransform.forward * Random.Range(minMaxDistanceForward.x, minMaxDistanceForward.y) + startConnection.connectionTransform.right * Random.Range(minMaxDistanceRight.x, minMaxDistanceRight.y);
-                }
-                Vector3 endPos = Vector3.zero;
-                int saftey = 50;
-                while (saftey > 0)
-                {
-                    bool passed = true;
-                    endPos = GetRandomOffset();
-                    Debug.DrawLine(startConnection.connectionTransform.position, endPos, Color.green, 30f);
-                    Debug.DrawLine(startConnection.connectionTransform.position, endPos, Color.yellow, 30f);
-                    if (checkForTerrainHeight)
+                    TerrainGeneration.Chunk chunk = TerrainGeneration.active.CreateOrGetChunk(TerrainGeneration.active.GetChunkCoord(endPos));
+                    if(chunkAverageHeigthMinMax.x <= chunk.heightAverage && chunkAverageHeigthMinMax.y >= chunk.heightAverage)
                     {
-                        TerrainGeneration.Chunk chunk = TerrainGeneration.active.CreateOrGetChunk(TerrainGeneration.active.GetChunkCoord(endPos));
-                        if(chunkAverageHeigthMinMax.x <= chunk.heightAverage && chunkAverageHeigthMinMax.y >= chunk.heightAverage)
-                        {
-                            float pointHeight = TerrainGeneration.active.GetHeight(endPos);
-                            if (heightMinMax.x <= pointHeight && heightMinMax.y >= pointHeight)
-                            { }
-                            else
-                            {
-                                passed = false;
-                            }
-                        }
+                        float pointHeight = TerrainGeneration.active.GetHeight(endPos);
+                        if (heightMinMax.x <= pointHeight && heightMinMax.y >= pointHeight)
+                        { }
                         else
                         {
                             passed = false;
                         }
-                        
                     }
-                    if (checkDistanceToTrack && passed)
+                    else
                     {
-                        float dist = TrackManager.active.GetDistanceFromTrack(endPos);
-                        if (dist < minDistanceFromTrack)
-                            passed = false;
-
+                        passed = false;
                     }
-                    if (passed)
-                        break;
-                    saftey--;
+                    
                 }
-                if (saftey <= 1)
+                if (checkDistanceToTrack && passed)
                 {
-                    Debug.LogWarning("Exeded saftey! " + saftey);
-                    structureMaster.RestartGeneration();
-                    yield break;
-                }
-                endConnection.connectionTransform.position = endPos;
-                endConnection.connectionTransform.rotation = Quaternion.Euler(0f, startConnection.connectionTransform.eulerAngles.y + Random.Range(minMaxRotOffset.x, minMaxRotOffset.y) + 180f, 0f);
-            }
-            CreatePath(startConnection, endConnection);
-        }
+                    float distFromTrack = TrackManager.active.GetDistanceFromTrack(endPos);
+                    if (distFromTrack < minDistanceFromTrack)
+                        passed = false;
 
-        yield break;
+                }
+                if (passed)
+                    break;
+                saftey--;
+            }
+            if (saftey <= 1)
+            {
+                Debug.LogWarning("Exeded saftey! " + saftey);
+                structureMaster.RestartGeneration();
+                yield break;
+            }
+            endConnection.connectionTransform.position = endPos;
+            endConnection.connectionTransform.rotation = Quaternion.Euler(0f, startConnection.connectionTransform.eulerAngles.y + Random.Range(minMaxRotOffset.x, minMaxRotOffset.y) + 180f, 0f);
+        }
+        
+        
+        //Multiplayer
+        Transform startTransform = startConnection.connectionTransform;
+        Transform endTransform = endConnection.connectionTransform;
+
+        float dist = Vector3.Distance(startTransform.position, endTransform.position);
+        
+        networkData.Value = new SplineNetworkData()
+        {
+            startConnectionPosition = startTransform.position,
+            startConnectionRotation = startTransform.eulerAngles,
+            startConnectionPointHandle = startTransform.position - startTransform.forward * (dist * Random.Range(minMaxHandleLenghtMult.x,minMaxHandleLenghtMult.y)),
+            
+            endConnectionPosition = endTransform.position,
+            endConnectionRotation = endTransform.eulerAngles,
+            endConnectionPointHandle = endTransform.position + endTransform.forward * (dist * Random.Range(minMaxHandleLenghtMult.x, minMaxHandleLenghtMult.y))
+        };
+        
+        CreatePath(networkData.Value);
     }
-    public void CreatePath(Connection start, Connection end)
+
+    public override void OnNetworkSpawn()
     {
+        if(IsClient)
+            CreatePath(networkData.Value);
+    }
+
+    private void CreatePath(SplineNetworkData splineNetworkData)
+    {
+        Connection start = GetStartConnection();
+        Connection end = GetEndConnection();
+        
         Transform startTransform = start.connectionTransform;
         Transform endTransform = end.connectionTransform;
 
-        float dist = Vector3.Distance(startTransform.position, endTransform.position);
+        startTransform.position = splineNetworkData.startConnectionPosition;
+        startTransform.eulerAngles = splineNetworkData.startConnectionRotation;
+        
+        endTransform.position = splineNetworkData.endConnectionPosition;
+        endTransform.eulerAngles = splineNetworkData.endConnectionRotation;
 
-        Point startPoint = Spline.CreatePoint(startTransform.position, startTransform.position - startTransform.forward * (dist * Random.Range(minMaxHandleLenghtMult.x,minMaxHandleLenghtMult.y)));
-        Point endPoint = Spline.CreatePoint(endTransform.position, endTransform.position + endTransform.forward * (dist * Random.Range(minMaxHandleLenghtMult.x, minMaxHandleLenghtMult.y)));
+        Point startPoint = Spline.CreatePoint(startTransform.position,splineNetworkData.startConnectionPointHandle);
+        Point endPoint = Spline.CreatePoint(endTransform.position, splineNetworkData.endConnectionPointHandle);
 
         //Calculate path
         TrackManager.CalculatePath(startPoint, endPoint, Spline.CalculateSplineLenght(startPoint, endPoint), out List<PathPoint> splinePath, 4f);
         TrackManager.CalculatePath(splinePath, out List<PathPoint> path, 4f);
 
         //Modify path
-        float randomness = Random.value * 100f;
+        float randomness = Mathf.PerlinNoise1D(splineNetworkData.startConnectionPointHandle.magnitude) * 100f;
         float[] offsetValues = new float[path.Count];
         float maxValue = 0f;
         float pathDist = path[0].distance;
@@ -166,7 +221,7 @@ public class SplineGenerator : StructureGenerator
                 maxValue = Mathf.Abs(noise);
             offsetValues[i] = noise;
         }
-        float offsetMult = Random.Range(minMaxTargetOffset.x, minMaxTargetOffset.y) / maxValue;
+        float offsetMult = Util.O1RangeToVector2Range(Mathf.PerlinNoise1D(splineNetworkData.endConnectionPointHandle.magnitude),minMaxTargetOffset) / maxValue;
         //Debug.Log("maxValue: " + maxValue + ", offsetMult: " + offsetMult);
         for (int i = 1; i < path.Count-1; i++)
         {
@@ -225,11 +280,16 @@ public class SplineGenerator : StructureGenerator
         //    Debug.DrawLine(Spline.CalculateSplinePosition(startPoint, endPoint, i), Spline.CalculateSplinePosition(startPoint, endPoint, i+ 0.05f), Color.purple,30f);
         //}
     }
-
     public bool DoesPathOverlap(List<PathPoint> path)
     {
-        if (sphereCheckRadius <= 0 || (path[^1].distance <= minLength && minLength > 0)) return false;
-
+        if (path.Count == 0)
+        {
+            Debug.LogWarning("Path.Count == 0");
+            return true;
+        }
+        if (path[^1].distance <= minLength && minLength > 0) return true;
+        if (sphereCheckRadius <= 0) return false;
+        
         float pathLength = path[^1].distance;
         float distance = 0.1f + sphereCheckRadius;
 

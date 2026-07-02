@@ -22,7 +22,7 @@ public class SectionEditor : Editor
 
                 if(childTransform.childCount == 0)
                 {
-                    section.AddTranfromToConnections(childTransform);
+                    section.AddTransformToConnections(childTransform);
                 }
             }
         }

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class Noise
+public class Noise
 {
-    public static List<NoiseSettings> settingsList = null;
-    public static void Initialize(int seed, List<NoiseSettings> noiseSettingList)
+    public List<NoiseSettings> settingsList = null;
+    public Noise(int seed, List<NoiseSettings> noiseSettingList)
     {
         settingsList = noiseSettingList;
         for (int i = 0; i < settingsList.Count; i++)
@@ -12,7 +12,7 @@ public static class Noise
             settingsList[i].Initialize(seed + i);
         }
     }
-    public static float SampleNoise(float posX, float posY)
+    public float SampleNoise(float posX, float posY)
     {
         float totalValue = 0f;
         foreach (NoiseSettings settings in settingsList)

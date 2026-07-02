@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Teleporter
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   nameOverride: 
-  prefab: {fileID: 2535188616866658808, guid: ff11f3253f0757df18494c4dc409a462, type: 3}
+  prefab: {fileID: 5087099552779580148, guid: f899cdc4caeea1df7b93dc683839d613, type: 3}
   description: Give you 2 teleporter stations to be later paired up and teleported
     between.
   probabilityCurve:

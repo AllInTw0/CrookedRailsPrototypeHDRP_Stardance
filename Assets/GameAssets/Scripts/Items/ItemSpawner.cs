@@ -24,7 +24,7 @@ public class ItemSpawner : StructureGenerator
             yield break;
         }
 
-        ItemSpawnBounds[] structureItemSpawnBoundsArray = transform.GetComponentsInChildren<ItemSpawnBounds>();
+        ItemSpawnBounds[] structureItemSpawnBoundsArray = GetItemSpawnBoundsArray(structureMaster);
 
         ProbabilityList<ItemSpawnEntry> probabilityList = new ProbabilityList<ItemSpawnEntry>(itemSpawnEntryList);
 
@@ -63,5 +63,16 @@ public class ItemSpawner : StructureGenerator
         }
 
         yield break;
+    }
+    
+    private ItemSpawnBounds[] GetItemSpawnBoundsArray(StructureMaster structureMaster)
+    {
+        List<ItemSpawnBounds> list = new List<ItemSpawnBounds>();
+        list.AddRange(GetComponentsInChildren<ItemSpawnBounds>());
+        for (int i = 0; i < structureMaster.structureSectionList.Count; i++)
+        {
+            list.AddRange(structureMaster.structureSectionList[i].GetComponentsInChildren<ItemSpawnBounds>());
+        }
+        return list.ToArray();
     }
 }
