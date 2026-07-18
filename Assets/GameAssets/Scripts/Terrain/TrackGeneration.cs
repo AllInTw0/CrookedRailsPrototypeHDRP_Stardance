@@ -30,11 +30,12 @@ public class TrackGeneration : MonoBehaviour
     {
         active = this;
     }
-    public void GenerateTrack(Vector3 start, Vector3 end, Point lastSplinePoint = null)
+    public void GenerateTrack(Vector3 start, Vector3 end, out TrackSection lastTrackSectionOut, Point lastSplinePoint = null, Point nextSplinePoint = null)
     {
         AStar aStar = new AStar(start, end, pathFindingSettings);
         NodePath nodePath = aStar.FindPath(aStar.GetNode(start), aStar.GetNode(end));
-        CreateTrackAlongNodes(nodePath, out List<PathPoint> allPathPoints, out TrackSection lastTrackSectionOut, lastSplinePoint);
+        CreateTrackAlongNodes(nodePath, out List<PathPoint> allPathPoints, out lastTrackSectionOut, lastSplinePoint, nextSplinePoint);
+        ModifyTerrainToFollowPath(allPathPoints,true);
     } 
     public List<NodePath> FindPaths(Vector3 start, Vector3 end, List<int> pathSeeds, int count = 3, float loadingBarTime = 0.4f)
     {
@@ -83,7 +84,7 @@ public class TrackGeneration : MonoBehaviour
         }
         return chosenPathList;
     }
-    public void CreateTrackAlongNodes(NodePath nodePath, out List<PathPoint> allPathPoints, out TrackSection lastTrackSectionOut, Point lastSplinePoint = null, TrackSection lastTrackSection = null)
+    public void CreateTrackAlongNodes(NodePath nodePath, out List<PathPoint> allPathPoints, out TrackSection lastTrackSectionOut, Point lastSplinePoint = null, Point nextSplinePoint = null, TrackSection lastTrackSection = null)
     {
         for (int i = 0; i < nodePath.path.Count; i++)
         {
@@ -113,6 +114,9 @@ public class TrackGeneration : MonoBehaviour
 
             Point newPoint = Spline.CreatePoint(currentNode.worldPos, currentNode.worldPos + averageDir * splineHandleLength);
 
+            if (i + trackSplineNodeIncrement >= nodePath.path.Count && nextSplinePoint != null)
+                newPoint = nextSplinePoint;
+            
             if (TrackManager.active)
             {
                 TrackSection trackSection = TrackManager.active.CreateTrackSection(lastSplinePoint, newPoint);

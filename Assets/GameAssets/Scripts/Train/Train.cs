@@ -68,6 +68,8 @@ public class Train : NetworkBehaviour
 
     private float playerDistFromTrain;
     
+    private bool consumeFuel;
+    
     //Multiplayer
     private NetworkVariable<TrainNetworkData> trainNetworkData = new(writePerm: NetworkVariableWritePermission.Server);
     private struct TrainNetworkData : INetworkSerializable
@@ -224,11 +226,11 @@ public class Train : NetworkBehaviour
         }
 
         //Fuel
-        if(acceleration > 0f && (controlls == null || controlls.currentState == LocomotiveControls.State.normal))
+        if(IsServer && consumeFuel && acceleration > 0f && (controlls == null || controlls.currentState == LocomotiveControls.State.normal))
         {
             foreach (FuelSource fuelSource in fuelSourceList)
             {
-                fuelSource.targetHealth.TakeDamage(distanceTravelled * TrainUpgradeHandler.active.GetStatValue(fuelSource.consumptionRate));
+                fuelSource.targetHealth.TakeDamage(Mathf.Abs(distanceTravelled) * TrainUpgradeHandler.active.GetStatValue(fuelSource.consumptionRate));
                 //Not having enough fuel handles LocomotiveControls.cs
             }
         }
@@ -271,6 +273,11 @@ public class Train : NetworkBehaviour
             };
         }
     }
+
+    public void SetFuelConsumption(bool value)
+    {
+        consumeFuel = value;
+    }
     public void SetAcceleration(float value)
     {
         acceleration = value;
@@ -307,7 +314,12 @@ public class Train : NetworkBehaviour
             {
                 consist[i].frontCoupler.ConnectCoupler(consist[i - 1].backCoupler);
             }
+            
+            //Assign Train
+            consist[i].SetLinkedTrain(this);
         }
+        
+
     }
     public float CalculateConsistLength(bool onlyPlayerRailCars = false)
     {
@@ -331,10 +343,16 @@ public class Train : NetworkBehaviour
 
         return consistLength;
     }
-    public void Initialize(float sectionProgress, TrackSection trackSection)
+    public void Initialize(float sectionProgress, TrackSection trackSection, bool fullSpeed)
     {
         this.frontTrackSection = trackSection;
         this.sectionProgress = sectionProgress;
+
+        if (fullSpeed)
+        {
+            controlls.SetFullThrottle();
+            speed = maxSpeed;
+        }
     }
     public List<FuelSource> GetFuelSourceList()
     {

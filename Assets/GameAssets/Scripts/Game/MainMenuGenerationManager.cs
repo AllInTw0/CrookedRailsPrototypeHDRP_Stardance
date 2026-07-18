@@ -37,7 +37,7 @@ public class MainMenuGenerationManager : MonoBehaviour
 
         TrackSection section = TrackManager.active.CreateTrackSection(pointA, pointB);
 
-        train.Initialize(train.GetConsistLenght() + 2.5f, section);
+        train.Initialize(train.GetConsistLenght() + 2.5f, section,true);
 
         lastSection = section;
         lastPoint = pointB;

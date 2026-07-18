@@ -350,6 +350,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ead24d7e0d3bc9488b3b6cc6242f4ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LeverInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Reverser
   actionName: Change Direction
   timeToInteract: 0
@@ -363,7 +364,6 @@ MonoBehaviour:
   notches: 1
   speed: 170
   displayNotches: 1
-  currentNotch: 0
 --- !u!1 &1354287302548652920
 GameObject:
   m_ObjectHideFlags: 0
@@ -612,6 +612,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2589ef97385237b4a99fa6146c09d6ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Locomotive
   actionName: Rerail
   timeToInteract: 0
@@ -1263,6 +1264,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3765559233668895629}
   - component: {fileID: 7188107575206817945}
+  - component: {fileID: 5770574258143907468}
   m_Layer: 15
   m_Name: Collision
   m_TagString: Moving
@@ -1307,6 +1309,38 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 8116640621501892788, guid: 49b02efd66d080945a04219e8448f6ca, type: 3}
+--- !u!114 &5770574258143907468
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3218687348395054059}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.AI.Navigation::Unity.AI.Navigation.NavMeshSurface
+  m_SerializedVersion: 0
+  m_AgentTypeID: -1372625422
+  m_CollectObjects: 2
+  m_Size: {x: 10, y: 10, z: 10}
+  m_Center: {x: 0, y: 2, z: 0}
+  m_LayerMask:
+    serializedVersion: 2
+    m_Bits: 32768
+  m_UseGeometry: 1
+  m_DefaultArea: 0
+  m_GenerateLinks: 0
+  m_IgnoreNavMeshAgent: 1
+  m_IgnoreNavMeshObstacle: 1
+  m_OverrideTileSize: 1
+  m_TileSize: 100
+  m_OverrideVoxelSize: 1
+  m_VoxelSize: 0.02
+  m_MinRegionArea: 2
+  m_NavMeshData: {fileID: 23800000, guid: 125d5c95d2a03c31c9ed023b10e3c0f2, type: 2}
+  m_BuildHeightMesh: 0
 --- !u!1 &3816647980750154961
 GameObject:
   m_ObjectHideFlags: 0
@@ -6494,6 +6528,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ead24d7e0d3bc9488b3b6cc6242f4ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LeverInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Break Lever
   actionName: Use
   timeToInteract: 0
@@ -6507,7 +6542,6 @@ MonoBehaviour:
   notches: 1
   speed: 250
   displayNotches: 0
-  currentNotch: 0
 --- !u!1 &4235341213232856734
 GameObject:
   m_ObjectHideFlags: 0
@@ -7392,6 +7426,11 @@ MonoBehaviour:
   m_ShapeWidth: -1
   m_ShapeHeight: -1
   m_AspectRatio: -1
+  m_Version: 14
+  m_ObsoleteShadowResolutionTier: 1
+  m_ObsoleteUseShadowQualitySettings: 0
+  m_ObsoleteCustomShadowResolution: 512
+  m_ObsoleteContactShadows: 0
   m_SpotIESCutoffPercent: 100
   m_LightDimmer: 1
   m_VolumetricDimmer: 0.25
@@ -7506,11 +7545,6 @@ MonoBehaviour:
   m_AreaLightEmissiveMeshShadowCastingMode: 0
   m_AreaLightEmissiveMeshMotionVectorGenerationMode: 0
   m_AreaLightEmissiveMeshLayer: -1
-  m_Version: 14
-  m_ObsoleteShadowResolutionTier: 1
-  m_ObsoleteUseShadowQualitySettings: 0
-  m_ObsoleteCustomShadowResolution: 512
-  m_ObsoleteContactShadows: 0
 --- !u!1 &5262543758360099037
 GameObject:
   m_ObjectHideFlags: 0
@@ -7828,6 +7862,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22a58bca052050c4098e00b58cbb53fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailCarHealth
+  ShowTopMostFoldoutHeaderGroup: 1
   healthType: 2
   health: 1000
   maxHealth: 1000
@@ -7851,6 +7886,7 @@ MonoBehaviour:
   - {fileID: 3105066914061373617}
   - {fileID: 1473308460990980535}
   - {fileID: 9090483232423769888}
+  healthStateList: []
 --- !u!1 &6367483308797791140
 GameObject:
   m_ObjectHideFlags: 0
@@ -8013,11 +8049,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 1.375, y: 2.5, z: 5.75}
+  m_Extents: {x: 1.375, y: 1, z: 5.75}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 0
-  m_Center: {x: 0, y: 2, z: -0.5}
+  m_Center: {x: 0, y: 0, z: -0.5}
   m_TimeToStationary: 0.5
 --- !u!1 &6423650013474941881
 GameObject:
@@ -8177,6 +8213,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2589ef97385237b4a99fa6146c09d6ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Oil Lamp
   actionName: Turn On
   timeToInteract: 0
@@ -8280,7 +8317,7 @@ MonoBehaviour:
   leverInteractable: {fileID: 0}
   notchAutoStopFilterList:
   - name: Station
-    autoStopFilterList: 020000000300000005000000
+    autoStopFilterList: 02000000030000000500000006000000
 --- !u!1 &7550963863790087808
 GameObject:
   m_ObjectHideFlags: 0
@@ -8435,6 +8472,11 @@ MonoBehaviour:
   m_ShapeWidth: -1
   m_ShapeHeight: -1
   m_AspectRatio: -1
+  m_Version: 14
+  m_ObsoleteShadowResolutionTier: 1
+  m_ObsoleteUseShadowQualitySettings: 0
+  m_ObsoleteCustomShadowResolution: 512
+  m_ObsoleteContactShadows: 0
   m_SpotIESCutoffPercent: 100
   m_LightDimmer: 1
   m_VolumetricDimmer: 0.25
@@ -8549,11 +8591,6 @@ MonoBehaviour:
   m_AreaLightEmissiveMeshShadowCastingMode: 0
   m_AreaLightEmissiveMeshMotionVectorGenerationMode: 0
   m_AreaLightEmissiveMeshLayer: -1
-  m_Version: 14
-  m_ObsoleteShadowResolutionTier: 1
-  m_ObsoleteUseShadowQualitySettings: 0
-  m_ObsoleteCustomShadowResolution: 512
-  m_ObsoleteContactShadows: 0
 --- !u!1 &7938186978373944457
 GameObject:
   m_ObjectHideFlags: 0
@@ -8599,6 +8636,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2589ef97385237b4a99fa6146c09d6ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Locomotive
   actionName: Rerail
   timeToInteract: 0
@@ -8751,6 +8789,11 @@ MonoBehaviour:
   m_ShapeWidth: -1
   m_ShapeHeight: -1
   m_AspectRatio: -1
+  m_Version: 14
+  m_ObsoleteShadowResolutionTier: 1
+  m_ObsoleteUseShadowQualitySettings: 0
+  m_ObsoleteCustomShadowResolution: 512
+  m_ObsoleteContactShadows: 0
   m_SpotIESCutoffPercent: 100
   m_LightDimmer: 1
   m_VolumetricDimmer: 2
@@ -8865,11 +8908,6 @@ MonoBehaviour:
   m_AreaLightEmissiveMeshShadowCastingMode: 0
   m_AreaLightEmissiveMeshMotionVectorGenerationMode: 0
   m_AreaLightEmissiveMeshLayer: -1
-  m_Version: 14
-  m_ObsoleteShadowResolutionTier: 1
-  m_ObsoleteUseShadowQualitySettings: 0
-  m_ObsoleteCustomShadowResolution: 512
-  m_ObsoleteContactShadows: 0
 --- !u!1 &8376243058352961802
 GameObject:
   m_ObjectHideFlags: 0
@@ -9007,6 +9045,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6ead24d7e0d3bc9488b3b6cc6242f4ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LeverInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Throttle
   actionName: Use
   timeToInteract: 0
@@ -9020,7 +9059,6 @@ MonoBehaviour:
   notches: 4
   speed: 170
   displayNotches: 1
-  currentNotch: 0
 --- !u!65 &395529979990357735
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -9299,6 +9337,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2589ef97385237b4a99fa6146c09d6ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Oil Lamp
   actionName: Turn On
   timeToInteract: 0
@@ -10124,19 +10163,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
       propertyPath: notchAutoStopFilterList.Array.data[0].autoStopFilterList.Array.size
-      value: 3
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
       propertyPath: notchAutoStopFilterList.Array.data[1].autoStopFilterList.Array.size
-      value: 4
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
       propertyPath: 'notchAutoStopFilterList.Array.data[0].autoStopFilterList.Array.data[2]'
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
+      propertyPath: 'notchAutoStopFilterList.Array.data[0].autoStopFilterList.Array.data[3]'
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
       propertyPath: 'notchAutoStopFilterList.Array.data[1].autoStopFilterList.Array.data[3]'
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
+      propertyPath: 'notchAutoStopFilterList.Array.data[1].autoStopFilterList.Array.data[4]'
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6523257155294142747, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
       propertyPath: m_LocalScale.z
@@ -10262,27 +10309,39 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
       propertyPath: notchAutoStopFilterList.Array.data[0].autoStopFilterList.Array.size
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
-      propertyPath: notchAutoStopFilterList.Array.data[1].autoStopFilterList.Array.size
       value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
-      propertyPath: notchAutoStopFilterList.Array.data[2].autoStopFilterList.Array.size
+      propertyPath: notchAutoStopFilterList.Array.data[1].autoStopFilterList.Array.size
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
+      propertyPath: notchAutoStopFilterList.Array.data[2].autoStopFilterList.Array.size
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
       propertyPath: 'notchAutoStopFilterList.Array.data[0].autoStopFilterList.Array.data[2]'
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
+      propertyPath: 'notchAutoStopFilterList.Array.data[0].autoStopFilterList.Array.data[3]'
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
       propertyPath: 'notchAutoStopFilterList.Array.data[1].autoStopFilterList.Array.data[3]'
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
+      propertyPath: 'notchAutoStopFilterList.Array.data[1].autoStopFilterList.Array.data[4]'
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
       propertyPath: 'notchAutoStopFilterList.Array.data[2].autoStopFilterList.Array.data[4]'
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3985682956224976935, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
+      propertyPath: 'notchAutoStopFilterList.Array.data[2].autoStopFilterList.Array.data[5]'
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6523257155294142747, guid: 7012bba8f3182334f98b03ab66b09436, type: 3}
       propertyPath: m_LocalScale.z

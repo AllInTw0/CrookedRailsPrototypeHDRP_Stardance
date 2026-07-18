@@ -1184,7 +1184,7 @@ MonoBehaviour:
   cameraTransform: {fileID: 6879617517326091863}
   colliderCrouchHeight: 0.9
   cameraCrouchHeight: 0.7
-  maxDistanceFromTrain: 15
+  maxDistanceFromTrain: 45
   maxDistanceLimitEnabled: 1
   maxStamina: 100
   staminaGainDelay: 0.9

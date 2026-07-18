@@ -220,7 +220,7 @@ public class GenerationManager : NetworkBehaviour
             AddWorldPosToNavGen(node.worldPos);
         }
         
-        trackGeneration.CreateTrackAlongNodes(nodepath, out List<PathPoint> path, out TrackSection lastTrackSectionOut, lastPoint, lastSection);
+        trackGeneration.CreateTrackAlongNodes(nodepath, out List<PathPoint> path, out TrackSection lastTrackSectionOut, lastPoint,null, lastSection);
 
         currentStationPos = lastTrackSectionOut.path[^1].position;
 
@@ -499,15 +499,23 @@ public class GenerationManager : NetworkBehaviour
 
         SpawnStructureNearTrack(section.length, section, startingLocationSO);
         
-        playerTrain.Initialize(playerTrain.GetConsistLenght() + 1.2f, section);
-
+        section.SetAutoStop(playerTrain.GetConsistLenght() + 1.2f, AutoStopType.StartingLocation);
+        
+        
         lastPoint = pointB;
         lastSection = section;
 
         //Track to starting location
-        Point point = Spline.CreatePoint(pos - Vector3.forward * startingLocationStructureTrackLength, pos - Vector3.forward * startingLocationStructureTrackLength * 1.5f);
-        trackGeneration.GenerateTrack(point.position, point.position + Vector3.back * 150f, point);
-
+        trackGeneration.GenerateTrack(section.pointA.position + Vector3.back * 150f, section.pointA.position, out TrackSection lastTrackSectionOut, null, section.pointA);
+        lastTrackSectionOut.SetNextSection(section);
+        
+        //playerTrain.Initialize(playerTrain.GetConsistLenght() + 1.2f, section,false);
+        
+        TrackSection findLastSection = lastTrackSectionOut;
+        while (findLastSection.previousSection != null)
+            findLastSection = findLastSection.previousSection;
+        playerTrain.Initialize(playerTrain.GetConsistLenght() + 1f, findLastSection,true);
+        
         Spline.DEBUG_DrawPointGizmos(pointA);
         Spline.DEBUG_DrawPointGizmos(pointB);
     }

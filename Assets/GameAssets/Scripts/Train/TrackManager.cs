@@ -24,7 +24,8 @@ public enum AutoStopType
     Supersonic,
     Station,
     Structure,
-    SlowDown
+    SlowDown,
+    StartingLocation
 }
 public class AutoStop
 {

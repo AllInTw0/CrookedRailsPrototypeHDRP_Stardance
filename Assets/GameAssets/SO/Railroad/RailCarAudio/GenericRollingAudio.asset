@@ -1,0 +1,54 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e2bef3820ed19e34b285a67745a6ed1, type: 3}
+  m_Name: GenericRollingAudio
+  m_EditorClassIdentifier: Assembly-CSharp::RailCarAudioSO
+  rollingAudioArray:
+  - clip: {fileID: 8300000, guid: 5490ba2a22974324a9ff881b1dac614f, type: 3}
+    minSpeed: 0
+  - clip: {fileID: 8300000, guid: e59e3eaa668d864ccb6d3feb346b3d5e, type: 3}
+    minSpeed: 2
+  - clip: {fileID: 8300000, guid: 7341d0e0db1811feaa1c5991b80c79b5, type: 3}
+    minSpeed: 5
+  speedToVolumeCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2.3423562
+      outSlope: 2.3423562
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.0045351475
+    - serializedVersion: 3
+      time: 0.11375491
+      value: 0.13246937
+      inSlope: 0.13336818
+      outSlope: 0.13336818
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.053774055
+    - serializedVersion: 3
+      time: 4.000244
+      value: 0.34949493
+      inSlope: 0.0044406443
+      outSlope: 0.0044406443
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.07251601
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

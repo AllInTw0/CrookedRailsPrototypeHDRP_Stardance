@@ -40,6 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8266530927262198979}
+  - component: {fileID: 6911581046793506319}
   - component: {fileID: 173760328443247355}
   - component: {fileID: 3068164435285337769}
   m_Layer: 0
@@ -65,6 +66,31 @@ Transform:
   - {fileID: 4651122525546521565}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6911581046793506319
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5848184906683987402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 2649008598
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &173760328443247355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -77,7 +103,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 13bffc8333ee6fe4b9088a6d76711fc8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StructureMaster
-  structureList:
+  ShowTopMostFoldoutHeaderGroup: 1
+  structureGeneratorList:
   - {fileID: 3068164435285337769}
   structureType: 1
   startConnection:
@@ -92,6 +119,7 @@ MonoBehaviour:
   overlapCheckLayerMask:
     serializedVersion: 2
     m_Bits: 1064960
+  maxRetryCount: 0
   structureConnectionList: []
   structureSectionList: []
   onSectionAdded:
@@ -109,6 +137,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d08e85745c880934ab2f722c4a57ff8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BasicStructureGenerator
+  ShowTopMostFoldoutHeaderGroup: 1
   generationEntryList:
   - sectionPrefabList:
     - {fileID: 2427493482864173330, guid: afc65d34151c1e94b8ec0c76180cffd3, type: 3}

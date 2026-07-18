@@ -67,6 +67,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22a58bca052050c4098e00b58cbb53fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailCarHealth
+  ShowTopMostFoldoutHeaderGroup: 1
   healthType: 2
   health: 250
   maxHealth: 500
@@ -84,6 +85,7 @@ MonoBehaviour:
   - {fileID: 4896061487346097381}
   - {fileID: 1870917712839514771}
   - {fileID: 7914078729592042666}
+  healthStateList: []
 --- !u!1 &2150089339656168448
 GameObject:
   m_ObjectHideFlags: 0
@@ -336,6 +338,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2589ef97385237b4a99fa6146c09d6ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Locomotive
   actionName: Rerail
   timeToInteract: 0
@@ -449,6 +452,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2589ef97385237b4a99fa6146c09d6ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Locomotive
   actionName: Rerail
   timeToInteract: 0
@@ -517,6 +521,51 @@ Transform:
   - {fileID: 9133159515204727611}
   m_Father: {fileID: 4788332280534327601}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4553173049829913330
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7238233307056232456}
+  - component: {fileID: 8324060872930792482}
+  m_Layer: 0
+  m_Name: Teleport
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7238233307056232456
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4553173049829913330}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.5, z: -2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6965105430134681891}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8324060872930792482
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4553173049829913330}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a40b4d102cbe0934faea5a60fba252be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeleportOnStart
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &5134333502374130755
 GameObject:
   m_ObjectHideFlags: 0
@@ -903,6 +952,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 7238233307056232456}
   - {fileID: 8616439908940691556}
   - {fileID: 6251954291392796044}
   - {fileID: 2282795010052330844}
@@ -921,8 +971,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailCar
   railCarSO: {fileID: 11400000, guid: 363cbbfcbb730f741a9d75758f6bf0f5, type: 2}
-  frontLength: 4
-  backLength: 4
   isPlayerRailCar: 1
   derailVisualAngle: 5
   derailVisualOffset: {x: 0.18, y: -0.09, z: 0}
@@ -948,11 +996,11 @@ NavMeshObstacle:
   m_Enabled: 1
   serializedVersion: 3
   m_Shape: 1
-  m_Extents: {x: 1.375, y: 2.5, z: 4}
+  m_Extents: {x: 1.375, y: 1, z: 4}
   m_MoveThreshold: 0.1
   m_Carve: 1
   m_CarveOnlyStationary: 0
-  m_Center: {x: 0, y: 2, z: 0}
+  m_Center: {x: 0, y: 0, z: 0}
   m_TimeToStationary: 0.5
 --- !u!114 &6618568313757701232
 MonoBehaviour:

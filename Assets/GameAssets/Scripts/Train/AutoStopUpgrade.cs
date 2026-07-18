@@ -69,7 +69,7 @@ public class AutoStopUpgrade : MonoBehaviour
             if (distanceToAutoStop <= distanceToStop)
             {
                 Debug.Log("Engaging breaks! Detected autostop");
-                if (nearestAutoStop.stopType == AutoStopType.Supersonic || nearestAutoStop.stopType == AutoStopType.Station || nearestAutoStop.stopType == AutoStopType.SlowDown)
+                if (nearestAutoStop.stopType == AutoStopType.Supersonic || nearestAutoStop.stopType == AutoStopType.Station || nearestAutoStop.stopType == AutoStopType.SlowDown || nearestAutoStop.stopType == AutoStopType.StartingLocation)
                 {
                     targetTrain.controlls.LockControlls();
                 }
@@ -98,6 +98,14 @@ public class AutoStopUpgrade : MonoBehaviour
                     targetTrain.controlls.ActivateSupersonic();
                     if (currentAutoBreakingStop.stopType == AutoStopType.Station) targetTrain.controlls.onSetOffTriggerGenerationReset = true;
                 }
+
+                if (currentAutoBreakingStop.stopType == AutoStopType.StartingLocation)
+                {
+                    targetTrain.controlls.Unlock();
+                    targetTrain.controlls.onSetOffTriggerGenerationReset = true;
+                    targetTrain.SetFuelConsumption(true);
+                }
+                
                 currentAutoBreakingStop = null;
                 //Unfreze players if the train was supersonic
                 PlayerMovement.active.UnFreeze();

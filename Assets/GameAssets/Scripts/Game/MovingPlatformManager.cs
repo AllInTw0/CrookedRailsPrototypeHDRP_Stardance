@@ -131,7 +131,7 @@ public class MovingPlatformManager : MonoBehaviour
         int i = FindEntry(entryTransform);
         if (i != -1)
         {
-            if (entries[i].rb != null)
+            if (entries[i].rb != null && Time.timeScale != 0)
             {
                 entries[i].rb.linearVelocity += entries[i].velocity;
                 entries[i].rb.interpolation = entries[i].rbInterpolation;

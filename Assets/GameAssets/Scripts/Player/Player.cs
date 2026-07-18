@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -38,12 +39,9 @@ public class Player : NetworkBehaviour
     private float rotXVelocity, rotX;
     
     private RigidbodyInterpolation rbStartInterpolation;
-    void Start()
+
+    private void Awake()
     {
-        //Add to static variables
-        if (IsOwner) localPlayer = this;
-        playerList.Add(this);
-        
         //Get components
         camera = GetComponentInChildren<PlayerCamera>();
         camera.player = this;
@@ -56,6 +54,13 @@ public class Player : NetworkBehaviour
         health.player = this;
         rb = GetComponent<Rigidbody>();
         rbStartInterpolation = rb.interpolation;
+    }
+
+    void Start()
+    {
+        //Add to static variables
+        if (IsOwner) localPlayer = this;
+        playerList.Add(this);
         
         //Destroy components that are client side only
         if (IsOwner == false)
@@ -80,10 +85,22 @@ public class Player : NetworkBehaviour
             playerIDNetworkVariable.Value = nextPlayerID;
             nextPlayerID++;
         }
-        
-        //Teleport to starting location
-        if(TeleportOnStart.active != null)
-            TeleportOnStart.active.Teleport();
+
+        AwaitTeleport();
+    }
+
+    private async void AwaitTeleport()
+    {
+        while (true)//Safety net
+        {
+            //Teleport to starting location
+            if (TeleportOnStart.active != null)
+            {
+                TeleportOnStart.active.Teleport();
+                return;
+            }
+            await Task.Delay(10);
+        }
     }
 
     private void Update()

@@ -51,6 +51,7 @@ public class CargoInfo
 }
 public class RailCar : MonoBehaviour
 {
+    private Train linkedTrain;
     //Variables
     [Header("Parameters")]
     public RailCarSO railCarSO;
@@ -210,5 +211,21 @@ public class RailCar : MonoBehaviour
     public void Rerail()
     {
         health.Rerail();
+    }
+
+    public void SetLinkedTrain(Train train)
+    {
+        linkedTrain = train;
+    }
+    public bool IsMoving()
+    {
+        return Mathf.Abs(speed) > 0.1f;
+    }
+
+    public float GetSpeed()
+    {
+        if (linkedTrain)
+            return linkedTrain.speed;
+        return speed;
     }
 }

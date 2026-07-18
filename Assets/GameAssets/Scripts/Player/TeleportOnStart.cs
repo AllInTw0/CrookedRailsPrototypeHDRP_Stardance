@@ -6,14 +6,9 @@ public class TeleportOnStart : NetworkBehaviour
 {
     public static TeleportOnStart active;
 
-    private void Awake()
+    private void Start()
     {
         active = this;
-    }
-
-    public override void OnNetworkSpawn()
-    {
-        Teleport();
     }
 
     public void Teleport()
