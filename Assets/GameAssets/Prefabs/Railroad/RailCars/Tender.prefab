@@ -430,6 +430,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22a58bca052050c4098e00b58cbb53fe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailCarHealth
+  ShowTopMostFoldoutHeaderGroup: 1
   healthType: 2
   health: 500
   maxHealth: 500
@@ -451,6 +452,7 @@ MonoBehaviour:
   - {fileID: 2847304135089316364}
   - {fileID: 4917842569182667239}
   - {fileID: 1064341811095421703}
+  healthStateList: []
 --- !u!1 &1420552394830321763
 GameObject:
   m_ObjectHideFlags: 0
@@ -496,6 +498,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2589ef97385237b4a99fa6146c09d6ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Locomotive
   actionName: Rerail
   timeToInteract: 0
@@ -686,6 +689,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf0215a8823ead64cb042e4c4ce5cd0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaterInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Tender Water
   actionName: Fill
   timeToInteract: 0
@@ -891,6 +895,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2589ef97385237b4a99fa6146c09d6ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Water Hatch
   actionName: Open
   timeToInteract: 0.25
@@ -1160,6 +1165,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c09d14bdc42a11245a7400fd9c9992b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
+  ShowTopMostFoldoutHeaderGroup: 1
   healthType: 0
   health: 100
   maxHealth: 100
@@ -1607,6 +1613,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1145095308688977823}
+  - component: {fileID: -4688235860746038309}
   - component: {fileID: 6874858873742985183}
   - component: {fileID: 3800539268194142411}
   - component: {fileID: 1687578413202623725}
@@ -1637,6 +1644,32 @@ Transform:
   - {fileID: 5386670886324249073}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-4688235860746038309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6829916163831001656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 405594729
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  <InScenePlaced>k__BackingField: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &6874858873742985183
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1649,6 +1682,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a32b359c9dace2742b786eb40287bd8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailCar
+  ShowTopMostFoldoutHeaderGroup: 1
+  trainID:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  consistIndex:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
   railCarSO: {fileID: 11400000, guid: 4b6e685f31014c845b8386bbafd91566, type: 2}
   isPlayerRailCar: 1
   derailVisualAngle: 5
@@ -1875,6 +1919,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2589ef97385237b4a99fa6146c09d6ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Locomotive
   actionName: Rerail
   timeToInteract: 0
@@ -2017,6 +2062,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c09d14bdc42a11245a7400fd9c9992b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
+  ShowTopMostFoldoutHeaderGroup: 1
   healthType: 0
   health: 4600
   maxHealth: 5000
@@ -2426,6 +2472,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54eb9eb5ed3aec74daac8cd1ea7d4094, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemTaker
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Fuel
   actionName: Refill Firewood
   timeToInteract: 0

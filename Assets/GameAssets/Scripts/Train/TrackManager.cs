@@ -137,6 +137,8 @@ public class TrackManager : NetworkBehaviour
         //private Vector3 pointBHandleForward;
         public Vector3 pointBHandleBackward;
         
+        public bool modifyGround;
+        
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref sectionID);
@@ -148,9 +150,10 @@ public class TrackManager : NetworkBehaviour
             serializer.SerializeValue(ref pointBPos);
             //serializer.SerializeValue(ref pointBHandleForward);
             serializer.SerializeValue(ref pointBHandleBackward);
+            serializer.SerializeValue(ref modifyGround);
         }
 
-        public TrackSectionNetworkData(TrackSection section)
+        public TrackSectionNetworkData(TrackSection section, bool modifyGround)
         {
             sectionID = section.sectionID;
             nextSectionID = -1;
@@ -163,6 +166,8 @@ public class TrackManager : NetworkBehaviour
             
             pointBPos = section.pointB.position;
             pointBHandleBackward = section.pointB.handleBackward;
+
+            this.modifyGround = modifyGround;
         }
     }
     private void Awake()
@@ -184,7 +189,7 @@ public class TrackManager : NetworkBehaviour
             Debug.Log("Sending track data to client");
             foreach (TrackSection section in trackSectionList)
             {
-                CreateTrackSectionFromNetworkDataRpc(new TrackSectionNetworkData(section),RpcTarget.Single(connectionEventData.ClientId, RpcTargetUse.Temp));
+                CreateTrackSectionFromNetworkDataRpc(new TrackSectionNetworkData(section,true),RpcTarget.Single(connectionEventData.ClientId, RpcTargetUse.Temp));
             }
         }
     }
@@ -224,11 +229,14 @@ public class TrackManager : NetworkBehaviour
             section.SetNextSection(FindTrackSectionByID(networkData.nextSectionID));
         if(networkData.previousSectionID >= 0)
             section.SetPreviousSection(FindTrackSectionByID(networkData.previousSectionID));
+        
+        if(networkData.modifyGround)
+            TrackGeneration.active.ModifyTerrainToFollowPath(new List<PathPoint>(section.path),true);
     }
-    public void SyncTrackSection(TrackSection section)
+    public void SyncTrackSection(TrackSection section, bool modifyGround)
     {
         if(IsServer)
-            CreateTrackSectionFromNetworkDataRpc(new TrackSectionNetworkData(section));
+            CreateTrackSectionFromNetworkDataRpc(new TrackSectionNetworkData(section, modifyGround));
         else
             Debug.LogWarning("Client calling a server function");
     }

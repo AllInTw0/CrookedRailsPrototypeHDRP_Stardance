@@ -40,7 +40,7 @@ public class RailCarAudio : MonoBehaviour
     {
         while (railCar.IsMoving())
         {
-            RollingAudio targetAudio = GetTargetRollingClip(railCar.GetSpeed());
+            RollingAudio targetAudio = GetTargetRollingClip(Mathf.Abs(railCar.GetSpeed()));
             if (rollingAudioSourceArray[0].clip != targetAudio.clip)
             {
                 rollingAudioSourceArray[1].clip = targetAudio.clip;
@@ -66,7 +66,7 @@ public class RailCarAudio : MonoBehaviour
 
     private float GetTargetVolume()
     {
-        return audioSO.speedToVolumeCurve.Evaluate(railCar.GetSpeed());
+        return audioSO.speedToVolumeCurve.Evaluate(Mathf.Abs(railCar.GetSpeed()));
     }
     private RollingAudio GetTargetRollingClip(float speed)
     {

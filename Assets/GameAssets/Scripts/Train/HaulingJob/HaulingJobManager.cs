@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering.HighDefinition;
@@ -8,7 +9,6 @@ public class HaulingJob
 {
     public List<HaulingJobEntry> haulingJobEntryList;
     public float distance;
-    public NodePath linkedTrainTrackPath;
     public float GetConsistLength()
     {
         float sum = 0f;
@@ -21,6 +21,17 @@ public class HaulingJob
         }
         return sum;
     }
+
+    public NodePath GetLinkedTrack()
+    {
+        for (int i = 0; i < HaulingJobManager.generatedHaulingJobList.Count; i++)
+        {
+            if (HaulingJobManager.generatedHaulingJobList[i] == this)
+                return HaulingJobManager.currentNodePathList[i];
+        }
+        Debug.LogError("Did not find linked track");
+        return null;
+    }
 }
 public class HaulingJobEntry
 {
@@ -30,20 +41,35 @@ public class HaulingJobEntry
     public float weight;
     public float pay;
 }
-public class HaulingJobManager : MonoBehaviour
+public class HaulingJobManager : NetworkBehaviour
 {
     public static HaulingJobManager active;
 
     public static List<HaulingJob> generatedHaulingJobList = new List<HaulingJob>();
-
+    public static int generatedHaulingJobLevel = -1;
+    public static List<NodePath> currentNodePathList = new List<NodePath>();
+    
     [Header("Cargo List")]
     [SerializeField]
     public List<CargoSO> haulingCargoInfoList = new List<CargoSO>();
+
+    public static int GetCargoSOID(CargoSO cargoSO)
+    {
+        for (int i = 0; i < active.haulingCargoInfoList.Count; i++)
+        {
+            if (active.haulingCargoInfoList[i] == cargoSO) return i;
+        }
+        return -1;
+    }
+    public static CargoSO GetCargoSOByID(int ID)
+    {
+        return active.haulingCargoInfoList[ID];
+    }
     [Header("Railcar List")]
     [SerializeField]
     public List<RailCarSO> railCarInfoList = new List<RailCarSO>();
     [Header("Pay params")]
-    public Vector2 payIncreaseFor100Meters;
+    public Vector2Int payIncreaseFor100Meters;
     [Header("Icon rendering")]
     public LayerMask renderLayer;
     public bool renderIconsOnstart;
@@ -54,7 +80,6 @@ public class HaulingJobManager : MonoBehaviour
     private void Awake()
     {
         active = this;
-        GenerateNewHaulingJobList(3);
     }
     private void Start()
     {
@@ -63,24 +88,69 @@ public class HaulingJobManager : MonoBehaviour
     }
     public void GenerateNewHaulingJobList(int count, List<NodePath> nodePathList = null)
     {
-        List<HaulingJob> haulingJobList = new List<HaulingJob>();
-
-        for (int i = 0; i < count; i++)
+        //Server
+        if (nodePathList != null)
         {
-            haulingJobList.Add(GenerateHaulingJob(i * 0.5f, i * 1f, 0.4f, 2 + i * 2, GameStateManager.currentLevel, nodePathList != null ? nodePathList[i] : null));
+            bool sorted = false;
+            while (sorted == false)
+            {
+                sorted = true;
+                for (int i = 0; i < nodePathList.Count - 1; i++)
+                {
+                    if (nodePathList[i].length > nodePathList[i + 1].length)
+                    {
+                        sorted = false;
+                        (nodePathList[i], nodePathList[i + 1]) = (nodePathList[i + 1], nodePathList[i]);
+                    }
+                }
+            }
         }
 
-        generatedHaulingJobList = haulingJobList;
-
+        currentNodePathList = nodePathList;
+        for (int i = 0; i < count; i++)
+        {
+            int seed = Random.Range(0, 99999999);
+            GenerateHaulingJobRpc(seed, i * 0.5f, i * 1f, 0.4f, 2 + i * 2, GameStateManager.currentLevel, nodePathList != null ? nodePathList[i].length : -1);
+        }
     }
-    public HaulingJob GenerateHaulingJob(float maxCargoDangerLevel, float targetDangerLevel, float mixedLevel, int maxCargoCount, int currentLevel, NodePath trackPath = null)
+
+    private void AddHaulingJobToList(HaulingJob haulingJob, int level)
     {
+        //Server & Client
+        
+        if (generatedHaulingJobLevel != level)
+        {
+            generatedHaulingJobList = new List<HaulingJob>();
+            generatedHaulingJobLevel = level;
+        }
+        
+        generatedHaulingJobList.Add(haulingJob);
+
+        bool sorted = false;
+        while (sorted == false)
+        {
+            sorted = true;
+            for (int i = 0; i < generatedHaulingJobList.Count-1; i++)
+            {
+                if (generatedHaulingJobList[i].distance > generatedHaulingJobList[i + 1].distance)
+                {
+                    sorted = false;
+                    (generatedHaulingJobList[i], generatedHaulingJobList[i + 1]) = (generatedHaulingJobList[i + 1], generatedHaulingJobList[i]);
+                }
+            }
+        }
+    }
+    [Rpc(SendTo.Everyone)]
+    public void GenerateHaulingJobRpc(int seed, float maxCargoDangerLevel, float targetDangerLevel, float mixedLevel, int maxCargoCount, int currentLevel, float trackLength = -1f)
+    {
+        System.Random rng = new System.Random(seed);
+        
         //Pick first cargo
         CargoSO firstCargo;
         int safety = 0;
         do
         {
-            firstCargo = haulingCargoInfoList[Random.Range(0, haulingCargoInfoList.Count)];
+            firstCargo = haulingCargoInfoList[rng.Next(0, haulingCargoInfoList.Count-1)];
             safety++;
         }
         while (firstCargo.dangerLevel > maxCargoDangerLevel && GetEligibleRailCars(firstCargo,currentLevel).Count == 0 && safety < 20);
@@ -93,18 +163,18 @@ public class HaulingJobManager : MonoBehaviour
         List<CargoSO> cargoList = new List<CargoSO>() { firstCargo };
         while (dangerSum <= targetDangerLevel && cargoList.Count < maxCargoCount)
         {
-            bool chooseMixed = Random.Range(0f, 1f) <= mixedLevel;
+            bool chooseMixed = rng.Next(0, 1000) <= mixedLevel * 1000f;
             CargoSO chosenCargo;
             safety = 0;
             do 
             {
                 if (chooseMixed)
                 {
-                    chosenCargo = haulingCargoInfoList[Random.Range(0, haulingCargoInfoList.Count)];
+                    chosenCargo = haulingCargoInfoList[rng.Next(0, haulingCargoInfoList.Count-1)];
                 }
                 else
                 {
-                    chosenCargo = cargoList[^1].fittingCargo[Random.Range(0, cargoList[^1].fittingCargo.Count)];
+                    chosenCargo = cargoList[^1].fittingCargo[rng.Next(0, cargoList[^1].fittingCargo.Count-1)];
                 }
                 safety++;
             } while (GetEligibleRailCars(chosenCargo, currentLevel).Count == 0 && safety < 20);
@@ -125,9 +195,9 @@ public class HaulingJobManager : MonoBehaviour
             entry.cargo = cargo;
 
             List<RailCarSO> eligibleRailCarList = GetEligibleRailCars(cargo, currentLevel);
-            entry.railCar = eligibleRailCarList[Random.Range(0, eligibleRailCarList.Count)];
+            entry.railCar = eligibleRailCarList[rng.Next(0, eligibleRailCarList.Count-1)];
 
-            entry.weight = Random.Range(10, 50);
+            entry.weight = rng.Next(10, 50);
             entry.pay = 0f;
 
             haulingJobEntryList.Add(entry);
@@ -143,26 +213,25 @@ public class HaulingJobManager : MonoBehaviour
         HaulingJob haulingJob = new HaulingJob();
         haulingJob.haulingJobEntryList = haulingJobEntryList;
 
-        if (trackPath == null)
-            haulingJob.distance = Random.Range(1250, 2500);
+        if (trackLength == -1f)
+            haulingJob.distance = rng.Next(1250, 2500);
         else
         {
-            haulingJob.distance = trackPath.length;
-            haulingJob.linkedTrainTrackPath = trackPath;
+            haulingJob.distance = trackLength;
         }
 
         //Calculate pay
-        float bonus = (Mathf.Floor(haulingJob.distance / 100f) * Random.Range(payIncreaseFor100Meters.x, payIncreaseFor100Meters.y)) / haulingJob.haulingJobEntryList.Count;
+        float bonus = (Mathf.Floor(haulingJob.distance / 100f) * rng.Next(payIncreaseFor100Meters.x, payIncreaseFor100Meters.y)) / haulingJob.haulingJobEntryList.Count;
         foreach (HaulingJobEntry entry in haulingJob.haulingJobEntryList)
         {
-            float cargo = Random.Range(entry.cargo.payRange.x, entry.cargo.payRange.y);
-            float railCar = Random.Range(entry.railCar.payRange.x, entry.railCar.payRange.y);
+            float cargo = rng.Next(entry.cargo.payRange.x, entry.cargo.payRange.y);
+            float railCar = rng.Next(entry.railCar.payRange.x, entry.railCar.payRange.y);
             float pay = Mathf.Round((bonus + cargo + railCar) / 10f) * 10f;
 
             entry.pay = pay;
         }
-        return haulingJob;
         
+        AddHaulingJobToList(haulingJob, currentLevel);
     }
 
     public List<RailCarSO> GetEligibleRailCars(CargoSO cargo, int level)
@@ -245,7 +314,7 @@ public class HaulingJobManager : MonoBehaviour
         if (cargoCopy)
         {
             RailCar railCarScript = railCarCopy.GetComponent<RailCar>();
-            railCarScript.ParentCargo(cargoCopy);
+            railCarScript.SetCargoPos(cargoCopy);
         }
 
         Bounds bounds = new Bounds();

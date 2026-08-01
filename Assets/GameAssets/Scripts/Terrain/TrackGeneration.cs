@@ -30,11 +30,11 @@ public class TrackGeneration : MonoBehaviour
     {
         active = this;
     }
-    public void GenerateTrack(Vector3 start, Vector3 end, out TrackSection lastTrackSectionOut, Point lastSplinePoint = null, Point nextSplinePoint = null)
+    public void GenerateTrack(Vector3 start, Vector3 end, out TrackSection lastTrackSectionOut, Point lastSplinePoint = null, Point nextSplinePoint = null, bool clientsModifyGround = true)
     {
         AStar aStar = new AStar(start, end, pathFindingSettings);
         NodePath nodePath = aStar.FindPath(aStar.GetNode(start), aStar.GetNode(end));
-        CreateTrackAlongNodes(nodePath, out List<PathPoint> allPathPoints, out lastTrackSectionOut, lastSplinePoint, nextSplinePoint);
+        CreateTrackAlongNodes(nodePath, out List<PathPoint> allPathPoints, out lastTrackSectionOut, lastSplinePoint, nextSplinePoint,null, clientsModifyGround);
         ModifyTerrainToFollowPath(allPathPoints,true);
     } 
     public List<NodePath> FindPaths(Vector3 start, Vector3 end, List<int> pathSeeds, int count = 3, float loadingBarTime = 0.4f)
@@ -84,7 +84,7 @@ public class TrackGeneration : MonoBehaviour
         }
         return chosenPathList;
     }
-    public void CreateTrackAlongNodes(NodePath nodePath, out List<PathPoint> allPathPoints, out TrackSection lastTrackSectionOut, Point lastSplinePoint = null, Point nextSplinePoint = null, TrackSection lastTrackSection = null)
+    public void CreateTrackAlongNodes(NodePath nodePath, out List<PathPoint> allPathPoints, out TrackSection lastTrackSectionOut, Point lastSplinePoint = null, Point nextSplinePoint = null, TrackSection lastTrackSection = null, bool clientsModifyGround = false)
     {
         for (int i = 0; i < nodePath.path.Count; i++)
         {
@@ -128,7 +128,7 @@ public class TrackGeneration : MonoBehaviour
                 allPathPoints.AddRange(trackSection.path);
                 lastTrackSection = trackSection;
                 
-                TrackManager.active.SyncTrackSection(trackSection);
+                TrackManager.active.SyncTrackSection(trackSection,clientsModifyGround);
             }
             lastSplinePoint = newPoint;
         }
@@ -225,10 +225,11 @@ public class TrackGeneration : MonoBehaviour
                     //Debug.DrawRay(vertWorldPos, Vector3.up, Color.blue, 20f);
                 }
             }
-        }
-        foreach (Vector2Int chunkCoord in chunksToModify)
-        {
-            TerrainGeneration.active.CreateOrUpdateChunk(chunkCoord);
+
+            if (chunk.meshData != null)
+            {
+                chunk.GenerateMesh();
+            }
         }
     }
 

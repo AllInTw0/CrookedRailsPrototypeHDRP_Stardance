@@ -105,6 +105,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Trigger
   onEnter:
     m_PersistentCalls:
+      m_Calls: []
+  onEnterAll:
+    m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2222539742441043059}
         m_TargetAssemblyTypeName: HaulingJobMonitorHandler, Assembly-CSharp
@@ -122,6 +125,9 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   onExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onExitAll:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 2222539742441043059}
@@ -151,6 +157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9beca446c842b904aa184751e6bb9844, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HaulingJobMonitorHandler
+  ShowTopMostFoldoutHeaderGroup: 1
   mainMonitorArm: {fileID: 4476731776641560231}
   monitorArmList:
   - {fileID: 1666223974857179062}
@@ -605,6 +612,10 @@ PrefabInstance:
     - target: {fileID: 3339909956994284493, guid: 396b6ccc81fa50049b2051189bf7a19f, type: 3}
       propertyPath: m_LocalRotation.z
       value: 0.33810276
+      objectReference: {fileID: 0}
+    - target: {fileID: 3822090304529241172, guid: 396b6ccc81fa50049b2051189bf7a19f, type: 3}
+      propertyPath: noQue
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4091312645944713898, guid: 396b6ccc81fa50049b2051189bf7a19f, type: 3}
       propertyPath: m_Positions.Array.data[0].x
@@ -1682,6 +1693,10 @@ PrefabInstance:
     - target: {fileID: 3803457256597009374, guid: 396b6ccc81fa50049b2051189bf7a19f, type: 3}
       propertyPath: animName
       value: move2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3822090304529241172, guid: 396b6ccc81fa50049b2051189bf7a19f, type: 3}
+      propertyPath: noQue
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4091312645944713898, guid: 396b6ccc81fa50049b2051189bf7a19f, type: 3}
       propertyPath: m_Positions.Array.data[0].x
@@ -2767,6 +2782,10 @@ PrefabInstance:
     - target: {fileID: 3803457256597009374, guid: 396b6ccc81fa50049b2051189bf7a19f, type: 3}
       propertyPath: animName
       value: move2
+      objectReference: {fileID: 0}
+    - target: {fileID: 3822090304529241172, guid: 396b6ccc81fa50049b2051189bf7a19f, type: 3}
+      propertyPath: noQue
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4091312645944713898, guid: 396b6ccc81fa50049b2051189bf7a19f, type: 3}
       propertyPath: m_Positions.Array.data[0].x

@@ -46,6 +46,7 @@ public class Player : NetworkBehaviour
         camera = GetComponentInChildren<PlayerCamera>();
         camera.player = this;
         movement = GetComponent<PlayerMovement>();
+        movement.player = this;
         avatar = GetComponent<PlayerAvatar>();
         avatar.player = this;
         inventory = GetComponent<PlayerInventory>();
@@ -69,7 +70,7 @@ public class Player : NetworkBehaviour
             //Destroy camera object. (Destroys PlayerInteract, PlayerCamera, Camera)
             Destroy(camera.gameObject);
             //Remove movement script
-            Destroy(movement);
+            //Destroy(movement);
         }
         
         //Set player mesh
@@ -85,8 +86,9 @@ public class Player : NetworkBehaviour
             playerIDNetworkVariable.Value = nextPlayerID;
             nextPlayerID++;
         }
-
-        AwaitTeleport();
+        
+        if (IsOwner)
+            AwaitTeleport();
     }
 
     private async void AwaitTeleport()
@@ -94,7 +96,7 @@ public class Player : NetworkBehaviour
         while (true)//Safety net
         {
             //Teleport to starting location
-            if (TeleportOnStart.active != null)
+            if (TeleportOnStart.active != null && Train.playerTrain.IsInitialized())
             {
                 TeleportOnStart.active.Teleport();
                 return;
@@ -141,10 +143,10 @@ public class Player : NetworkBehaviour
 
     private void FixedUpdate()
     {
-        if (IsOwner == false)
-        {
-            rb.AddForce(Vector3.down * gravityForce);
-        }
+        //if (IsOwner == false)
+        //{
+        //    rb.AddForce(Vector3.down * gravityForce);
+        //}
     }
 
     private void StateUpdate(PlayerNetworkData previous, PlayerNetworkData current)

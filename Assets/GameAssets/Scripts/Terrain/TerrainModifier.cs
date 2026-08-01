@@ -20,7 +20,7 @@ public class TerrainModifier : StructureGenerator
         ModifyGround(transform.position, influenceDistance, shapeBasedOnDistance, boxCollider);
         yield break;
     }
-
+    
     public static void ModifyGround(Vector3 worldPos, float influenceDistance, AnimationCurve shapeBasedOnDistance = null, BoxCollider boxCollider = null)
     {
         Vector2Int chunkCoord = TerrainGeneration.active.GetChunkCoord(worldPos);

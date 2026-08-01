@@ -7,7 +7,8 @@ using Random = UnityEngine.Random;
 public class Train : NetworkBehaviour
 {
     public static Train playerTrain;
-
+    public static List<Train> activeTrainList = new List<Train>();
+    
     [System.Serializable]
     public class FuelSource
     {
@@ -89,7 +90,8 @@ public class Train : NetworkBehaviour
     {
         if (isPlayerTrain)
             playerTrain = this;
-
+        activeTrainList.Add(this);
+        
         RecalculateConsistLength();
     }
 
@@ -118,9 +120,9 @@ public class Train : NetworkBehaviour
         }
         
         //Player dist
-        if (PlayerMovement.active != null && GameStateManager.gameStarted)
+        if (GameStateManager.gameStarted)
         {
-            playerDistFromTrain = GetClosestDistanceToPos(PlayerMovement.active.transform.position);
+            playerDistFromTrain = GetClosestDistanceToPos(Player.localPlayer.transform.position);
             if (autoStopPlayerDist > 0 && playerDistFromTrain >= autoStopPlayerDist && deceleration == 0)
             {
                 Debug.Log("Player Is To Far! Engaging breaks!");
@@ -143,15 +145,15 @@ public class Train : NetworkBehaviour
                 break;
             }
         }
-        if(controlls.currentState == LocomotiveControls.State.derailed)
+        if(controlls.currentState.Value == LocomotiveControls.State.derailed)
         {
             if (derailed == false)
-                controlls.Unlock();
+                controlls.SetState(LocomotiveControls.State.normal);
         }
-        else if(controlls.currentState == LocomotiveControls.State.normal)
+        else if(controlls.currentState.Value == LocomotiveControls.State.normal)
         {
             if (derailed)
-                controlls.SetDerailled();
+                controlls.SetState(LocomotiveControls.State.derailed);
         }
 
         //Update Speed    
@@ -189,44 +191,11 @@ public class Train : NetworkBehaviour
         if(isPlayerTrain) 
             GameStateManager.distanceTravelled += distanceTravelled;
 
-        //Check front
-        if (TrackManager.active.GetTrackSectionFromProgress(sectionProgress, frontTrackSection, out TrackSection newSection, out float newSectionProgress))
-        {
-            //Update section
-            sectionProgress = newSectionProgress;
-            frontTrackSection = newSection;
-        }
-        else if(speed > 0)
-        {
-            //End of track
-            Debug.Log("End of track front");
-            speed *= -0.5f;
-        }
-
-
-        //Check back
-        if (TrackManager.active.GetTrackSectionFromProgress(sectionProgress - consistLength, frontTrackSection, out newSection, out newSectionProgress) == false && speed < 0)
-        {
-            Debug.Log("End of track back");
-            speed *= -0.5f;
-        }
-
-
-        float railCarProgress = sectionProgress;
-        TrackSection railCarSection = frontTrackSection;
-        foreach (var railCar in consist)
-        {
-            TrackManager.active.GetTrackSectionFromProgress(railCarProgress - railCar.frontLength, railCarSection, out newSection, out newSectionProgress);
-            railCarProgress = newSectionProgress;
-            railCarSection = newSection;
-
-            railCar.UpdateRailCar(railCarProgress, railCarSection, distanceTravelled);
-
-            railCarProgress -= railCar.backLength + couplerLength;
-        }
-
+        UpdatePosition(distanceTravelled);
+        
+ 
         //Fuel
-        if(IsServer && consumeFuel && acceleration > 0f && (controlls == null || controlls.currentState == LocomotiveControls.State.normal))
+        if(IsServer && consumeFuel && acceleration > 0f && (controlls == null || controlls.currentState.Value == LocomotiveControls.State.normal))
         {
             foreach (FuelSource fuelSource in fuelSourceList)
             {
@@ -274,6 +243,43 @@ public class Train : NetworkBehaviour
         }
     }
 
+    private void UpdatePosition(float distanceTravelled = 0f)
+    {   
+        //Check front
+        if (TrackManager.active.GetTrackSectionFromProgress(sectionProgress, frontTrackSection, out TrackSection newSection, out float newSectionProgress))
+        {
+            //Update section
+            sectionProgress = newSectionProgress;
+            frontTrackSection = newSection;
+        }
+        else if(speed > 0)
+        {
+            //End of track
+            Debug.Log("End of track front");
+            speed *= -0.5f;
+        }
+
+
+        //Check back
+        if (TrackManager.active.GetTrackSectionFromProgress(sectionProgress - consistLength, frontTrackSection, out newSection, out newSectionProgress) == false && speed < 0)
+        {
+            Debug.Log("End of track back");
+            speed *= -0.5f;
+        }
+        
+        float railCarProgress = sectionProgress;
+        TrackSection railCarSection = frontTrackSection;
+        foreach (var railCar in consist)
+        {
+            TrackManager.active.GetTrackSectionFromProgress(railCarProgress - railCar.frontLength, railCarSection, out newSection, out newSectionProgress);
+            railCarProgress = newSectionProgress;
+            railCarSection = newSection;
+
+            railCar.UpdateRailCar(railCarProgress, railCarSection, distanceTravelled);
+
+            railCarProgress -= railCar.backLength + couplerLength;
+        }
+    }
     public void SetFuelConsumption(bool value)
     {
         consumeFuel = value;
@@ -316,7 +322,7 @@ public class Train : NetworkBehaviour
             }
             
             //Assign Train
-            consist[i].SetLinkedTrain(this);
+            consist[i].SetLinkedTrain(this, i);
         }
         
 
@@ -353,6 +359,10 @@ public class Train : NetworkBehaviour
             controlls.SetFullThrottle();
             speed = maxSpeed;
         }
+
+        UpdatePosition();
+        
+        //GetComponentInChildren<TeleportOnStart>().Teleport();
     }
     public List<FuelSource> GetFuelSourceList()
     {
@@ -406,6 +416,10 @@ public class Train : NetworkBehaviour
     {
         return consist;
     }
+    public void SetConsist(List<RailCar> consist)
+    {
+        this.consist = consist;
+    }
     public RailCar AddRailCar(RailCarSO railCarInfo, int index)
     {
         RailCar railCarCopy = Instantiate(railCarInfo.prefab,transform).GetComponent<RailCar>();
@@ -424,8 +438,11 @@ public class Train : NetworkBehaviour
         consist.Add(railCarCopy);
         consist.AddRange(listBack);
 
+        //Sync to client
+        railCarCopy.GetComponent<NetworkObject>().Spawn(true);
+        
         RecalculateConsistLength();
-
+        
         return railCarCopy;
     }
 
@@ -450,12 +467,14 @@ public class Train : NetworkBehaviour
         {
             if (consist[i].isPlayerRailCar == false)
             {
-                Destroy(consist[i].gameObject);
+                consist[i].DestroyRailCar();
                 consist.RemoveAt(i);
                 i--;
             }
         }
-
+        
+        RecalculateConsistLength();
+        
         Debug.Log("Removed NonPlayer RailCars");
     }
     public void HeallAllRailCars()
@@ -483,6 +502,19 @@ public class Train : NetworkBehaviour
         return minDist;
     }
 
+    public List<Player> GetPlayersOnTrain()
+    {
+        List<Player> playersOnTrain = new List<Player>();
+        for (int i = 0; i < Player.playerList.Count; i++)
+        {
+            if (Player.playerList[i].movement.IsOnRailCar(out RailCar railCar) && railCar.GetLinkedTrain() == this)
+            {
+                playersOnTrain.Add(Player.playerList[i]);
+            }
+        }
+
+        return playersOnTrain;
+    }
     public float GetPlayerDist()
     {
         return playerDistFromTrain;

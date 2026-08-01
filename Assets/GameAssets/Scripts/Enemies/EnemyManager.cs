@@ -142,7 +142,7 @@ public class EnemyManager : MonoBehaviour
         
         for (int i = 0; i < enemyList.Count; i++)
         {
-            float dist = Vector3.Distance(PlayerMovement.active.transform.position, enemyList[i].transform.position);
+            float dist = Vector3.Distance(Player.localPlayer.transform.position, enemyList[i].transform.position);
             if(dist > maxDistanceFromPlayer)
             {
                 Destroy(enemyList[i].gameObject);

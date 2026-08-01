@@ -148,7 +148,7 @@ public class MeshData
     public void Destroy()
     {
         if (meshObject)
-            GameObject.DestroyImmediate(meshObject);
+            ThreadManager.AddMainThreadJob(delegate{GameObject.Destroy(meshObject);});
     }
     private Vector3[] CalculateNormals()
     {

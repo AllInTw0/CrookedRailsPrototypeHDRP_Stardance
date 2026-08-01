@@ -84,6 +84,7 @@ MonoBehaviour:
   Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
+  <InScenePlaced>k__BackingField: 0
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
@@ -143,8 +144,8 @@ MonoBehaviour:
     - {fileID: 2427493482864173330, guid: afc65d34151c1e94b8ec0c76180cffd3, type: 3}
     countType: 1
     minMaxCount: {x: 6, y: 10}
-    lengthType: 2
-    lengthAddition: 0
+    lengthType: 1
+    lengthAddition: 20
     countCurve:
       serializedVersion: 2
       m_Curve: []

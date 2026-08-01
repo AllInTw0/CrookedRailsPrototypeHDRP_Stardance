@@ -148,7 +148,7 @@ public class Settings : MonoBehaviour
             Display.displays[i].Activate();
         }
         
-        bool fullscreen = Screen.fullScreen;
+        bool fullscreen = PlayerPrefs.GetInt("fullscreen", 1) == 1;
         Resolution currentResolution = Screen.currentResolution;
         int currentResolutionIndex = 0;
         Resolution[] resolutionArray = Screen.resolutions;
@@ -164,6 +164,7 @@ public class Settings : MonoBehaviour
         {
             fullscreen = newValue == 1f;
             Screen.SetResolution(currentResolution.width, currentResolution.height, fullscreen);
+            PlayerPrefs.SetInt("fullscreen", (int)newValue);
         });
         graphicsSection.AddDropdown("Resolution", new List<string>(strResolutionList), currentResolutionIndex).onValueChanged.AddListener((float newValue) =>
         {
@@ -171,7 +172,9 @@ public class Settings : MonoBehaviour
             currentResolution = resolutionArray[currentResolutionIndex];
             Screen.SetResolution(currentResolution.width, currentResolution.height, fullscreen);
         });
-
+        
+        Screen.SetResolution(currentResolution.width, currentResolution.height, fullscreen);
+        
         graphicsSection.AddTitle("View");
 
         fov = PlayerPrefs.GetFloat("fov", 60f);

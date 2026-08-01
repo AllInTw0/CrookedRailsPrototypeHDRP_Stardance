@@ -126,12 +126,12 @@ public class MovingPlatformManager : MonoBehaviour
         entries.Add(entry);
     }
 
-    public void RemoveEntry(Transform entryTransform)
+    public void RemoveEntry(Transform entryTransform, bool applyVelocity = true)
     {
         int i = FindEntry(entryTransform);
         if (i != -1)
         {
-            if (entries[i].rb != null && Time.timeScale != 0)
+            if (entries[i].rb != null && Time.timeScale != 0 && applyVelocity)
             {
                 entries[i].rb.linearVelocity += entries[i].velocity;
                 entries[i].rb.interpolation = entries[i].rbInterpolation;

@@ -1,7 +1,8 @@
 using System;
+using Unity.Netcode;
 using UnityEngine;
 
-public class LocomotiveControls : MonoBehaviour
+public class LocomotiveControls : NetworkBehaviour
 {
     [SerializeField] 
     private Train train;
@@ -21,10 +22,6 @@ public class LocomotiveControls : MonoBehaviour
     private float supersonicAcceleration;
     [SerializeField]
     private float supersonicDeceleration;
-    //Run Time
-    private int throttleNotch;
-    private int reverserNotch;
-    private int locoBreaksNotch;
 
     public enum State
     {
@@ -35,224 +32,228 @@ public class LocomotiveControls : MonoBehaviour
         derailed
     }
     [HideInInspector]
-    public State currentState;
+    public NetworkVariable<State> currentState;
+
+    public void SetState(State newState)
+    {
+        currentState.Value = newState;
+    }
     [HideInInspector]
-    public bool onSetOffTriggerGenerationReset;
+    public NetworkVariable<bool> onSetOffTriggerGenerationReset;
     private void Start()
     {
-        //onSetOffTriggerGenerationReset = true;
-    }
-    private void LateUpdate()
-    {
-        if (currentState == State.locked)
+        throttle.interactEvent.AddListener(() =>
         {
-            throttle.SetCurrentNotch(throttleNotch);
-            locoBreaks.SetCurrentNotch(locoBreaksNotch);
-            reverser.SetCurrentNotch(reverserNotch);
-            return;
+            if (currentState.Value == State.normal)
+            {
+                locoBreaks.SetCurrentNotch(0);
+
+                train.SetMaxSpeed((throttle.GetCurrentNotch() / (float)throttle.notches) * TrainUpgradeHandler.active.GetStatValue(TrainStatType.Speed));
+                if (throttle.GetCurrentNotch() == 0)
+                    train.SetAcceleration(0f);
+                else
+                    train.SetAcceleration(reverser.GetCurrentNotch() == 0 ? TrainUpgradeHandler.active.GetStatValue(TrainStatType.Acceleration) : -TrainUpgradeHandler.active.GetStatValue(TrainStatType.Acceleration));
+
+                train.SetDeceleration(0f);
+            }
+            else if (currentState.Value == State.supersonic)
+            {
+                if (throttle.GetCurrentNotch() > 0)
+                {
+                    if (throttle.actionNameOverride != "")
+                    {
+                        FreezePlayersToTrainRpc();
+                    }
+
+                    throttle.SetActionNameOverride("");
+
+                    locoBreaks.SetCurrentNotch(0);
+                    reverser.SetCurrentNotch(0);
+
+                    train.SetMaxSpeed(supersonicSpeed);
+                    train.SetAcceleration(supersonicAcceleration);
+                    train.SetDeceleration(0f);
+                }
+            }
+        });
+        reverser.interactEvent.AddListener(() =>
+        {
+            if (currentState.Value == State.normal)
+            {
+                if (throttle.GetCurrentNotch() == 0)
+                    train.SetAcceleration(0f);
+                else
+                    train.SetAcceleration(reverser.GetCurrentNotch() == 0 ? TrainUpgradeHandler.active.GetStatValue(TrainStatType.Acceleration) : -TrainUpgradeHandler.active.GetStatValue(TrainStatType.Acceleration));
+            }
+        });
+        locoBreaks.interactEvent.AddListener(()=>
+        {
+            if (currentState.Value == State.normal)
+            {
+                if (locoBreaks.GetCurrentNotch() == 1)
+                {
+                    throttle.SetCurrentNotch(0);
+
+                    train.SetMaxSpeed(0f);
+                    train.SetAcceleration(0f);
+                    train.SetDeceleration(TrainUpgradeHandler.active.GetStatValue(TrainStatType.Deceleration));
+                }
+            }
+        });
+
+        currentState.OnValueChanged += StateChanged;
+    }
+
+    private void StateChanged(State previousState, State currentState)
+    {
+        //Unfreze players if the train was supersonic
+        Player.localPlayer.movement.UnFreeze();
+        if (currentState == State.normal)
+        {
+            throttle.SetActionNameOverride("");
+            throttle.SetLocked(false);
+            locoBreaks.SetLocked(false);
+            reverser.SetLocked(false);
         }
         else if (currentState == State.supersonic)
         {
-            if (throttle.GetCurrentNotch() > 0)
-            {
-                throttleNotch = throttle.notches;
-            }
-            if (throttleNotch > 0)
-            {
-                //if (onSetOffTriggerGenerationReset)
-                //{
-                //    onSetOffTriggerGenerationReset = false;
-                //    GenerationManager.active.GenerateTillNextStation();
-                //}
-
-                if(onSetOffTriggerGenerationReset && (HaulingJobMonitorHandler.active != null && HaulingJobMonitorHandler.haulingJobPicked == false))
-                {
-                    throttle.SetActionNameOverride("Pick a job first!");
-                    throttle.SetCurrentNotch(throttleNotch);
-                    throttleNotch = 0;
-
-                    locoBreaks.SetCurrentNotch(0);
-                    locoBreaksNotch = 0;
-
-                    reverser.SetCurrentNotch(0);
-                    reverserNotch = 0;
-                    return;
-                }
-
-                if (throttle.actionNameOverride != "")
-                {
-                    //Freeze the players to the train
-                    PlayerMovement.active.Freeze(Train.playerTrain.GetRailCarAtIndex(0));
-                }
-                throttle.SetActionNameOverride("");
-                throttle.SetCurrentNotch(throttleNotch);
-
-                locoBreaks.SetCurrentNotch(0);
-                locoBreaksNotch = 0;
-
-                reverser.SetCurrentNotch(0);
-                reverserNotch = 0;
-
-                train.SetMaxSpeed(supersonicSpeed);
-                train.SetAcceleration(supersonicAcceleration);
-                train.SetDeceleration(0f);
-            }
+            Break();
+            reverser.SetCurrentNotch(0);
+            
+            throttle.SetLocked(true);
+            locoBreaks.SetLocked(true);
+            reverser.SetLocked(true);
+        }
+        else if (currentState == State.locked)
+        {
+            throttle.SetLocked(true);
+            locoBreaks.SetLocked(true);
+            reverser.SetLocked(true);
         }
         else if (currentState == State.depletedFuel)
+        {
+            Break();
+            reverser.SetCurrentNotch(0);
+
+            train.HasEnoughFuel(out string depletedFuelSourceName);
+            throttle.SetActionNameOverride("No " + depletedFuelSourceName + "!");
+            
+            throttle.SetLocked(false);
+            locoBreaks.SetLocked(true);
+            reverser.SetLocked(true);
+        }
+        else if (currentState == State.derailed)
+        {
+            Break();
+            
+            throttle.SetActionNameOverride("Derailed!");
+            
+            reverser.SetCurrentNotch(0);
+            
+            throttle.SetLocked(true);
+            locoBreaks.SetLocked(true);
+            reverser.SetLocked(true);
+        }
+    }
+    private void LateUpdate()
+    {
+        if (currentState.Value == State.supersonic)
+        {
+            if (onSetOffTriggerGenerationReset.Value)
+            {
+                if (HaulingJobMonitorHandler.active != null && HaulingJobMonitorHandler.haulingJobPicked == false)
+                {
+                    throttle.SetLocked(true);
+                    throttle.SetActionNameOverride("Pick a job first!");
+                }
+                else
+                {
+                    int playersOnTrainCount = train.GetPlayersOnTrain().Count;
+                    if (playersOnTrainCount < Player.playerList.Count)
+                    {
+                        throttle.SetLocked(true);
+                        throttle.SetActionNameOverride("Not all players are on the train! [" + playersOnTrainCount + "/" + Player.playerList.Count + "]");
+                    }
+                    else
+                    {
+                        throttle.SetActionNameOverride();
+                        throttle.SetLocked(false);
+                    }
+                }
+            }
+            else
+            {
+                throttle.SetActionNameOverride("Set off");
+                throttle.SetLocked(false);
+            }
+        }
+        else if (currentState.Value == State.depletedFuel)
         {
             //Fuel
             if (train.HasEnoughFuel(out string depletedFuelSourceName))
             {
                 throttle.SetActionNameOverride("");
                 throttle.SetLocked(false);
-                currentState = State.normal;
+                currentState.Value = State.normal;
             }
-
-            //Controlls
-            UpdateThrottle();
-            UpdateBreaks();
-            UpdateReverser();
         }
-        else if (currentState == State.normal) 
+        else if (currentState.Value == State.normal) 
         {
             if(train.HasEnoughFuel(out string depletedFuelSourceName) == false)
             {
                 throttle.SetActionNameOverride("No " + depletedFuelSourceName + "!");
                 throttle.SetLocked(true);
                 throttle.SetCurrentNotch(0);
-                currentState = State.depletedFuel;
+                currentState.Value = State.depletedFuel;
             }
-
-            //Controlls
-            UpdateThrottle();
-            UpdateBreaks();
-            UpdateReverser();
         }
 
-        if (throttleNotch > 0)
+        if (throttle.GetCurrentNotch() > 0)
         {
-            if (onSetOffTriggerGenerationReset)
+            if (onSetOffTriggerGenerationReset.Value && IsServer)
             {
-                onSetOffTriggerGenerationReset = false;
+                onSetOffTriggerGenerationReset.Value = false;
                 GenerationManager.active.GenerateTillNextStation();
             }
-        }
-    }
-    public void UpdateThrottle()
-    {
-        if (throttleNotch != throttle.GetCurrentNotch())
-        {
-            throttleNotch = throttle.GetCurrentNotch();
-
-            locoBreaks.SetCurrentNotch(0);
-            locoBreaksNotch = 0;
-
-            train.SetMaxSpeed((throttleNotch / (float)throttle.notches) * TrainUpgradeHandler.active.GetStatValue(TrainStatType.Speed));
-            if (throttleNotch == 0)
-                train.SetAcceleration(0f);
-            else
-                train.SetAcceleration(reverserNotch == 0 ? TrainUpgradeHandler.active.GetStatValue(TrainStatType.Acceleration) : -TrainUpgradeHandler.active.GetStatValue(TrainStatType.Acceleration));
-
-            train.SetDeceleration(0f);
-        }
-    }
-    public void UpdateBreaks()
-    {
-        if (locoBreaksNotch != locoBreaks.GetCurrentNotch())
-        {
-            locoBreaksNotch = locoBreaks.GetCurrentNotch();
-
-            throttle.SetCurrentNotch(0);
-            throttleNotch = 0;
-
-            train.SetMaxSpeed(0f);
-            train.SetAcceleration(0f);
-            train.SetDeceleration(TrainUpgradeHandler.active.GetStatValue(TrainStatType.Deceleration));
-        }
-    }
-    public void UpdateReverser()
-    {
-        if (reverserNotch != reverser.GetCurrentNotch())
-        {
-            reverserNotch = reverser.GetCurrentNotch();
-
-            if (throttleNotch == 0)
-                train.SetAcceleration(0f);
-            else
-                train.SetAcceleration(reverserNotch == 0 ? TrainUpgradeHandler.active.GetStatValue(TrainStatType.Acceleration) : -TrainUpgradeHandler.active.GetStatValue(TrainStatType.Acceleration));
         }
     }
     public void Break()
     {
         throttle.SetCurrentNotch(0);
-        throttleNotch = 0;
-
         locoBreaks.SetCurrentNotch(1);
-        locoBreaksNotch = 1;
 
         train.SetMaxSpeed(0f);
         train.SetAcceleration(0f);
         train.SetDeceleration(GetDeceleration());
-
-        //if (supersonic)
-        //{
-        //    //UnFreeze the players from the train
-        //MOVED TO TRAIN.CS
-        //}
-        currentState = State.normal;//supersonic = false;
-    }
-    public void SetDerailled()
-    {
-        LockControlls();
-        throttle.SetActionNameOverride("Derailed!");
-        currentState = State.derailed;
-    }
-    public void LockControlls()
-    {
-        Break();
-
-        currentState = State.locked; //locked = true;   
-        reverser.SetCurrentNotch(0);
-        reverserNotch = 0;
-
-        throttle.SetLocked(true);
-        locoBreaks.SetLocked(true);
-        reverser.SetLocked(true);
-    }
-    public void ActivateSupersonic()
-    {
-        currentState = State.supersonic;
-        //supersonic = true;
-        //locked = false;
-
-        throttle.SetActionNameOverride("Set off");
-
-        throttle.SetLocked(false);
-        locoBreaks.SetLocked(true);
-        reverser.SetLocked(true);
-    }
-    public void Unlock()
-    {
-        currentState = State.normal;//locked = false;
-        throttle.SetActionNameOverride("");
-        throttle.SetLocked(false);
-        locoBreaks.SetLocked(false);
-        reverser.SetLocked(false);
     }
     public void SetFullThrottle()
     {
         throttle.SetCurrentNotch(throttle.notches);
-        UpdateThrottle();
-
         locoBreaks.SetCurrentNotch(0);
-        UpdateBreaks();
+        locoBreaks.SetCurrentNotch(0);
+        
+        train.SetMaxSpeed(TrainUpgradeHandler.active.GetStatValue(TrainStatType.Speed));
+        train.SetAcceleration(TrainUpgradeHandler.active.GetStatValue(TrainStatType.Acceleration));
     }
 
     public float GetDeceleration()
     {
-        if (currentState == State.supersonic)
+        if (currentState.Value == State.supersonic)
             return supersonicDeceleration;
         else
             return TrainUpgradeHandler.active.GetStatValue(TrainStatType.Deceleration);
+    }
+    
+    [Rpc(SendTo.Everyone)]
+    private void FreezePlayersToTrainRpc()
+    {
+        if (Player.localPlayer.movement.IsOnRailCar(out RailCar railCar) && railCar.GetLinkedTrain() == train)
+        {
+            Player.localPlayer.movement.Freeze(railCar);
+        }
+        else
+        {
+            Player.localPlayer.movement.Freeze(Train.playerTrain.GetRailCarAtIndex(0));
+        }
     }
 }

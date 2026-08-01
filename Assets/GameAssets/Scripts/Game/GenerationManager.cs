@@ -83,6 +83,16 @@ public class GenerationManager : NetworkBehaviour
     private List<StructureSpawnParams> strutureSpawnParamList;
     [SerializeField]
     private float distanceBufferBetweenStructures;
+    private enum DebugTrainStartLocation
+    {
+        TrainRide,
+        StartingLocation,
+        Station
+    }
+
+    [Header("Debug")] 
+    [SerializeField] 
+    private DebugTrainStartLocation trainStartLocation;
     [Header("Temp")]
     [SerializeField]
     private bool disableNavMeshGen;
@@ -110,8 +120,7 @@ public class GenerationManager : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         Debug.Log("Is Server: " + IsServer);
-        if (IsServer)
-            WaitForScripts();
+        WaitForScripts();
     }
 
     private async void WaitForScripts()
@@ -122,10 +131,13 @@ public class GenerationManager : NetworkBehaviour
             {
                 if (TerrainGeneration.terrainNoise != null)
                 {
-                    GenerateStart();
+                    if(IsServer)
+                        GenerateStart();
+                    else
+                        terrainGeneration.SetUpdateRenderDistance(true);
                     return;
                 }
-                await Task.Delay(100);
+                await Task.Delay(50);
             }
         }
         catch (Exception e)
@@ -154,7 +166,7 @@ public class GenerationManager : NetworkBehaviour
             GenerateStartRpc(true);
             DestroySectionsBehindTrain();
             //Generate
-            OnFindPaths(GameStateManager.currentHaulingJob.linkedTrainTrackPath);
+            OnFindPaths(GameStateManager.currentHaulingJob.GetLinkedTrack());
         }
     }
     [Rpc(SendTo.NotServer)]
@@ -514,10 +526,22 @@ public class GenerationManager : NetworkBehaviour
         TrackSection findLastSection = lastTrackSectionOut;
         while (findLastSection.previousSection != null)
             findLastSection = findLastSection.previousSection;
-        playerTrain.Initialize(playerTrain.GetConsistLenght() + 1f, findLastSection,true);
+
+        if (trainStartLocation == DebugTrainStartLocation.TrainRide)
+        {
+            playerTrain.Initialize(playerTrain.GetConsistLenght() + 1f, findLastSection, true);
+        }
+        else if (trainStartLocation == DebugTrainStartLocation.StartingLocation ||
+                 trainStartLocation == DebugTrainStartLocation.Station)
+        {
+            playerTrain.Initialize(playerTrain.GetConsistLenght(), section, true);
+        }
+        
+        terrainGeneration.SetUpdateRenderDistance(true);
         
         Spline.DEBUG_DrawPointGizmos(pointA);
         Spline.DEBUG_DrawPointGizmos(pointB);
+        
     }
     private void GenerateStation()
     {
@@ -528,25 +552,31 @@ public class GenerationManager : NetworkBehaviour
         //MOVED TO HaulinJobMonitorHandler.cs
         //Generate new hauling jobs
         //HaulingJobManager.active.GenerateNewHaulingJobList(3);
-
+        
+        List<TrackSection> generatedSectionList = new List<TrackSection>();
         //Pre Station Track
         TrackSection generatedSection = GenerateStraightSection(playerTrain.GetConsistLenght() + 12.5f);
-        TrackManager.active.SyncTrackSection(generatedSection);
+        generatedSectionList.Add(generatedSection);
         SpawnStructureNearTrack(generatedSection.length, generatedSection, preStationSO);
         //generatedSection.SetAutoStop(generatedSection.length - 2.5f,AutoStopType.Front);
 
         //Speed Track Enter
         generatedSection = GenerateStraightSection(stationSpeedTrackDistance);
-        TrackManager.active.SyncTrackSection(generatedSection);
+        generatedSectionList.Add(generatedSection);
         ListOfPathPoints.AddRange(generatedSection.path);
 
         //Station Track
         float startionTrackLength = playerTrain.GetConsistLenght() + 10f;
         generatedSection = GenerateStraightSection(startionTrackLength,110f);
-        TrackManager.active.SyncTrackSection(generatedSection);
+        generatedSectionList.Add(generatedSection);
         ListOfPathPoints.AddRange(generatedSection.path);
         SpawnStructureNearTrack(generatedSection.length - 2, generatedSection, stationSO);
         Vector3 middlePos = TrackManager.GetPathPosition(generatedSection.path, generatedSection.length * 0.5f);
+
+        if (trainStartLocation == DebugTrainStartLocation.Station)
+        {
+            playerTrain.Initialize(generatedSection.length - 3f, generatedSection,false);
+        }
         
         //generatedSection.SetAutoStop(generatedSection.length - 5f, AutoStopType.Front);
 
@@ -583,7 +613,7 @@ public class GenerationManager : NetworkBehaviour
         currentGeneratedDistance += generatedSection.length;
 
         lastSection.SetNextSection(generatedSection);
-        TrackManager.active.SyncTrackSection(generatedSection);
+        generatedSectionList.Add(generatedSection);
         lastSection = generatedSection;
         lastPoint = point;
         
@@ -591,19 +621,26 @@ public class GenerationManager : NetworkBehaviour
         generatedSection.SetAutoStop(generatedSection.length - 1f, AutoStopType.SlowDown);
 
         //Modify Ground
-        float dist = startionTrackLength * 0.5f + stationSpeedTrackDistance;
-        AnimationCurve newAnimationCurve = new AnimationCurve();
-        newAnimationCurve.keys = new Keyframe[] { new Keyframe(0f, 1f), new Keyframe(dist - 30f, 1f), new Keyframe(dist, 0f) };
-        TerrainModifier.ModifyGround(new Vector3(middlePos.x, middlePos.y - 100f, middlePos.z), dist, newAnimationCurve);
-
-        dist = startionTrackLength * 0.5f + stationSpeedTrackDistance * 0.5f;
-        AnimationCurve newAnimationCurve1 = new AnimationCurve();
-        newAnimationCurve1.keys = new Keyframe[] { new Keyframe(0f, 1f), new Keyframe(dist - 30f, 1f), new Keyframe(dist, 0f) };
-        TerrainModifier.ModifyGround(new Vector3(middlePos.x, middlePos.y, middlePos.z), dist, newAnimationCurve1);
+        ModifyGroundRpc(new Vector3(middlePos.x, middlePos.y - 100f, middlePos.z), startionTrackLength * 0.5f + stationSpeedTrackDistance);
+        
+        ModifyGroundRpc(new Vector3(middlePos.x, middlePos.y, middlePos.z), startionTrackLength * 0.5f + stationSpeedTrackDistance * 0.5f);
 
         ThreadManager.AddThreadJob(delegate { trackGeneration.ModifyTerrainToFollowPath(ListOfPathPoints, true); }, delegate {  });
+
+
+        for (int i = 0; i < generatedSectionList.Count; i++)
+        {
+            TrackManager.active.SyncTrackSection(generatedSectionList[i],true);
+        }
         
         stationGenerated = true;
+    }
+    [Rpc(SendTo.Everyone)]
+    private void ModifyGroundRpc(Vector3 worldPos, float influenceDistance)
+    {
+        AnimationCurve newAnimationCurve = new AnimationCurve();
+        newAnimationCurve.keys = new Keyframe[] { new Keyframe(0f, 1f), new Keyframe(influenceDistance - 30f, 1f), new Keyframe(influenceDistance, 0f) };
+        TerrainModifier.ModifyGround(worldPos, influenceDistance, newAnimationCurve);
     }
     private TrackSection GenerateStraightSection(float distance, float handleLength = 10f)
     {

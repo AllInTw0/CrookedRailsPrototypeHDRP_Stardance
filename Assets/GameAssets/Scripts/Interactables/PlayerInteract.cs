@@ -20,6 +20,8 @@ public class PlayerInteract : MonoBehaviour
     private bool holdingInteractLastFrame;
     private bool finishedInteracting;
     private float timeHoldingInteract;
+
+    private bool allowedToInteract = false;
     void Start()
     {
         active = this;
@@ -39,7 +41,7 @@ public class PlayerInteract : MonoBehaviour
         Raycast();
 
         //Interact Handling
-        if (holdingInteractLastFrame == false && InputManager.interactAction.IsPressed() && currentInteractable != null)
+        if (allowedToInteract && holdingInteractLastFrame == false && InputManager.interactAction.IsPressed() && currentInteractable != null)
         {
             //Began To Hold Interact
             Debug.Log("Began Interact");
@@ -51,7 +53,7 @@ public class PlayerInteract : MonoBehaviour
         }
         
         //For Interactables With Timers
-        if (holdingInteractLastFrame && finishedInteracting == false && currentInteractable != null)
+        if (allowedToInteract && holdingInteractLastFrame && finishedInteracting == false && currentInteractable != null)
         {
             //Is Interacting
             Debug.Log("Is Interacting");
@@ -77,6 +79,9 @@ public class PlayerInteract : MonoBehaviour
             InteractIcon.active.SetProgress(0f);
             if(InteractIcon.active.animator.isActiveAndEnabled) InteractIcon.active.animator.SetBool("Interacting",false);
         }
+        
+        if(InputManager.interactAction.IsPressed() == false)
+            allowedToInteract = true;
     }
 
     private void Raycast()
@@ -150,6 +155,8 @@ public class PlayerInteract : MonoBehaviour
             InteractIcon.active.animator.SetTrigger("Finished");
         else
             InteractIcon.active.animator.SetTrigger("Failed");
+
+        allowedToInteract = false;
     }
     public bool IsLookingAtInteractable()
     {

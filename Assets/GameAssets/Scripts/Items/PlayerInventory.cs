@@ -192,7 +192,7 @@ public class PlayerInventory : NetworkBehaviour
         item.BecomeVisible();
 
         ItemSO itemInfo = item.itemInfo;
-        Transform orientation = PlayerMovement.active.orientation;
+        Transform orientation = Player.localPlayer.orientation;
         item.transform.rotation = Quaternion.Euler(Random.Range(-90f, 90f), itemInfo.randomYRot ? Random.Range(0f, 360f) : orientation.eulerAngles.y, Random.Range(-90f, 90f));
         item.DropFromPos(transform.position + Vector3.up + orientation.forward * itemInfo.dropOffset.z + orientation.up * itemInfo.dropOffset.y + orientation.right * itemInfo.dropOffset.x);
 

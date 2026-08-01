@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
 public class CargoInfo
@@ -49,9 +51,21 @@ public class CargoInfo
         return GetValueSum() - GetExpensesSum();
     }
 }
-public class RailCar : MonoBehaviour
+public class RailCar : NetworkBehaviour
 {
     private Train linkedTrain;
+    private NetworkVariable<RailCarNetworkData> networkData = new(writePerm: NetworkVariableWritePermission.Server);
+    private struct RailCarNetworkData : INetworkSerializable
+    {
+        public ushort trainID;
+        public int consistIndex;
+
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref trainID);
+            serializer.SerializeValue(ref consistIndex);
+        }
+    }
     //Variables
     [Header("Parameters")]
     public RailCarSO railCarSO;
@@ -105,18 +119,75 @@ public class RailCar : MonoBehaviour
     private float swayRot;
     private float railCarLastRotY;
 
+    private void ServerValuesChanged(RailCarNetworkData previous, RailCarNetworkData current)
+    {
+        if(IsServer) 
+            return;
+        
+        //Sync linked train and consist index
+        //Will be called when the consist changes (Server spawns in railcars)
+        for (int i = 0; i < Train.activeTrainList.Count; i++)
+        {
+            if (Train.activeTrainList[i].NetworkBehaviourId == current.trainID)
+            {
+                linkedTrain = Train.activeTrainList[i];
+                
+                List<RailCar> consist = linkedTrain.GetConsist();
+                if(consist.Contains(this) == false)
+                    consist.Add(this);
+
+                bool sorted = false;
+                while (sorted == false)
+                {
+                    sorted = true;
+                    for (int j = 0; j < consist.Count-1; j++)
+                    {
+                        if(consist[j].networkData.Value.consistIndex > consist[j+1].networkData.Value.consistIndex)
+                        {
+                            (consist[j], consist[j + 1]) = (consist[j + 1], consist[j]);
+                            sorted = false;
+                        }
+                    }
+                }
+                
+                linkedTrain.SetConsist(consist);
+                return;
+            }
+        }
+    }
     private void Awake()
     {
         currentCargo = new CargoInfo();
         currentCargo.railCarRefrence = this;
         currentCargo.railCarHealth = health;
+
+        networkData.OnValueChanged += ServerValuesChanged;
     }
+
+    public override void OnNetworkSpawn()
+    {
+        if(IsServer == false)
+            ServerValuesChanged(default, networkData.Value);
+    }
+
     private void Update()
     {
         derailTime += derailed ? Time.deltaTime : -Time.deltaTime;
         derailTime = Mathf.Clamp01(derailTime);
 
         UpdateSway();
+    }
+
+    private void LateUpdate()
+    {
+        if (currentCargo != null && currentCargo.cargoObject != null)
+            SetCargoPos(currentCargo.cargoObject);
+    }
+
+    public void SetCargoPos(GameObject cargoObject)
+    {
+        cargoObject.transform.position = cargoOrigin.position;
+        cargoObject.transform.rotation = cargoOrigin.rotation;
     }
     private void FixedUpdate()
     {
@@ -165,20 +236,37 @@ public class RailCar : MonoBehaviour
     {
         return currentCargo;
     }
-    public void SetCargo(CargoSO cargoSO, float cargoValue, float railCarValue)
+    public void SetCargo(CargoSO cargoSO, int cargoValue, int railCarValue)
     {
-        CargoInfo cargoInfo = new CargoInfo();
-        cargoInfo.cargoInfo = cargoSO;
-
+        NetworkObject cargoPrefabReference = null;
         if (cargoSO.cargoPrefab != null)
         {
-            cargoInfo.cargoObject = Instantiate(cargoSO.cargoPrefab);
-            ParentCargo(cargoInfo.cargoObject);
+            cargoPrefabReference = Instantiate(cargoSO.cargoPrefab).GetComponent<NetworkObject>();
+            if (cargoPrefabReference != null)
+                cargoPrefabReference.Spawn(true);
+            else
+                Debug.LogWarning("CARGO PREFAB HAS NO NETWORK OBJECT: " + cargoSO);
         }
 
+        SetCargoRpc(HaulingJobManager.GetCargoSOID(cargoSO), cargoPrefabReference, cargoValue, railCarValue);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    public void SetCargoRpc(int cargoSOID, NetworkObjectReference cargoPrefab, int cargoValue, int railCarValue)
+    {
+        Debug.Log("SetCargoRpc: " + gameObject.name);
+        CargoSO cargoSO = HaulingJobManager.GetCargoSOByID(cargoSOID);
+        
+        CargoInfo cargoInfo = new CargoInfo();
+        cargoInfo.cargoInfo = cargoSO;
+        
         cargoInfo.cargoValue = cargoValue;
-        if(cargoInfo.cargoObject)
+
+        if (cargoPrefab.TryGet(out NetworkObject cargoObject))
+        {
+            cargoInfo.cargoObject = cargoObject.gameObject;
             cargoInfo.cargoHealth = cargoInfo.cargoObject.GetComponent<Health>();
+        }
 
         cargoInfo.railCarValue = railCarValue;
         cargoInfo.railCarHealth = health;
@@ -186,13 +274,19 @@ public class RailCar : MonoBehaviour
         cargoInfo.railCarRefrence = this;
 
         currentCargo = cargoInfo;
+
     }
-    public void ParentCargo(GameObject cargoObject)
+
+    public void DestroyRailCar()
     {
-        cargoObject.transform.SetParent(cargoOrigin);
-        cargoObject.transform.localPosition = Vector3.zero;
-        cargoObject.transform.localRotation = Quaternion.identity;
+        if (currentCargo != null && currentCargo.cargoObject != null)
+        {
+            currentCargo.cargoObject.GetComponent<NetworkObject>().Despawn();
+        }
+        
+        GetComponent<NetworkObject>().Despawn();
     }
+
     public float GetWeight()
     {
         if (currentCargo != null && currentCargo.cargoInfo != null)
@@ -213,9 +307,23 @@ public class RailCar : MonoBehaviour
         health.Rerail();
     }
 
-    public void SetLinkedTrain(Train train)
+    public void SetLinkedTrain(Train train, int consistIndex)
     {
         linkedTrain = train;
+
+        if (IsServer)
+        {
+            networkData.Value = new RailCarNetworkData()
+            {
+                trainID = train.NetworkBehaviourId,
+                consistIndex = consistIndex
+            };
+        }
+    }
+
+    public Train GetLinkedTrain()
+    {
+        return linkedTrain;
     }
     public bool IsMoving()
     {

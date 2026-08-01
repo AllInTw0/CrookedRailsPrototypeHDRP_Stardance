@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SteamDonkey
   m_EditorClassIdentifier: Assembly-CSharp::CargoSO
   cargoName: Steam Donkey
-  cargoPrefab: {fileID: 919132149155446097, guid: 244b21928a44176469b4f85e0b98fd9b, type: 3}
+  cargoPrefab: {fileID: 2894439934143939039, guid: 1cfc4b16aab0a2a4d860669292ae39e4, type: 3}
   weight: 30
   fittingCargo:
   - {fileID: 11400000}
@@ -22,4 +22,5 @@ MonoBehaviour:
   fittingRailCars:
   - {fileID: 11400000, guid: e1b57eeabcc8afe4482d17364ce7a8b7, type: 2}
   payRange: {x: 80, y: 100}
-  iconList: []
+  iconList:
+  - {fileID: 2800000, guid: 2359410e491108c4397e1f3f5da3c0ad, type: 2}

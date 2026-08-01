@@ -116,9 +116,17 @@ public class ShopStand : AnimationPlayer
 
         EnableStand();
 
-        onInteract.AddListener(() => { shopItem.linkedShop.SelectShopItem(shopItem); });
+        onInteract.AddListener(() => { shopItem.linkedShop.SelectShopItemRpc(shopItem.standIndex); });
     }
 
+    public void UpdateShopItem(ShopItem shopItem)
+    {
+        this.shopItem = shopItem;
+    }
+    public ShopItem GetShopItem()
+    {
+        return shopItem;
+    }
     public void ClearStand()
     {
         if (shopItemPreview != null)

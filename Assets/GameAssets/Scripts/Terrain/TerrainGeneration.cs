@@ -434,16 +434,23 @@ public class TerrainGeneration : NetworkBehaviour
             meshData.CreateMesh();
             meshData.CreateMeshObject(worldPos);
             threading = false;
-            
+
             if(onMeshRecievedSpawnFoliage)
-                active.StartCoroutine(SpawnFoliage());   
+                active.StartCoroutine(SpawnFoliage(true));   
         }
         
-        public IEnumerator SpawnFoliage()
+        public IEnumerator SpawnFoliage(bool forceRegenerate = false)
         {
-            if (foliageSpawned || threading || meshData == null)
-                yield break;
-            
+            if (forceRegenerate)
+            {
+                DestroyFoliage();
+            }
+            else
+            {
+                if (foliageSpawned || threading || meshData == null)
+                    yield break;
+            }
+
             foliageSpawned = true;
             yield return new WaitForSeconds(1f);
 
@@ -533,11 +540,9 @@ public class TerrainGeneration : NetworkBehaviour
         {
             return new Vector3(worldPos.x + timeX * active.chunkSize, GetVertexWorldPos(Mathf.FloorToInt(timeX * (heightMap.GetLength(0)-1f)), Mathf.FloorToInt(timeZ * (heightMap.GetLength(1) - 1f))).y, worldPos.y + timeZ * active.chunkSize); 
         }
-        public void Destroy()
-        {
-            if (meshData == null)
-                return;
 
+        private void DestroyFoliage()
+        {
             foreach (KeyValuePair<ObjectPool, List<GameObject>> poolObjectPair in poolDictionary)
             {
                 foreach (GameObject obj in poolObjectPair.Value)
@@ -545,6 +550,13 @@ public class TerrainGeneration : NetworkBehaviour
                     poolObjectPair.Key.Add(obj);
                 }
             }
+        }
+        public void Destroy()
+        {
+            if (meshData == null)
+                return;
+
+            DestroyFoliage();
 
             meshData.Destroy();
             meshData = null;

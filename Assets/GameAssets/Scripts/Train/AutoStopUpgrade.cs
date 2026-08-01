@@ -71,7 +71,8 @@ public class AutoStopUpgrade : MonoBehaviour
                 Debug.Log("Engaging breaks! Detected autostop");
                 if (nearestAutoStop.stopType == AutoStopType.Supersonic || nearestAutoStop.stopType == AutoStopType.Station || nearestAutoStop.stopType == AutoStopType.SlowDown || nearestAutoStop.stopType == AutoStopType.StartingLocation)
                 {
-                    targetTrain.controlls.LockControlls();
+                    targetTrain.controlls.Break();
+                    targetTrain.controlls.SetState(LocomotiveControls.State.locked);
                 }
                 else
                 {
@@ -86,29 +87,26 @@ public class AutoStopUpgrade : MonoBehaviour
         {
             if (Mathf.Abs(targetTrain.speed) < TrainUpgradeHandler.active.GetStatValue(TrainStatType.Speed) && currentAutoBreakingStop.stopType == AutoStopType.SlowDown)
             {
-                targetTrain.controlls.Unlock();
+                targetTrain.controlls.SetState(LocomotiveControls.State.normal);
                 targetTrain.controlls.SetFullThrottle();
                 currentAutoBreakingStop = null;
-                PlayerMovement.active.UnFreeze();
             }
             else if (Mathf.Abs(targetTrain.speed) < 0.01f)
             {
                 if (currentAutoBreakingStop.stopType == AutoStopType.Supersonic || currentAutoBreakingStop.stopType == AutoStopType.Station)
                 {
-                    targetTrain.controlls.ActivateSupersonic();
-                    if (currentAutoBreakingStop.stopType == AutoStopType.Station) targetTrain.controlls.onSetOffTriggerGenerationReset = true;
+                    targetTrain.controlls.SetState(LocomotiveControls.State.supersonic);
+                    if (currentAutoBreakingStop.stopType == AutoStopType.Station) targetTrain.controlls.onSetOffTriggerGenerationReset.Value = true;
                 }
 
                 if (currentAutoBreakingStop.stopType == AutoStopType.StartingLocation)
                 {
-                    targetTrain.controlls.Unlock();
-                    targetTrain.controlls.onSetOffTriggerGenerationReset = true;
+                    targetTrain.controlls.SetState(LocomotiveControls.State.normal);
+                    targetTrain.controlls.onSetOffTriggerGenerationReset.Value = true;
                     targetTrain.SetFuelConsumption(true);
                 }
                 
                 currentAutoBreakingStop = null;
-                //Unfreze players if the train was supersonic
-                PlayerMovement.active.UnFreeze();
             }
         }
     }

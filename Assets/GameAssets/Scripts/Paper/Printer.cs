@@ -14,6 +14,8 @@ public class Printer : MonoBehaviour
         }
     }
 
+    [SerializeField] 
+    private bool noQue = false;
     //Run time
     [HideInInspector]
     public List<Notification> notificationQueList = new List<Notification>();
@@ -84,6 +86,8 @@ public class Printer : MonoBehaviour
     }
     public void AddNotification(Texture2D texture, float length = 5f)
     {
+        if(noQue) ClearNotifications();
+        
         notificationQueList.Add(new Notification(texture, length));
     }
 }

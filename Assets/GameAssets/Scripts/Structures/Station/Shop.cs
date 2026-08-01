@@ -1,23 +1,51 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using static Util;
-public class ShopItem
+public class ShopItem : INetworkSerializable
 {
-    public ShopItemSO itemInfo;
+    private int itemID;
+    public int standIndex;
     public int price;
     public int stock;
 
-    public Shop linkedShop;
-
-    public ShopItem(ShopItemSO itemInfo, int price, int stock, Shop linkedShop)
+    public ShopItemSO itemInfo
     {
-        this.itemInfo = itemInfo;
+        get{return linkedShop.GetItemFromID(itemID);}
+    }
+    public Shop linkedShop
+    {
+        get { return linkedShopRefrence.TryGet(out Shop shop) ? shop : null; }
+    }
+    private NetworkBehaviourReference linkedShopRefrence;
+    
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref itemID);
+        serializer.SerializeValue(ref standIndex);
+        serializer.SerializeValue(ref price);
+        serializer.SerializeValue(ref stock);
+        
+        serializer.SerializeValue(ref linkedShopRefrence);
+    }
+
+    //This is needed otherwise the network code returns an error: (MissingMethodException: Default constructor not found for type ShopItem)
+    public ShopItem() : this(null, 0, 0,0, null)
+    {
+        
+    }
+    public ShopItem(ShopItemSO itemInfo, int price, int stock,int standIndex, Shop linkedShop)
+    {
+        if(linkedShop == null)return;
+        
+        this.itemID = linkedShop.GetItemID(itemInfo);
+        this.standIndex = standIndex;
         this.price = price;
-        this.linkedShop = linkedShop;
         this.stock = stock;
+        linkedShopRefrence = linkedShop;
     }
 }
-public class Shop : MonoBehaviour
+public class Shop : NetworkBehaviour
 {
     [Header("Refrences")]
     [SerializeField]
@@ -40,10 +68,25 @@ public class Shop : MonoBehaviour
     [Header("Debug")] 
     public int debugLevel;
     
-    private List<ShopItem> shopItemList;
+    private ShopItem[] shopItemArray;
 
     [HideInInspector]
     public ShopItem selectedShopItem;
+
+
+    public int GetItemID(ShopItemSO item)
+    {
+        for (int i = 0; i < shopItemEntryList.Count; i++)
+        {
+            if (item == shopItemEntryList[i])
+                return i;
+        }
+        return -1;
+    }
+    public ShopItemSO GetItemFromID(int  itemID)
+    {
+        return shopItemEntryList[itemID];
+    }
     
     private void Start()
     {
@@ -51,33 +94,7 @@ public class Shop : MonoBehaviour
             //Buy item
             if (selectedShopItem != null)
             {
-                if (selectedShopItem.stock > 0 && Money.CanAfford(selectedShopItem.price))
-                {
-                    if (selectedShopItem.itemInfo is ItemSO) 
-                    {
-                        Vector3 pos = itemSpawnPos.position + new Vector3(Random.Range(-0.4f, 0.4f), 0, Random.Range(-0.4f, 0.4f));
-                        Quaternion rot = Quaternion.Euler(Random.Range(-90f, 90), Random.Range(-90f, 90), Random.Range(-90f, 90));
-                        Item.SpawnItem((ItemSO)selectedShopItem.itemInfo, pos, rot);
-                    }
-                    else if (selectedShopItem.itemInfo is UpgradeSO)
-                    {
-                        TrainUpgradeHandler.active.AddUpgrade((UpgradeSO)selectedShopItem.itemInfo);
-                    }
-
-                    if(GameStateManager.boughtItemList.Contains(selectedShopItem.itemInfo) == false)
-                        GameStateManager.boughtItemList.Add(selectedShopItem.itemInfo);
-
-                    selectedShopItem.stock--;
-                    Money.AddMoney(-selectedShopItem.price);
-                    RenderMonitorPaper();
-
-                    if(selectedShopItem.stock <= 0)
-                        shopMonitor.DisableButton();
-                }
-                else
-                {
-                    Debug.LogWarning("Cant buy item");
-                }
+                BuyItemRpc();
             }
             else
             {
@@ -85,11 +102,48 @@ public class Shop : MonoBehaviour
             }
         });
 
-        shopItemList = new List<ShopItem>();
+        shopItemArray = new ShopItem[shopStandList.Count];
+    }
+    
+    [Rpc(SendTo.Server)]
+    private void BuyItemRpc()
+    {
+        if (selectedShopItem != null)
+        {
+            if (selectedShopItem.stock > 0 && Money.CanAfford(selectedShopItem.price))
+            {
+                if (selectedShopItem.itemInfo is ItemSO) 
+                {
+                    Vector3 pos = itemSpawnPos.position + new Vector3(Random.Range(-0.4f, 0.4f), 0, Random.Range(-0.4f, 0.4f));
+                    Quaternion rot = Quaternion.Euler(Random.Range(-90f, 90), Random.Range(-90f, 90), Random.Range(-90f, 90));
+                    Item.SpawnItem((ItemSO)selectedShopItem.itemInfo, pos, rot);
+                }
+                else if (selectedShopItem.itemInfo is UpgradeSO)
+                {
+                    TrainUpgradeHandler.active.AddUpgrade((UpgradeSO)selectedShopItem.itemInfo);
+                }
+
+                if(GameStateManager.boughtItemList.Contains(selectedShopItem.itemInfo) == false)
+                    GameStateManager.boughtItemList.Add(selectedShopItem.itemInfo);
+
+                selectedShopItem.stock--;
+                Money.AddMoney(-selectedShopItem.price);
+                
+                SyncShopItemRpc(selectedShopItem);
+            }
+            else
+            {
+                Debug.LogWarning("Cant buy item");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("No selected item");
+        }
     }
     public void Initialize(int overrideLevel = -1)
     {
-        if (shopItemEntryList.Count == 0) return;
+        if (shopItemEntryList.Count == 0 || IsServer == false) return;
 
         int currentLevel = overrideLevel == -1 ? GameStateManager.currentLevel : overrideLevel;
         
@@ -133,28 +187,58 @@ public class Shop : MonoBehaviour
 
     public void AddItemToShop(ShopItemSO shopItem)
     {
-        if(shopItemList.Count < shopStandList.Count)
+        for (int i = 0; i < shopItemArray.Length; i++)
         {
-            shopItemList.Add(new ShopItem(shopItem, shopItem.price, shopItem.stock, this));
-            shopStandList[shopItemList.Count - 1].Intialize(shopItemList[shopItemList.Count - 1]);
+            if (shopItemArray[i] == null)
+            {
+                SyncShopItemRpc(new ShopItem(shopItem, shopItem.price, shopItem.stock, i, this));
+
+                return;
+            }
+        }
+
+        Debug.LogWarning("Cant add item to shop!");
+        
+    }
+
+    [Rpc(SendTo.Everyone)]
+    private void SyncShopItemRpc(ShopItem shopItem)
+    {
+        shopItemArray[shopItem.standIndex] = shopItem;
+        if (shopStandList[shopItem.standIndex].GetShopItem() == null)
+        {
+            shopStandList[shopItem.standIndex].Intialize(shopItem);
         }
         else
         {
-            Debug.LogWarning("Cant add item to shop!");
+            shopStandList[shopItem.standIndex].UpdateShopItem(shopItem);
+
+            if (selectedShopItem.standIndex == shopItem.standIndex)
+            {
+                selectedShopItem = shopItem;
+                
+                RenderMonitorPaper();
+
+                if (selectedShopItem.stock <= 0)
+                    shopMonitor.DisableButton();
+            }
         }
     }
-
-    public void ClearShop()
+    
+    [Rpc(SendTo.Everyone)]
+    public void ClearShopRpc()
     {
         foreach (ShopStand stand in shopStandList)
         {
             stand.ClearStand();
         }
-        shopItemList.Clear();
+
+        shopItemArray = new ShopItem[shopStandList.Count];
     }
-    public void SelectShopItem(ShopItem shopItem)
+    [Rpc(SendTo.Everyone)]
+    public void SelectShopItemRpc(int standIndex)
     {
-        selectedShopItem = shopItem;
+        selectedShopItem = shopItemArray[standIndex];
 
         shopMonitor.EnableButton();
         RenderMonitorPaper();     

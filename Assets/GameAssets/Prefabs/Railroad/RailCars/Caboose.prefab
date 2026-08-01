@@ -370,6 +370,75 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 2, y: 1, z: 6}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &3568463282675512861
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1426704278124284179}
+  - component: {fileID: 9037239491481697729}
+  - component: {fileID: 5836675793120340695}
+  m_Layer: 0
+  m_Name: Ladder (7)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1426704278124284179
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3568463282675512861}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.6, y: 1.4599999, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1628626091860292703}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!114 &9037239491481697729
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3568463282675512861}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36f77ab6b860218468f3ba25ae307f04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ladder
+  ladderCollider: {fileID: 0}
+--- !u!136 &5836675793120340695
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3568463282675512861}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.2
+  m_Height: 1.4
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!1 &3767469252684201463
 GameObject:
   m_ObjectHideFlags: 0
@@ -519,6 +588,8 @@ Transform:
   - {fileID: 3672232854062557682}
   - {fileID: 813458686327294575}
   - {fileID: 9133159515204727611}
+  - {fileID: 3655830693677969017}
+  - {fileID: 1426704278124284179}
   m_Father: {fileID: 4788332280534327601}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4553173049829913330
@@ -725,6 +796,75 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6208178813047713747
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3655830693677969017}
+  - component: {fileID: 1650017516467556616}
+  - component: {fileID: 3793124199734953047}
+  m_Layer: 0
+  m_Name: Ladder (6)
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3655830693677969017
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6208178813047713747}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.6, y: 1.4599999, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1628626091860292703}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!114 &1650017516467556616
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6208178813047713747}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 36f77ab6b860218468f3ba25ae307f04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Ladder
+  ladderCollider: {fileID: 0}
+--- !u!136 &3793124199734953047
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6208178813047713747}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.2
+  m_Height: 1.4
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.5, z: 0}
 --- !u!1 &6695784301086370192
 GameObject:
   m_ObjectHideFlags: 0
@@ -929,9 +1069,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6965105430134681891}
+  - component: {fileID: -4052127220496601566}
   - component: {fileID: 8970799430584954118}
   - component: {fileID: 3168425228512143040}
   - component: {fileID: 6618568313757701232}
+  - component: {fileID: 6493376050156834556}
   m_Layer: 0
   m_Name: Caboose
   m_TagString: Untagged
@@ -958,6 +1100,32 @@ Transform:
   - {fileID: 2282795010052330844}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &-4052127220496601566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7421378637153406739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 2061217280
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  <InScenePlaced>k__BackingField: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &8970799430584954118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -970,6 +1138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a32b359c9dace2742b786eb40287bd8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailCar
+  ShowTopMostFoldoutHeaderGroup: 1
   railCarSO: {fileID: 11400000, guid: 363cbbfcbb730f741a9d75758f6bf0f5, type: 2}
   isPlayerRailCar: 1
   derailVisualAngle: 5
@@ -1022,6 +1191,21 @@ MonoBehaviour:
   - {fileID: 3872089190396340736}
   wheelRadius: 0.4
   wheelCircumference: 0
+--- !u!114 &6493376050156834556
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7421378637153406739}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6e827123ea6ed02e8975aa24fa96766, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Caboose
+  doorInteractableList:
+  - {fileID: 4115585316463642367}
+  - {fileID: 8087628200463312433}
 --- !u!1 &8040922601530534831
 GameObject:
   m_ObjectHideFlags: 0
@@ -1349,6 +1533,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2256394206928596641, guid: 832d8a348ed019345b966dfeef9c8b05, type: 3}
   m_PrefabInstance: {fileID: 40414475966284796}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4115585316463642367 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4148637460875707651, guid: 832d8a348ed019345b966dfeef9c8b05, type: 3}
+  m_PrefabInstance: {fileID: 40414475966284796}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ead24d7e0d3bc9488b3b6cc6242f4ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LeverInteractable
 --- !u!1001 &1090909809075027491
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2317,6 +2512,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2256394206928596641, guid: 832d8a348ed019345b966dfeef9c8b05, type: 3}
   m_PrefabInstance: {fileID: 5309723300827243314}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &8087628200463312433 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4148637460875707651, guid: 832d8a348ed019345b966dfeef9c8b05, type: 3}
+  m_PrefabInstance: {fileID: 5309723300827243314}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ead24d7e0d3bc9488b3b6cc6242f4ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LeverInteractable
 --- !u!1001 &5625767339160863255
 PrefabInstance:
   m_ObjectHideFlags: 0

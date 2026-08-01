@@ -2,9 +2,14 @@ using System;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class LeverInteractable : Interactable
 {
+    
+    [SerializeField]
+    public UnityEvent interactEvent;
+    
     enum LeverType
     {
         Rotation,
@@ -51,6 +56,7 @@ public class LeverInteractable : Interactable
                 localCurrentNotchHistoryList.Clear();
             }
         }
+        interactEvent.Invoke();
     }
 
     public int GetCurrentNotch()
@@ -89,17 +95,24 @@ public class LeverInteractable : Interactable
             localCurrentNotchHistoryList.Add((byte)notch);
             InteractRpc();
         }
-
+        
+        interactEvent.Invoke();
+        
         InteractIcon.active.Refresh();
         return base.Interact();
     }
     [Rpc(SendTo.Server)]
     private void InteractRpc()
     {
-        int notch = GetCurrentNotch() + 1;
-        if (notch > notches)
-            notch = 0;
-        serverCurrentNotch.Value = (byte)notch;
+        if (locked == false)
+        {
+            int notch = GetCurrentNotch() + 1;
+            if (notch > notches)
+                notch = 0;
+            serverCurrentNotch.Value = (byte)notch;
+
+            interactEvent.Invoke();
+        }
     }
 
     public void SetCurrentNotch(int value)
@@ -141,5 +154,10 @@ public class LeverInteractable : Interactable
     {
         this.locked = locked;
         InteractIcon.active.Refresh();
+    }
+
+    public bool IsLocked()
+    {
+        return locked;
     }
 }

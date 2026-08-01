@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class PlayerMovement : GroundMovement
 {
-    public static PlayerMovement active;
+    [NonSerialized] 
+    public Player player;
     //Variables
     [Header("Player Movement")]
     [SerializeField]
@@ -75,10 +76,6 @@ public class PlayerMovement : GroundMovement
     //Input
     private Vector2 moveInput;
     private bool noclip;
-    private void Awake()
-    {
-        active = this;
-    }
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -89,6 +86,9 @@ public class PlayerMovement : GroundMovement
 
     public override float GetTargetSpeed()
     {
+        if (player != Player.localPlayer)
+            return 0f;
+        
         if (tooFarFromTrain)
             return 0f;
         
@@ -100,6 +100,9 @@ public class PlayerMovement : GroundMovement
 
     public override Vector2 GetMovementVector()
     {
+        if (player != Player.localPlayer)
+            return Vector3.zero;
+        
         moveInput = InputManager.active.moveInput;
         Vector2 mag = FindVelRelativeToLook();
         float xMag = mag.x, zMag = mag.y;
@@ -133,92 +136,98 @@ public class PlayerMovement : GroundMovement
     {
         if(noclip == false && currentLadder == null)
             UpdateMovement();
-        
-        if (InputManager.debugCamAction.triggered && canNoclip)
+
+        if (player == Player.localPlayer)
         {
-            if(noclip)
-                DisableNoclip();
+            if (InputManager.debugCamAction.triggered && canNoclip)
+            {
+                if (noclip)
+                    DisableNoclip();
+                else
+                    EnableNoclip();
+            }
+
+            moveInput = InputManager.active.moveInput;
+            if (noclip)
+            {
+                //Noclip
+                rb.MovePosition(transform.position + GetNoclipVector() * Time.deltaTime);
+            }
             else
-                EnableNoclip();
-        }
-        
-        moveInput = InputManager.active.moveInput;
-        if (noclip)
-        {
-            //Noclip
-            rb.MovePosition(transform.position + GetNoclipVector() * Time.deltaTime);
-        }
-        else
-        {
-            //Player specific movement
-            
-            //Crouching 
-            if (crouched == false && InputManager.crouchAction.IsPressed())
             {
-                crouched = true;
-                capsuleCollider.height = colliderCrouchHeight;
-                capsuleCollider.center = new Vector3(0, capsuleCollider.height * 0.5f, 0);
-                cameraTransform.localPosition = new Vector3(0, cameraCrouchHeight, 0);
+                //Player specific movement
 
-                //if (grounded == false)
-                //rb.position += new Vector3(0, cameraStandingHeight - cameraCrouchHeight, 0);
-            }
-            else if (crouched && InputManager.crouchAction.IsPressed() == false)
-            {
-                crouched = false;
-                capsuleCollider.height = colliderStandingHeight;
-                capsuleCollider.center = new Vector3(0, capsuleCollider.height * 0.5f, 0);
-                cameraTransform.localPosition = new Vector3(0, cameraStandingHeight, 0);
-
-                //if (grounded == false)
-                //rb.position -= new Vector3(0, cameraStandingHeight - cameraCrouchHeight, 0);
-            }
-
-            //Calculating Stamina
-            if (InputManager.sprintAction.IsPressed() == false)
-            {
-                //Not Sprinting
-                staminaGainDelayTime += Time.deltaTime;
-                if (staminaGainDelayTime >= staminaGainDelay)
+                //Crouching 
+                if (crouched == false && InputManager.crouchAction.IsPressed())
                 {
-                    stamina += staminaGain * Time.deltaTime;
+                    crouched = true;
+                    capsuleCollider.height = colliderCrouchHeight;
+                    capsuleCollider.center = new Vector3(0, capsuleCollider.height * 0.5f, 0);
+                    cameraTransform.localPosition = new Vector3(0, cameraCrouchHeight, 0);
+
+                    //if (grounded == false)
+                    //rb.position += new Vector3(0, cameraStandingHeight - cameraCrouchHeight, 0);
+                }
+                else if (crouched && InputManager.crouchAction.IsPressed() == false)
+                {
+                    crouched = false;
+                    capsuleCollider.height = colliderStandingHeight;
+                    capsuleCollider.center = new Vector3(0, capsuleCollider.height * 0.5f, 0);
+                    cameraTransform.localPosition = new Vector3(0, cameraStandingHeight, 0);
+
+                    //if (grounded == false)
+                    //rb.position -= new Vector3(0, cameraStandingHeight - cameraCrouchHeight, 0);
+                }
+
+                //Calculating Stamina
+                if (InputManager.sprintAction.IsPressed() == false)
+                {
+                    //Not Sprinting
+                    staminaGainDelayTime += Time.deltaTime;
+                    if (staminaGainDelayTime >= staminaGainDelay)
+                    {
+                        stamina += staminaGain * Time.deltaTime;
+                        stamina = Mathf.Clamp(stamina, 0, maxStamina);
+                    }
+                }
+                else if (moveInput != Vector2.zero)
+                {
+                    //Sprinting
+                    staminaGainDelayTime = 0;
+                    stamina -= staminaLoss * Time.deltaTime;
                     stamina = Mathf.Clamp(stamina, 0, maxStamina);
                 }
+
+                StatUI.active.UpdateStamina(Mathf.FloorToInt(stamina), maxStamina);
+
+
+                //Jumping
+                jumpTimer += Time.deltaTime;
+                if (InputManager.jumpAction.WasPressedThisFrame() && grounded && jumpTimer >= jumpCoolDown)
+                {
+                    float force = jumpForce;
+                    if (IsInWater())
+                        force *= (1f - GetPercentUnderWater() * waterSlowDownMult);
+
+                    rb.AddForce(0f, crouched ? force * 0.5f : force, 0f);
+
+                    jumpTimer = 0f;
+
+                    DisableGrounded();
+
+                    if (IsInWater())
+                        SoundManager.active.PlayAtPos(transform.position, "Water - Impact");
+                    else
+                        SoundManager.active.PlayAtPos(transform.position, "Jump");
+                }
+
+                //Distance walked statistic
+                float distKM = (new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude * Time.deltaTime) /
+                               1000f;
+                GameStateManager.AddToStatistic("Distance Walked", distKM,
+                    GameStateManager.StatisticType.DistanceKilometers);
+
             }
-            else if(moveInput != Vector2.zero)
-            {
-                //Sprinting
-                staminaGainDelayTime = 0;
-                stamina -= staminaLoss * Time.deltaTime;
-                stamina = Mathf.Clamp(stamina, 0, maxStamina);
-            }
-            StatUI.active.UpdateStamina(Mathf.FloorToInt(stamina),maxStamina);
-            
-
-            //Jumping
-            jumpTimer += Time.deltaTime;
-            if (InputManager.jumpAction.WasPressedThisFrame() && grounded && jumpTimer >= jumpCoolDown)
-            {
-                float force = jumpForce;
-                if (IsInWater())
-                    force *= (1f - GetPercentUnderWater() * waterSlowDownMult);
-
-                rb.AddForce(0f, crouched ? force * 0.5f : force, 0f);
-                
-                jumpTimer = 0f;
-                
-                DisableGrounded();
-
-                if(IsInWater())
-                    SoundManager.active.PlayAtPos(transform.position, "Water - Impact");
-                else
-                    SoundManager.active.PlayAtPos(transform.position, "Jump");
-            }
-
-            //Distance walked statistic
-            float distKM = (new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude * Time.deltaTime) / 1000f;
-            GameStateManager.AddToStatistic("Distance Walked", distKM, GameStateManager.StatisticType.DistanceKilometers);
-            
         }
     }
 
@@ -229,122 +238,142 @@ public class PlayerMovement : GroundMovement
         
         if (currentLadder != null) 
         {
-            //Ladder
-            targetSpeed = climbingSpeed;
-            
-            Vector3 forceVector = Vector3.zero;
-            Vector3 ladderDir = currentLadder.GetLadderDir();
-            void CheckIfVectorIsClimbing(Vector3 vector)
+            if (player == Player.localPlayer)
             {
-                if (vector == Vector3.zero) return;
+                //Ladder
+                targetSpeed = climbingSpeed;
 
-                float angle = Vector2.Angle(new Vector2(vector.x, vector.z), new Vector2(ladderDir.x, ladderDir.z));
-                if(angle < climbingAngleThreshold)
+                Vector3 forceVector = Vector3.zero;
+                Vector3 ladderDir = currentLadder.GetLadderDir();
+
+                void CheckIfVectorIsClimbing(Vector3 vector)
                 {
-                    forceVector += new Vector3(0f, vector.y + 0.3f, 0f); // +0.3f bias to climbing upwards
+                    if (vector == Vector3.zero) return;
+
+                    float angle = Vector2.Angle(new Vector2(vector.x, vector.z), new Vector2(ladderDir.x, ladderDir.z));
+                    if (angle < climbingAngleThreshold)
+                    {
+                        forceVector += new Vector3(0f, vector.y + 0.3f, 0f); // +0.3f bias to climbing upwards
+                    }
+                    else
+                    {
+                        forceVector += vector;
+                    }
                 }
-                else
+
+                CheckIfVectorIsClimbing(PlayerCamera.active.GetDir() * moveInput.y);
+                CheckIfVectorIsClimbing(orientation.right * moveInput.x);
+
+                forceVector = forceVector.normalized;
+
+                rb.AddForce(forceVector * ((targetSpeed / baseSpeed) * acceleration));
+
+                //Limit speed
+                float velocity = rb.linearVelocity.magnitude;
+                if (velocity > targetSpeed && moveInput != Vector2.zero)
                 {
-                    forceVector += vector;
+                    Vector3 n = rb.linearVelocity.normalized * targetSpeed;
+                    rb.linearVelocity = new Vector3(n.x, n.y, n.z);
                 }
-            }
-            CheckIfVectorIsClimbing(PlayerCamera.active.GetDir() * moveInput.y);
-            CheckIfVectorIsClimbing(orientation.right * moveInput.x);
 
-            forceVector = forceVector.normalized;
-
-            rb.AddForce(forceVector * ((targetSpeed / baseSpeed) * acceleration));
-
-            //Limit speed
-            float velocity = rb.linearVelocity.magnitude;
-            if (velocity > targetSpeed && moveInput != Vector2.zero)
-            {
-                Vector3 n = rb.linearVelocity.normalized * targetSpeed;
-                rb.linearVelocity = new Vector3(n.x, n.y, n.z);
-            }
-
-            //Drag
-            if (moveInput == Vector2.zero && velocity > 0.1f)
-            {
-                rb.AddForce(-rb.linearVelocity.normalized * ((targetSpeed / baseSpeed) * deceleration));
-            }
-            else if (moveInput == Vector2.zero)
-            {
-                rb.linearVelocity = new Vector3(0, 0, 0);
+                //Drag
+                if (moveInput == Vector2.zero && velocity > 0.1f)
+                {
+                    rb.AddForce(-rb.linearVelocity.normalized * ((targetSpeed / baseSpeed) * deceleration));
+                }
+                else if (moveInput == Vector2.zero)
+                {
+                    rb.linearVelocity = new Vector3(0, 0, 0);
+                }
             }
         }
         else
         {
-            if (jumpTimer >= variableJumpTime.x && jumpTimer <= variableJumpTime.y &&
-                InputManager.jumpAction.IsPressed() == false && grounded == false)
+            if (player == Player.localPlayer)
             {
-                rb.AddForce(Vector3.down * variableJumpGravityForce);
-            }
-            
-            
-            //Max Distance 
-            if (maxDistanceLimitEnabled && Train.playerTrain != null && GameStateManager.gameStarted)
-            {
-                DistanceWaypoint closestWaypoint = null;
-                float distanceToWaypoint = float.MaxValue;
-                foreach (DistanceWaypoint waypoint in GameStateManager.waypointList)
+                if (jumpTimer >= variableJumpTime.x && jumpTimer <= variableJumpTime.y &&
+                    InputManager.jumpAction.IsPressed() == false && grounded == false)
                 {
-                    float d = Vector3.Distance(transform.position, waypoint.transform.position);
-                    if(d < distanceToWaypoint)
-                    {
-                        closestWaypoint = waypoint;
-                        distanceToWaypoint = d;
-                    }
+                    rb.AddForce(Vector3.down * variableJumpGravityForce);
                 }
 
-                float trainDist = Train.playerTrain.GetClosestDistanceToPos(transform.position);
 
-                if (closestWaypoint != null && trainDist > distanceToWaypoint)
+                //Max Distance 
+                if (maxDistanceLimitEnabled && Train.playerTrain != null && GameStateManager.gameStarted)
                 {
-
-                    if (distanceToWaypoint > closestWaypoint.maxDistance && Vector3.Distance(transform.position + projectedVector, closestWaypoint.transform.position) > distanceToWaypoint)
+                    DistanceWaypoint closestWaypoint = null;
+                    float distanceToWaypoint = float.MaxValue;
+                    foreach (DistanceWaypoint waypoint in GameStateManager.waypointList)
                     {
-                        Debug.Log("Walking away from a waypoint!");
-                        if (sentATooFarFromTrainWarning == false)
+                        float d = Vector3.Distance(transform.position, waypoint.transform.position);
+                        if (d < distanceToWaypoint)
                         {
-                            Override title = new Override("Title", OverrideType.Text, "WARNING");
-                            Override message = new Override("Message", OverrideType.Text, "You're to far from the structure! You may NOT go FURTHER!");
-                            Override subText = new Override("SubText", OverrideType.Text, Mathf.Round(distanceToWaypoint) + "m");
-                            MiniPrinter.active.AddNotification(PaperRenderer.active.RenderPaper("Message", new List<Override>() { title, message, subText }));
-                            sentATooFarFromTrainWarning = true;
+                            closestWaypoint = waypoint;
+                            distanceToWaypoint = d;
                         }
-                        tooFarFromTrain = true;
+                    }
+
+                    float trainDist = Train.playerTrain.GetClosestDistanceToPos(transform.position);
+
+                    if (closestWaypoint != null && trainDist > distanceToWaypoint)
+                    {
+
+                        if (distanceToWaypoint > closestWaypoint.maxDistance &&
+                            Vector3.Distance(transform.position + projectedVector, closestWaypoint.transform.position) >
+                            distanceToWaypoint)
+                        {
+                            Debug.Log("Walking away from a waypoint!");
+                            if (sentATooFarFromTrainWarning == false)
+                            {
+                                Override title = new Override("Title", OverrideType.Text, "WARNING");
+                                Override message = new Override("Message", OverrideType.Text,
+                                    "You're to far from the structure! You may NOT go FURTHER!");
+                                Override subText = new Override("SubText", OverrideType.Text,
+                                    Mathf.Round(distanceToWaypoint) + "m");
+                                MiniPrinter.active.AddNotification(PaperRenderer.active.RenderPaper("Message",
+                                    new List<Override>() { title, message, subText }));
+                                sentATooFarFromTrainWarning = true;
+                            }
+
+                            tooFarFromTrain = true;
+                        }
+                        else
+                        {
+                            if (distanceToWaypoint < closestWaypoint.maxDistance - 2f)
+                                sentATooFarFromTrainWarning = false;
+                            tooFarFromTrain = false;
+                        }
                     }
                     else
                     {
-                        if (distanceToWaypoint < closestWaypoint.maxDistance - 2f)
-                            sentATooFarFromTrainWarning = false;
-                        tooFarFromTrain = false;
-                    }
-                }
-                else
-                {
-                    if (trainDist >= maxDistanceFromTrain && Train.playerTrain.GetClosestDistanceToPos(transform.position + projectedVector) > trainDist)
-                    {
-                        Debug.Log("Walking away from the train!");
-                        if (sentATooFarFromTrainWarning == false)
+                        if (trainDist >= maxDistanceFromTrain &&
+                            Train.playerTrain.GetClosestDistanceToPos(transform.position + projectedVector) > trainDist)
                         {
-                            Override title = new Override("Title", OverrideType.Text, "WARNING");
-                            Override message = new Override("Message", OverrideType.Text, "You're to far from the train! You may NOT go FURTHER!");
-                            Override subText = new Override("SubText", OverrideType.Text, Mathf.Round(trainDist) + "m");
-                            MiniPrinter.active.AddNotification(PaperRenderer.active.RenderPaper("Message", new List<Override>() { title, message, subText }));
-                            sentATooFarFromTrainWarning = true;
+                            Debug.Log("Walking away from the train!");
+                            if (sentATooFarFromTrainWarning == false)
+                            {
+                                Override title = new Override("Title", OverrideType.Text, "WARNING");
+                                Override message = new Override("Message", OverrideType.Text,
+                                    "You're to far from the train! You may NOT go FURTHER!");
+                                Override subText = new Override("SubText", OverrideType.Text,
+                                    Mathf.Round(trainDist) + "m");
+                                MiniPrinter.active.AddNotification(PaperRenderer.active.RenderPaper("Message",
+                                    new List<Override>() { title, message, subText }));
+                                sentATooFarFromTrainWarning = true;
+                            }
+
+                            tooFarFromTrain = true;
                         }
-                        tooFarFromTrain = true;
-                    }
-                    else
-                    {
-                        if (trainDist < maxDistanceFromTrain - 2f)
-                            sentATooFarFromTrainWarning = false;
-                        tooFarFromTrain = false;
+                        else
+                        {
+                            if (trainDist < maxDistanceFromTrain - 2f)
+                                sentATooFarFromTrainWarning = false;
+                            tooFarFromTrain = false;
+                        }
                     }
                 }
             }
+
             FixedUpdateMovement();
         }
     }
@@ -405,11 +434,6 @@ public class PlayerMovement : GroundMovement
     {
         currentLadder = null;
         MovingPlatformManager.active.RemoveEntry(transform);
-    }
-
-    public void Teleport(Vector3 worldPos)
-    {
-        PlayerMovement.active.rb.position = worldPos;
     }
 
     public bool IsPositionInGameplaySpace(Vector3 worldPos)

@@ -17,7 +17,7 @@ public class ShopEditor : Editor
 
         if (GUILayout.Button("Reroll items"))
         {
-            shop.ClearShop();
+            shop.ClearShopRpc();
             shop.Initialize();
         }
     }

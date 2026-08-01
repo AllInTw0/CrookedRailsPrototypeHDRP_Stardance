@@ -157,7 +157,7 @@ public class Companion : MonoBehaviour
         switch (state)
         {
             case CompanionState.normal:
-                movement.SetTarget(PlayerMovement.active.transform, 1f);
+                movement.SetTarget(Player.localPlayer.transform, 1f);
                 //Check if should jump
                 bool shouldJump = false;
                 if (IsPointOnMovingPlatform(movement.GetTargetPosition(), out Transform playerPlatform))
@@ -304,7 +304,7 @@ public class Companion : MonoBehaviour
                 }
                 break;
             case CompanionState.TV:
-                movement.SetTarget(PlayerMovement.active.transform,1f);
+                movement.SetTarget(Player.localPlayer.transform,1f);
                 if (movement.HasReachedTarget() == false)
                 {
                     state = CompanionState.normal;
@@ -475,7 +475,7 @@ public class Companion : MonoBehaviour
         //Rotation
         //Logic
         Vector3 bodyLook = Vector3.zero;
-        Vector3 screenLook = movement.GetTargetTransform() == PlayerMovement.active.transform ? PlayerCamera.active.transform.position - screen.position : movement.GetTargetPosition() - screen.position;
+        Vector3 screenLook = movement.GetTargetTransform() == Player.localPlayer.transform ? PlayerCamera.active.transform.position - screen.position : movement.GetTargetPosition() - screen.position;
 
         if (movement.HasReachedTarget() == false)
         {

@@ -16,7 +16,7 @@ public class CargoSO : ScriptableObject
     public List<CargoSO> fittingCargo = new List<CargoSO>();
     public float dangerLevel;
     public List<RailCarSO> fittingRailCars = new List<RailCarSO>();
-    public Vector2 payRange;
+    public Vector2Int payRange;
     [Header("Icons")]
     public List<Texture2D> iconList = new List<Texture2D>();
 

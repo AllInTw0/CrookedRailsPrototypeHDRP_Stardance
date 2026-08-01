@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -108,7 +109,7 @@ public class EnemySpawner : MonoBehaviour
         Vector3 trainDirVector3 = Train.playerTrain.GetRailCarAtIndex(0).transform.forward * Train.playerTrain.GetSpeed();
         Vector2 trainDir = new Vector2(trainDirVector3.x, trainDirVector3.z).normalized;
 
-        Vector3 playerDirVector3 = PlayerMovement.active.rb.linearVelocity + PlayerMovement.active.orientation.forward;
+        Vector3 playerDirVector3 = Player.localPlayer.rb.linearVelocity + Player.localPlayer.orientation.forward;
         Vector2 playerDir = new Vector2(playerDirVector3.x, playerDirVector3.z).normalized;
 
         Vector2 dir = trainDir + playerDir * 0.5f;
@@ -127,9 +128,11 @@ public class EnemySpawner : MonoBehaviour
     }
     private void Update()
     {
-
+        if(NetworkManager.Singleton.IsServer == false)
+            return;
+        
         //Debug.Log("TravelDir: " + averageTravelDir);
-        Vector3 start = PlayerMovement.active.transform.position + Vector3.up;
+        Vector3 start = Player.localPlayer.transform.position + Vector3.up;
         Debug.DrawLine(start, start + new Vector3(averageTravelDir.x, 0, averageTravelDir.y) * 6f, Color.yellow);
 
         if ((CanEnemiesSpawn() == false && enemiesSpawnAllways == false) || disableEnemySpawning)
@@ -158,7 +161,7 @@ public class EnemySpawner : MonoBehaviour
     }
     public static bool CanEnemiesSpawn()
     {
-        if (Train.playerTrain.controlls.currentState == LocomotiveControls.State.supersonic)
+        if (Train.playerTrain.controlls.currentState.Value == LocomotiveControls.State.supersonic)
             return false;
 
         int sectionsForward = 0;
@@ -304,7 +307,7 @@ public class EnemySpawner : MonoBehaviour
             if (enemy == null)
                 return spawnedDanger;
 
-            Vector3 startPos = PlayerMovement.active.transform.position;
+            Vector3 startPos = Player.localPlayer.transform.position;
 
             Vector3 spawnDir = Quaternion.AngleAxis(Random.Range(minMaxRot.x, minMaxRot.y), Vector3.up) * new Vector3(averageTravelDir.x, 0f, averageTravelDir.y);
             Vector3 spawnPos = startPos + spawnDir.normalized * Random.Range(minMaxDistance.x, minMaxDistance.y);

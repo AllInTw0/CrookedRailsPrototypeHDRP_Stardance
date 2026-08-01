@@ -235,7 +235,7 @@ public class Teleporter : Item
     }
     public bool IsInGameplaySpace()
     {
-        return PlayerMovement.active.IsPositionInGameplaySpace(transform.position);
+        return Player.localPlayer.movement.IsPositionInGameplaySpace(transform.position);
     }
     public IEnumerator ReceiveEnumerator()
     {

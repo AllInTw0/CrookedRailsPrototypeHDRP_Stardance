@@ -274,4 +274,14 @@ public class GroundMovement : MonoBehaviour
         MovingPlatformManager.active.RemoveEntry(transform);
     }
     
+    public void Teleport(Vector3 worldPos, bool saveVelocity = false)
+    {
+        rb.position = worldPos;
+        MovingPlatformManager.active.RemoveEntry(transform,false);
+        if (saveVelocity == false)
+        {
+            rb.linearVelocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+    }
 }

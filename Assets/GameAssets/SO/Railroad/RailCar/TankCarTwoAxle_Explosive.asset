@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RailCarSO
   railCarName: 
   prefab: {fileID: 7730770237663613648, guid: dd8687eaf07dd191498e966693f793d5, type: 3}
-  icon: {fileID: 21300000, guid: 197872cf989ba1746a262ccbdfa6b00a, type: 3}
+  icon: {fileID: 0}
   weight: 50
   minLevel: 0
   maxLevel: 4
-  payRange: {x: 60, y: 10}
+  payRange: {x: 60, y: 100}

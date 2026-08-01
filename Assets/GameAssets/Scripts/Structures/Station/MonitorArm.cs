@@ -69,4 +69,9 @@ public class MonitorArm : AnimationPlayer
         DisableButton();
         monitorEnabled = false;
     }
+
+    public bool IsMonitorEnabled()
+    {
+        return monitorEnabled;
+    }
 }

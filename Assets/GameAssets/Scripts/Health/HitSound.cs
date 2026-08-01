@@ -50,7 +50,7 @@ public class HitSound : MonoBehaviour
             {
                 //Update Other
                 hitInfo.damageText.text = "-"+hitInfo.totalDamage;
-                SoundManager.active.PlayAtPos(PlayerMovement.active.transform.position,hitSoundName);
+                SoundManager.active.PlayAtPos(Player.localPlayer.transform.position,hitSoundName);
                 hitInfo.updateNextFrame = false;
                 hitInfo.timeSinceUpdate = 0f;
             }
