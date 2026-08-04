@@ -145,7 +145,7 @@ public class Shop : NetworkBehaviour
     {
         if (shopItemEntryList.Count == 0 || IsServer == false) return;
 
-        int currentLevel = overrideLevel == -1 ? GameStateManager.currentLevel : overrideLevel;
+        int currentLevel = overrideLevel == -1 ? GameStateManager.currentLevel.Value : overrideLevel;
         
         List<ProbabilityListElement<ShopItemSO>> shopItemProbabilityList = new List<ProbabilityListElement<ShopItemSO>>();
         

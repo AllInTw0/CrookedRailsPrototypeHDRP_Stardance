@@ -51,16 +51,12 @@ public class EnemySpawner : MonoBehaviour
     private AnimationCurve baseLevelDanger;
     [Header("Spawning")]
     [SerializeField]
-    private float travelDirMeasureDelay = 1f;
-    [SerializeField]
-    private int maxDirRecordCount = 10;
-    [SerializeField]
     private int minTrainSectionCountAhead;
     [SerializeField]
     private int minTrainSectionCountBehind;
     [Header("Debug")]
     [SerializeField]
-    private bool enemiesSpawnAllways;
+    private bool enemiesSpawnAlways;
     [SerializeField]
     private bool disableEnemySpawning;
 
@@ -79,8 +75,7 @@ public class EnemySpawner : MonoBehaviour
     private float lastTrainDistance;
 
     //Spawning variables
-    private List<Vector2> travelDirList = new List<Vector2>();
-    private Vector2 averageTravelDir;
+
     private void Start()
     {
         active = this;
@@ -102,40 +97,14 @@ public class EnemySpawner : MonoBehaviour
                 }
             }
         }
-        InvokeRepeating(nameof(UpdateTravelDir), 0f, travelDirMeasureDelay);
-    }
-    private void UpdateTravelDir()
-    {
-        Vector3 trainDirVector3 = Train.playerTrain.GetRailCarAtIndex(0).transform.forward * Train.playerTrain.GetSpeed();
-        Vector2 trainDir = new Vector2(trainDirVector3.x, trainDirVector3.z).normalized;
-
-        Vector3 playerDirVector3 = Player.localPlayer.rb.linearVelocity + Player.localPlayer.orientation.forward;
-        Vector2 playerDir = new Vector2(playerDirVector3.x, playerDirVector3.z).normalized;
-
-        Vector2 dir = trainDir + playerDir * 0.5f;
-
-        travelDirList.Add(dir);
-        if (travelDirList.Count > maxDirRecordCount)
-            travelDirList.RemoveAt(0);
-
-        //Average
-        Vector2 dirSum = Vector2.zero;
-        foreach (Vector2 dirEntry in travelDirList)
-        {
-            dirSum += dirEntry;
-        }
-        averageTravelDir = dirSum / travelDirList.Count;
     }
     private void Update()
     {
-        if(NetworkManager.Singleton.IsServer == false)
+        if(NetworkManager.Singleton && NetworkManager.Singleton.IsServer == false)
             return;
         
-        //Debug.Log("TravelDir: " + averageTravelDir);
-        Vector3 start = Player.localPlayer.transform.position + Vector3.up;
-        Debug.DrawLine(start, start + new Vector3(averageTravelDir.x, 0, averageTravelDir.y) * 6f, Color.yellow);
 
-        if ((CanEnemiesSpawn() == false && enemiesSpawnAllways == false) || disableEnemySpawning)
+        if (CanEnemiesSpawn() == false || disableEnemySpawning)
         {
             SetUpdateCoolDown(2f);
             return;
@@ -159,30 +128,38 @@ public class EnemySpawner : MonoBehaviour
             wave.ResetValues(0f);
         }
     }
-    public static bool CanEnemiesSpawn()
+    public bool CanEnemiesSpawn()
     {
-        if (Train.playerTrain.controlls.currentState.Value == LocomotiveControls.State.supersonic)
-            return false;
+        if (enemiesSpawnAlways)
+            return true;
 
-        int sectionsForward = 0;
-        TrackSection section = Train.playerTrain.frontTrackSection;
-        while(section != null)
+        if (Train.playerTrain)
         {
-            sectionsForward++;
-            section = section.nextSection;
-        }
-        if (sectionsForward < active.minTrainSectionCountAhead)
-            return false;
+            if (Train.playerTrain.controlls.currentState.Value == LocomotiveControls.State.supersonic)
+                return false;
 
-        int sectionsBackwards = 0;
-        section = Train.playerTrain.frontTrackSection;
-        while (section != null)
-        {
-            sectionsBackwards++;
-            section = section.previousSection;
+            int sectionsForward = 0;
+            TrackSection section = Train.playerTrain.frontTrackSection;
+            while (section != null)
+            {
+                sectionsForward++;
+                section = section.nextSection;
+            }
+
+            if (sectionsForward < active.minTrainSectionCountAhead)
+                return false;
+
+            int sectionsBackwards = 0;
+            section = Train.playerTrain.frontTrackSection;
+            while (section != null)
+            {
+                sectionsBackwards++;
+                section = section.previousSection;
+            }
+
+            if (sectionsBackwards < active.minTrainSectionCountBehind)
+                return false;
         }
-        if (sectionsBackwards < active.minTrainSectionCountBehind)
-            return false;
 
         return true;
     }
@@ -190,7 +167,16 @@ public class EnemySpawner : MonoBehaviour
     {
         spawnedEnemyArray = EnemyManager.active.GetEnemies();
         float totalSpawnedDanger = GetTotalDanger();
-        float maxDanger = GetMaxDanger() * (1f - 0.2f * ((PlayerHealth.active.maxHealth - PlayerHealth.active.health) / PlayerHealth.active.maxHealth));
+
+        int totalMaxHealth = 0;
+        int totalHealth = 0;
+        foreach (Player player in Player.playerList)
+        {
+            totalMaxHealth += player.health.maxHealth;
+            totalHealth += player.health.GetHealth();
+        }
+        
+        float maxDanger = GetMaxDanger() * (1f - 0.2f * ((totalMaxHealth - totalHealth) / totalMaxHealth));
 
         float freeDanger = maxDanger - totalSpawnedDanger;
 
@@ -246,7 +232,7 @@ public class EnemySpawner : MonoBehaviour
             List<WaveEntry> waveEntryListCopy = new List<WaveEntry>(waveEntryList);
             for (int i = 0; i < waveEntryListCopy.Count; i++)
             {
-                if (waveEntryListCopy[i].minDistanceTravelled > waveEntryListCopy[i].distanceTravelled)
+                if (waveEntryListCopy[i].minDistanceTravelled > waveEntryListCopy[i].distanceTravelled && Train.playerTrain)
                 {
                     waveEntryListCopy.RemoveAt(i);
                     i--;
@@ -285,6 +271,7 @@ public class EnemySpawner : MonoBehaviour
     {
         float spawnedDanger = 0f;
         float realSpawnedDanger = 0f;
+        int playerIndex = 0;
         while (spawnedDanger < targetDanger)
         {
             float freeDanger = targetDanger - spawnedDanger;
@@ -307,9 +294,10 @@ public class EnemySpawner : MonoBehaviour
             if (enemy == null)
                 return spawnedDanger;
 
-            Vector3 startPos = Player.localPlayer.transform.position;
-
-            Vector3 spawnDir = Quaternion.AngleAxis(Random.Range(minMaxRot.x, minMaxRot.y), Vector3.up) * new Vector3(averageTravelDir.x, 0f, averageTravelDir.y);
+            Vector3 startPos = Player.playerList[playerIndex].transform.position;
+            Vector3 travelDir = Player.playerList[playerIndex].GetTravelDir();
+                
+            Vector3 spawnDir = Quaternion.AngleAxis(Random.Range(minMaxRot.x, minMaxRot.y), Vector3.up) * new Vector3(travelDir.x, 0f, travelDir.y);
             Vector3 spawnPos = startPos + spawnDir.normalized * Random.Range(minMaxDistance.x, minMaxDistance.y);
 
             if (NavMesh.SamplePosition(spawnPos, out NavMeshHit hit, 10f, 1 << NavMesh.GetAreaFromName("Walkable"))) {
@@ -323,6 +311,9 @@ public class EnemySpawner : MonoBehaviour
             }
 
             spawnedDanger += enemy.dangerValue;
+            playerIndex++;
+            if (playerIndex >= Player.playerList.Count)
+                playerIndex = 0;
         }
 
         return spawnedDanger;
@@ -360,7 +351,7 @@ public class EnemySpawner : MonoBehaviour
 
     private float GetMaxDanger()
     {
-        float maxDanger = baseLevelDanger.Evaluate(GameStateManager.currentLevel);
+        float maxDanger = baseLevelDanger.Evaluate(GameStateManager.currentLevel.Value);
         return maxDanger;
     }
     

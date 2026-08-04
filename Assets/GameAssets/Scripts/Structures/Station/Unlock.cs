@@ -1,8 +1,9 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Experimental.GlobalIllumination;
 
-public class Unlock : MonoBehaviour
+public class Unlock : NetworkBehaviour
 {
     [SerializeField]
     private MonitorArm unlockMonitor;
@@ -16,7 +17,7 @@ public class Unlock : MonoBehaviour
             CheckForUnlocks();
         });
     }
-
+    
     private void CheckForUnlocks()
     {
         List<ShopItemSO> playerItemList = new List<ShopItemSO>();
@@ -30,8 +31,10 @@ public class Unlock : MonoBehaviour
             }
         }
 
-        foreach (UnlockEntry unlockEntry in GameStateManager.unlockList)
+        for (int i = 0; i < GameStateManager.unlockList.Count; i++)
         {
+            UnlockEntry unlockEntry = GameStateManager.unlockList[i];
+            
             if (unlockEntry.isUnlocked) continue;
 
             bool unlock = true;
@@ -46,12 +49,7 @@ public class Unlock : MonoBehaviour
 
             if (unlock)
             {
-                Debug.Log("Unlocked");
-                targetUnlockShop.AddItemToShop(unlockEntry.targetShopItem);
-                unlockEntry.isUnlocked = true;
-                unlockMonitor.buttonInteractable.SetActionNameOverride("Unlocked " + unlockEntry.targetShopItem.GetName() + "!", 2f);
-
-                UpdateMonitor();
+                UnlockByIndexRpc(i);
                 return;
             }
 
@@ -59,6 +57,19 @@ public class Unlock : MonoBehaviour
 
         unlockMonitor.buttonInteractable.InteractionFailed();
         unlockMonitor.buttonInteractable.SetActionNameOverride("No items match", 2f);
+    }
+    
+    [Rpc(SendTo.Everyone)]
+    public void UnlockByIndexRpc(int index)
+    {
+        Debug.Log("Unlocked");
+        if(IsServer) 
+            targetUnlockShop.AddItemToShop(GameStateManager.unlockList[index].targetShopItem);
+        
+        GameStateManager.unlockList[index].isUnlocked = true;
+        unlockMonitor.buttonInteractable.SetActionNameOverride("Unlocked " + GameStateManager.unlockList[index].targetShopItem.GetName() + "!", 2f);
+
+        UpdateMonitor();
     }
     public void PlayerEntered() 
     {

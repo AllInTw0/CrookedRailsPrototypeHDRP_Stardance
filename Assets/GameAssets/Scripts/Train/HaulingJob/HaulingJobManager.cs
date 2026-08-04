@@ -110,7 +110,7 @@ public class HaulingJobManager : NetworkBehaviour
         for (int i = 0; i < count; i++)
         {
             int seed = Random.Range(0, 99999999);
-            GenerateHaulingJobRpc(seed, i * 0.5f, i * 1f, 0.4f, 2 + i * 2, GameStateManager.currentLevel, nodePathList != null ? nodePathList[i].length : -1);
+            GenerateHaulingJobRpc(seed, i * 0.5f, i * 1f, 0.4f, 2 + i * 2, GameStateManager.currentLevel.Value, nodePathList != null ? nodePathList[i].length : -1);
         }
     }
 

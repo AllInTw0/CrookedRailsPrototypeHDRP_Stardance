@@ -90,6 +90,7 @@ public class AutoStopUpgrade : MonoBehaviour
                 targetTrain.controlls.SetState(LocomotiveControls.State.normal);
                 targetTrain.controlls.SetFullThrottle();
                 currentAutoBreakingStop = null;
+                targetTrain.controlls.UnFreezePlayersToTrainRpc();
             }
             else if (Mathf.Abs(targetTrain.speed) < 0.01f)
             {
@@ -105,7 +106,7 @@ public class AutoStopUpgrade : MonoBehaviour
                     targetTrain.controlls.onSetOffTriggerGenerationReset.Value = true;
                     targetTrain.SetFuelConsumption(true);
                 }
-                
+                targetTrain.controlls.UnFreezePlayersToTrainRpc();
                 currentAutoBreakingStop = null;
             }
         }

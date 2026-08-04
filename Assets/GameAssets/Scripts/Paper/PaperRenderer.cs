@@ -116,8 +116,10 @@ public class PaperRenderer : MonoBehaviour
                         copy.Find("Pay").GetComponent<TMP_Text>().text = entry.pay + "$";
                         sum += entry.pay;
 
+                        RectTransform icon = ((RectTransform)copy.Find("Icon"));
+                        icon.sizeDelta = new Vector2(heigth,icon.sizeDelta.y);
                         if (entry.railCar.icon != null)
-                            copy.Find("Icon").GetComponent<RawImage>().texture = entry.cargo.GetIcon(entry.railCar);
+                            icon.GetComponent<RawImage>().texture = entry.cargo.GetIcon(entry.railCar);
                     }
 
                     OverrideEntry infoOverride = paper.FindOverrideEntry("Info");

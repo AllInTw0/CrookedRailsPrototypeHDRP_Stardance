@@ -26,8 +26,8 @@ public class Tender : MonoBehaviour
     private void Start()
     {
         active = this;
-        lastWaterLevel = waterLevel.health;
-        lastFuelLevel = fuelLevel.health;
+        lastWaterLevel = waterLevel.GetHealth();
+        lastFuelLevel = fuelLevel.GetHealth();
     }
     private void Update()
     {
@@ -49,13 +49,13 @@ public class Tender : MonoBehaviour
             }
         }
 
-        if (waterLevel.health != lastWaterLevel)
-            UpdateWarning("Water", waterLevel.health, lastWaterLevel, waterLevel.maxHealth);
-        if (fuelLevel.health != lastFuelLevel)
-            UpdateWarning("Fuel", fuelLevel.health, lastFuelLevel, fuelLevel.maxHealth);
+        if (waterLevel.GetHealth() != lastWaterLevel)
+            UpdateWarning("Water", waterLevel.GetHealth(), lastWaterLevel, waterLevel.maxHealth);
+        if (fuelLevel.GetHealth() != lastFuelLevel)
+            UpdateWarning("Fuel", fuelLevel.GetHealth(), lastFuelLevel, fuelLevel.maxHealth);
 
-        lastWaterLevel = waterLevel.health;
-        lastFuelLevel = fuelLevel.health;
+        lastWaterLevel = waterLevel.GetHealth();
+        lastFuelLevel = fuelLevel.GetHealth();
     }
     public void HatchInteract()
     {

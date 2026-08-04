@@ -76,7 +76,7 @@ public class RailCarAudio : MonoBehaviour
                 return audioSO.rollingAudioArray[i];
         }
 
-        return null;
+        return audioSO.rollingAudioArray[0];
     }
 
     private void ConfigureSource(AudioSource source)

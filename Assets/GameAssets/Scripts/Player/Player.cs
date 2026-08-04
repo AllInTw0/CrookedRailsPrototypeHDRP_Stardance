@@ -13,7 +13,7 @@ public class Player : NetworkBehaviour
     private static byte nextPlayerID = 0; // byte is a 0-255 int
     
     //Network
-    private NetworkVariable<PlayerNetworkData> playerNetworkData = new (writePerm: NetworkVariableWritePermission.Owner);
+    public NetworkVariable<PlayerNetworkData> playerNetworkData = new (writePerm: NetworkVariableWritePermission.Owner);
     private NetworkVariable<byte> playerIDNetworkVariable = new (writePerm: NetworkVariableWritePermission.Server);
     public byte playerID
     {
@@ -39,6 +39,12 @@ public class Player : NetworkBehaviour
     private float rotXVelocity, rotX;
     
     private RigidbodyInterpolation rbStartInterpolation;
+    
+    //Travel dir (used for enemy spawning)
+    private const int maxTravelDirCount = 10;
+    private Vector3 lastPos;
+    private List<Vector3> travelDirList = new List<Vector3>();
+    private Vector3 travelDir = Vector3.zero;
 
     private void Awake()
     {
@@ -89,6 +95,8 @@ public class Player : NetworkBehaviour
         
         if (IsOwner)
             AwaitTeleport();
+        
+        InvokeRepeating(nameof(UpdateTravelDir),0.5f,0.5f);
     }
 
     private async void AwaitTeleport()
@@ -105,6 +113,29 @@ public class Player : NetworkBehaviour
         }
     }
 
+    private void UpdateTravelDir()
+    {
+        Vector3 dir = (transform.position - lastPos + orientation.forward * 0.1f).normalized;
+        travelDirList.Add(dir);
+        
+        if(travelDirList.Count > maxTravelDirCount)
+            travelDirList.RemoveAt(0);
+
+        Vector3 sum = Vector3.zero;
+        foreach (Vector3 d in travelDirList)
+        {
+            sum += d;
+        }
+
+        travelDir = (sum / travelDirList.Count).normalized;
+
+        lastPos = transform.position;
+    }
+
+    public Vector3 GetTravelDir()
+    {
+        return travelDir;
+    }
     private void Update()
     {
         if (IsOwner)
@@ -129,6 +160,10 @@ public class Player : NetworkBehaviour
             {
                 position = position,
                 velocity = rb.linearVelocity,
+                moveInput = InputManager.active.moveInput,
+                crouching = InputManager.crouchAction.IsPressed(),
+                jumping = InputManager.jumpAction.IsPressed(),
+                sprinting = InputManager.sprintAction.IsPressed(),
                 yRot = (short)orientation.eulerAngles.y,
                 xRot = (short)camera.rotationX,
                 movingPlatformID = movingPlatformID
@@ -173,10 +208,14 @@ public class Player : NetworkBehaviour
         return rotX;
     }
     
-    private struct PlayerNetworkData : INetworkSerializable
+    public struct PlayerNetworkData : INetworkSerializable
     {
         public Vector3 position;
         public Vector3 velocity;
+        public Vector2 moveInput;
+        public bool crouching;
+        public bool sprinting;
+        public bool jumping;
         public short yRot, xRot;
         public byte movingPlatformID; // 0-255 (0 - not on platform)
         
@@ -184,6 +223,10 @@ public class Player : NetworkBehaviour
         {
             serializer.SerializeValue(ref position);
             serializer.SerializeValue(ref velocity);
+            serializer.SerializeValue(ref moveInput);
+            serializer.SerializeValue(ref crouching);
+            serializer.SerializeValue(ref jumping);
+            serializer.SerializeValue(ref sprinting);
             serializer.SerializeValue(ref yRot);
             serializer.SerializeValue(ref xRot);
             serializer.SerializeValue(ref movingPlatformID);

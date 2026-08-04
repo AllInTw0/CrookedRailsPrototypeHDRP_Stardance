@@ -39,6 +39,8 @@ public class ShopItemSO : ScriptableObject
     private int lastEvaluationLevel = -1;
     public void EvaluateCurves(int level)
     {
+        System.Random rng = new System.Random(GameStateManager.gameSeed.Value + description.Length + level);
+        
         if (level == lastEvaluationLevel)
         {
             Debug.Log("Didnt evaluate item. LastEvaluationLevel: " + lastEvaluationLevel + ", Level: " +  level);
@@ -47,20 +49,22 @@ public class ShopItemSO : ScriptableObject
 
         randomness = randomnessCurve.Evaluate(level);
 
-        probability = probabilityCurve.Evaluate(level) * (Random.value * randomness * 0.2f + 1f);
-        price = Mathf.RoundToInt(Mathf.Clamp(priceCurve.Evaluate(level) + (Random.value * randomness * 20f), 1f, float.MaxValue));
+        probability = probabilityCurve.Evaluate(level) * ((float)rng.NextDouble() * randomness * 0.2f + 1f);
+        price = Mathf.RoundToInt(Mathf.Clamp(priceCurve.Evaluate(level) + ((float)rng.NextDouble() * randomness * 20f), 1f, float.MaxValue));
         if (price > 20)
         {
             price = Mathf.RoundToInt(price / 5f) * 5;
         }
         
-        sell = Mathf.RoundToInt(Mathf.Clamp(sellCurve.Evaluate(level) + (Random.value * randomness * 5f), 1f, price));
+        sell = Mathf.RoundToInt(Mathf.Clamp(sellCurve.Evaluate(level) + ((float)rng.NextDouble() * randomness * 5f), 1f, price));
         lastEvaluationLevel = level;
     }
 
     public void EvaluateStock(int level)
     {
-        stock = Mathf.RoundToInt(stockCurve.Evaluate(level) * (Random.value * randomness * 1f + 1f));
+        System.Random rng = new System.Random(GameStateManager.gameSeed.Value + description.Length + level);
+        
+        stock = Mathf.RoundToInt(stockCurve.Evaluate(level) * ((float)rng.NextDouble() * randomness * 1f + 1f));
         if(stock < 1) stock = 1;
     }
 }

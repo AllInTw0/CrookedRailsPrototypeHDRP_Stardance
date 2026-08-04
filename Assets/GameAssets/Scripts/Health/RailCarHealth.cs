@@ -79,7 +79,7 @@ public class RailCarHealth : Health
             if(i+1 < healthStateList.Count)
                 endHealth =  healthStateList[i+1].startHealthPercent * maxHealth;
             
-            if (health <= startHealth && (health > endHealth || (endHealth == -1 && health >= 0f)))
+            if (GetHealth() <= startHealth && (GetHealth() > endHealth || (endHealth == -1 && GetHealth() >= 0f)))
             {
                 currentState = i;
                 break;
@@ -150,7 +150,7 @@ public class RailCarHealth : Health
     {
         Rerail();
         brokenDown = false;
-        health = maxHealth;
+        TakeDamage(-999999999); //health = maxHealth;
         foreach (GameObject obj in brokenDownParticles)
         {
             obj.SetActive(false);

@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 using UnityEngine.AI;
@@ -191,7 +192,12 @@ public class EnemyManager : MonoBehaviour
     public void SpawnEnemy(GameObject prefab, Vector3 position, Quaternion rotation)
     {
         GameObject enemy = Instantiate(enemyPrefab, position, rotation);
-        enemyList.Add(enemy.transform.GetComponent<Enemy>());
+        enemy.GetComponent<NetworkObject>().Spawn(true);
+    }
+
+    public void AddEnemyToList(Enemy enemy)
+    {
+        enemyList.Add(enemy);
     }
     public int GetEnemyCount()
     {

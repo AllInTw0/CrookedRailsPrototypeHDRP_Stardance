@@ -25,25 +25,25 @@ public class CargoInfo
     {
         if (cargoInfo != null)
             if (cargoHealth != null)
-                return Mathf.Round((cargoHealth.health / cargoHealth.maxHealth) * 100f) + "%";
+                return Mathf.Round((cargoHealth.GetHealth() / cargoHealth.maxHealth) * 100f) + "%";
             else
-                return Mathf.Round((railCarHealth.health / railCarHealth.maxHealth) * 100f) + "%*";
+                return Mathf.Round((railCarHealth.GetHealth() / railCarHealth.maxHealth) * 100f) + "%*";
         else
             return "-";
     }
     public string GetRailCarHealthPrecentString()
     {
-        return Mathf.Round((railCarHealth.health / railCarHealth.maxHealth) * 100f) + "%";
+        return Mathf.Round((railCarHealth.GetHealth() / railCarHealth.maxHealth) * 100f) + "%";
     }
     public float GetExpensesSum()
     {
         if (cargoHealth != null)
         {
-            return GetValueSum() * (2f - (cargoHealth.health / cargoHealth.maxHealth) - (railCarHealth.health / railCarHealth.maxHealth));
+            return GetValueSum() * (2f - (cargoHealth.GetHealth() / cargoHealth.maxHealth) - (railCarHealth.GetHealth() / railCarHealth.maxHealth));
         }
         else
         {
-            return GetValueSum() * (2f - 2f * (railCarHealth.health / railCarHealth.maxHealth));
+            return GetValueSum() * (2f - 2f * (railCarHealth.GetHealth() / railCarHealth.maxHealth));
         }
     }
     public float GetPaySum()
@@ -133,6 +133,14 @@ public class RailCar : NetworkBehaviour
                 linkedTrain = Train.activeTrainList[i];
                 
                 List<RailCar> consist = linkedTrain.GetConsist();
+                for (int j = 0; j < consist.Count; j++)
+                {
+                    if (consist[j] == null)
+                    {
+                        consist.RemoveAt(j);
+                        j--;
+                    }
+                }
                 if(consist.Contains(this) == false)
                     consist.Add(this);
 

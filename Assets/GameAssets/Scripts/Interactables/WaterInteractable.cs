@@ -42,7 +42,7 @@ public class WaterInteractable : Interactable
             if (bucketScript.IsFilled())
             {
                 float waterAmmount = bucketScript.GetWaterAmmount();
-                if(targetHealth.health <= targetHealth.maxHealth - waterAmmount)
+                if(targetHealth.GetHealth() <= targetHealth.maxHealth - waterAmmount)
                 {
                     bucketScript.Empty();
                     targetHealth.TakeDamage(-waterAmmount);

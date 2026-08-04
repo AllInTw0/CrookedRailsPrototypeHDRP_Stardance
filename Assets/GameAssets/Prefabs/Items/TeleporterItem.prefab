@@ -6304,6 +6304,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2589ef97385237b4a99fa6146c09d6ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EventInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Teleporter
   actionName: Teleport
   timeToInteract: 0.5
@@ -6665,6 +6666,10 @@ PrefabInstance:
     - target: {fileID: 3054434672981801572, guid: 221c75568a78042c8892ba8727f1af62, type: 3}
       propertyPath: m_Center.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3140944376010762303, guid: 221c75568a78042c8892ba8727f1af62, type: 3}
+      propertyPath: objectName
+      value: Teleporter
       objectReference: {fileID: 0}
     - target: {fileID: 3751801714539862511, guid: 221c75568a78042c8892ba8727f1af62, type: 3}
       propertyPath: m_LocalPosition.x

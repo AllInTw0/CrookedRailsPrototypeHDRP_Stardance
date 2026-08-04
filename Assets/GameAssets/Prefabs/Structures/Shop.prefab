@@ -180,6 +180,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Trigger
   onEnter:
     m_PersistentCalls:
+      m_Calls: []
+  onEnterAll:
+    m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4662868523620828901}
         m_TargetAssemblyTypeName: Shop, Assembly-CSharp
@@ -209,6 +212,9 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   onExit:
+    m_PersistentCalls:
+      m_Calls: []
+  onExitAll:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4662868523620828901}
@@ -280,6 +286,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d806e2d06f8d39041807cd8ea2d78613, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Shop
+  ShowTopMostFoldoutHeaderGroup: 1
   shopStandList:
   - {fileID: 3817913312653976456}
   - {fileID: 3893439590345984195}

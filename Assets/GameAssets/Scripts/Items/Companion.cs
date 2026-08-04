@@ -520,7 +520,7 @@ public class Companion : MonoBehaviour
         {
             foreach (Health health in EnemyManager.active.healthTypeArray[(int)healthTypeFilterList[i]])
             {
-                if (health.health <= 0f)
+                if (health.GetHealth() <= 0f)
                     continue;
 
                 float distance = Vector3.Distance(transform.position, health.transform.position);

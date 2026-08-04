@@ -1252,6 +1252,7 @@ MonoBehaviour:
   Ownership: 2
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
+  <InScenePlaced>k__BackingField: 0
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
@@ -1287,10 +1288,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   ShowTopMostFoldoutHeaderGroup: 1
   healthType: 1
-  health: 100
+  startingHealth: 100
   maxHealth: 100
   audioOnDamageTaken: Player Takes Damage
   origin: {fileID: 0}
+  invulnerable: 1
   onTakeDamage:
     m_PersistentCalls:
       m_Calls: []
@@ -1314,6 +1316,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
   ShowTopMostFoldoutHeaderGroup: 1
+  playerNetworkData:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
   orientation: {fileID: 5018052482369340482}
   gravityForce: 18
   rotSmoothTime: 0.2

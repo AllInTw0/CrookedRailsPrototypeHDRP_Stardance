@@ -37,6 +37,9 @@ public class RunningGear : MonoBehaviour
         {
             wheelAnimator.speed = (distanceTravelled / Time.deltaTime) / wheelCircumference;
         }
+        
+        if(distanceTravelled == 0f) return;
+        
         rotationTravelled = (distanceTravelled / wheelCircumference) * 360f;
         foreach (Transform wheelTransform in wheelTransformList)
         {

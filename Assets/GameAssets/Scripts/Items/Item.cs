@@ -361,6 +361,7 @@ public class Item : NetworkBehaviour
 
     public override void OnDestroy()
     {
+        transform.position = Vector3.zero;
         //ItemManager.RemoveItem(this);
     }
 }

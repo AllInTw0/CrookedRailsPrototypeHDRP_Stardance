@@ -60,9 +60,10 @@ public class LocomotiveControls : NetworkBehaviour
             {
                 if (throttle.GetCurrentNotch() > 0)
                 {
-                    if (throttle.actionNameOverride != "")
+                    if (throttle.actionNameOverride == "Set off")
                     {
-                        FreezePlayersToTrainRpc();
+                        if(IsServer)
+                            FreezePlayersToTrainRpc();
                     }
 
                     throttle.SetActionNameOverride("");
@@ -161,7 +162,7 @@ public class LocomotiveControls : NetworkBehaviour
         {
             if (onSetOffTriggerGenerationReset.Value)
             {
-                if (HaulingJobMonitorHandler.active != null && HaulingJobMonitorHandler.haulingJobPicked == false)
+                if (HaulingJobMonitorHandler.active != null && HaulingJobMonitorHandler.haulingJobPicked.Value == false)
                 {
                     throttle.SetLocked(true);
                     throttle.SetActionNameOverride("Pick a job first!");
@@ -176,7 +177,7 @@ public class LocomotiveControls : NetworkBehaviour
                     }
                     else
                     {
-                        throttle.SetActionNameOverride();
+                        throttle.SetActionNameOverride("Set off");
                         throttle.SetLocked(false);
                     }
                 }
@@ -255,5 +256,10 @@ public class LocomotiveControls : NetworkBehaviour
         {
             Player.localPlayer.movement.Freeze(Train.playerTrain.GetRailCarAtIndex(0));
         }
+    }
+    [Rpc(SendTo.Everyone)]
+    public void UnFreezePlayersToTrainRpc()
+    {
+        Player.localPlayer.movement.UnFreeze();
     }
 }

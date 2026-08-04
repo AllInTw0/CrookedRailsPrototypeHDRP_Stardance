@@ -193,6 +193,7 @@ MonoBehaviour:
   freezeTime: 0.8
   attackDelay: 0.225
   attackDamage: 20
+  attackForce: 2.5
   attackSoundName: Small Enemy Attack
   attackImpactSoundName: Enemy Attack Impact
   healthTypeFilterList: 01000000020000000400000005000000
@@ -382,6 +383,7 @@ GameObject:
   - component: {fileID: 1560277106313700146}
   - component: {fileID: 7477618007067767545}
   - component: {fileID: 4171352187836740491}
+  - component: {fileID: 5124467602069354198}
   - component: {fileID: 7106498880292165457}
   - component: {fileID: 2535033255997809392}
   - component: {fileID: 4093623089762549372}
@@ -460,6 +462,32 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &5124467602069354198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6631932380828592750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 3242837286
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  <InScenePlaced>k__BackingField: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &7106498880292165457
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -472,11 +500,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 425724faff24b0540864d35df4f01d67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyHealth
+  ShowTopMostFoldoutHeaderGroup: 1
   healthType: 3
-  health: 25
+  startingHealth: 25
   maxHealth: 25
   audioOnDamageTaken: 
   origin: {fileID: 172228222760864834}
+  invulnerable: 0
   onTakeDamage:
     m_PersistentCalls:
       m_Calls: []
@@ -496,6 +526,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 913c63a61ff2c014aae2c50b1adec2fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GroundEnemy
+  ShowTopMostFoldoutHeaderGroup: 1
   enemyInfo: {fileID: 11400000, guid: fb00dc0c533df4d4a9b006ca29b43a84, type: 2}
   centerTransform: {fileID: 172228222760864834}
   health: {fileID: 7106498880292165457}

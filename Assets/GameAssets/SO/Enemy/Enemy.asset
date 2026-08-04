@@ -15,7 +15,7 @@ MonoBehaviour:
   prefab: {fileID: 6631932380828592750, guid: d56d93cadd6fc0b45b67c4f380b0c7ab, type: 3}
   HealthWeightParamsList:
   - healthType: 1
-    sightDistance: 0
+    sightDistance: 15
     importanceWeight: 2
   - healthType: 2
     sightDistance: 20

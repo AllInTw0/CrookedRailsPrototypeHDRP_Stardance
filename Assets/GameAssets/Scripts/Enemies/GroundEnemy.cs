@@ -15,9 +15,13 @@ public class GroundEnemy : Enemy
     [Header("Spawning")]
     public float spawnFreezeTime;
 
-    private void Start()
+    private void Awake()
     {
         movement = GetComponent<PathFindingGroundMovement>();
+    }
+
+    private void Start()
+    {
         Freeze();
         Invoke(nameof(UnFreeze), spawnFreezeTime);
     }
@@ -97,6 +101,7 @@ public class GroundEnemy : Enemy
         }
 
         movement.UpdateNavigationBehaviour();
+        base.UpdateBehaviour();
     }
     public Vector3 GetRandomPosition(float radius = 4f)
     {

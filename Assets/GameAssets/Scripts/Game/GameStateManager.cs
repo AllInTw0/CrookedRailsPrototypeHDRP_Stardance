@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 
@@ -9,27 +10,19 @@ public class UnlockEntry
     public List<ShopItemSO> neededShopItemList;
     public bool isUnlocked;
 }
-public class GameStateManager : MonoBehaviour
+public class GameStateManager : NetworkBehaviour
 {
     //Serialized
 
     //Run Time
+    public static NetworkVariable<int> gameSeed = new(writePerm: NetworkVariableWritePermission.Server);
     public static HaulingJob currentHaulingJob;
-    public static bool gameStarted;
-    //public static bool isStartingLocationSpawned;
-    //public static bool isStationSpawned;
-
-    public static int currentLevel = 0;
-
+    public static NetworkVariable<bool> gameStarted = new(writePerm:NetworkVariableWritePermission.Server);
+    
+    public static NetworkVariable<int> currentLevel = new(writePerm:NetworkVariableWritePermission.Server);
+    
     public static float distanceTravelled = 0f;
-
-    //public static bool canEnemiesSpawn
-    //{
-    //    get
-    //    {
-    //        return !(isStartingLocationSpawned || isStationSpawned);
-    //    }
-    //}
+    
     public static List<DistanceWaypoint> waypointList = new List<DistanceWaypoint>();
 
     //Shop Stuff
@@ -38,19 +31,20 @@ public class GameStateManager : MonoBehaviour
     public static List<UnlockEntry> unlockList;
     [SerializeField]
     private List<UnlockEntry> _unlockList;
-    private void Start()
+
+    public override void OnNetworkSpawn()
     {
         ResetValues();
     }
     private void Awake()
     {
-        gameStarted = false;
+        gameStarted.Value = false;
     }
     public void ResetValues()
     {
-        gameStarted = false;
+        gameStarted.Value = false;
         currentHaulingJob = null;
-        currentLevel = 0;
+        currentLevel.Value = 0;
         distanceTravelled = 0f;
 
         waypointList = new List<DistanceWaypoint>();
@@ -62,7 +56,9 @@ public class GameStateManager : MonoBehaviour
         unlockList = _unlockList;
         statisticEntryList = new List<StatisticEntry>();
         Money.SetStartingMoney();
-
+        
+        gameSeed.Value = Random.Range(0, 999999999);
+        
         GameOverScreen.onGameOver.AddListener(() =>
         {
             AddToStatistic("Train's Travelled Distance", Mathf.Round((distanceTravelled / 1000f) * 100f) / 100f, StatisticType.DistanceKilometers);

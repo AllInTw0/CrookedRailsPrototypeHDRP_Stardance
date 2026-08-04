@@ -120,7 +120,7 @@ public class Train : NetworkBehaviour
         }
         
         //Player dist
-        if (GameStateManager.gameStarted)
+        if (GameStateManager.gameStarted.Value)
         {
             playerDistFromTrain = GetClosestDistanceToPos(Player.localPlayer.transform.position);
             if (autoStopPlayerDist > 0 && playerDistFromTrain >= autoStopPlayerDist && deceleration == 0)
@@ -419,6 +419,8 @@ public class Train : NetworkBehaviour
     public void SetConsist(List<RailCar> consist)
     {
         this.consist = consist;
+        RecalculateConsistLength();
+        UpdatePosition();
     }
     public RailCar AddRailCar(RailCarSO railCarInfo, int index)
     {
@@ -451,7 +453,7 @@ public class Train : NetworkBehaviour
         depletedFuelSourceName = "";
         foreach (FuelSource fuelSource in fuelSourceList)
         {
-            if (fuelSource.targetHealth.health <= 0)
+            if (fuelSource.targetHealth.GetHealth() <= 0)
             {
                 depletedFuelSourceName = fuelSource.fuelName;
                 return false;

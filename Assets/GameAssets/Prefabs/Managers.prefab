@@ -408,12 +408,10 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  travelDirMeasureDelay: 1
-  maxDirRecordCount: 10
   minTrainSectionCountAhead: 8
   minTrainSectionCountBehind: 2
-  enemiesSpawnAllways: 0
-  disableEnemySpawning: 1
+  enemiesSpawnAlways: 0
+  disableEnemySpawning: 0
 --- !u!1 &4103196173146610950
 GameObject:
   m_ObjectHideFlags: 0
@@ -658,10 +656,11 @@ MonoBehaviour:
   railCar: {fileID: 11400000, guid: 56e8af232a5f402b1aa937f4db311341, type: 2}
   cargo: {fileID: 11400000, guid: 4715cc542e4088448b6041c9ea8e2fa9, type: 2}
   enemy: {fileID: 11400000, guid: fb00dc0c533df4d4a9b006ca29b43a84, type: 2}
-  item: {fileID: 11400000, guid: 04966b570f156e94f8df143d47a58ea2, type: 2}
+  item: {fileID: 11400000, guid: 517ca367be1565a4294aa7684a1e17ae, type: 2}
   shakeStrength: 1
   shakeSpring: 1
   shakeDamp: 1
+  debugHealth: 0
 --- !u!1 &6799618200178374423
 GameObject:
   m_ObjectHideFlags: 0
@@ -720,7 +719,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1708868192
+  GlobalObjectIdHash: 229873088
   InScenePlacedSourceGlobalObjectIdHash: 229873088
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1348,6 +1347,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7308716989163042663}
   - component: {fileID: 7883285603582094826}
+  - component: {fileID: 3093925036794678692}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -1382,11 +1382,25 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d989de9c7a91e64294bd1e533469893, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameStateManager
+  ShowTopMostFoldoutHeaderGroup: 1
   _unlockList:
   - targetShopItem: {fileID: 11400000, guid: 989eeba39d1dd8e4081946ecc68bddd3, type: 2}
     neededShopItemList:
     - {fileID: 11400000, guid: eace34aab063c944ab7933acb4427aa0, type: 2}
     isUnlocked: 0
+--- !u!114 &3093925036794678692
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8261908619367197273}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cb469a05aa45954caf6d7ff43e16dd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Money
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &8673284284306497303
 GameObject:
   m_ObjectHideFlags: 0
@@ -1488,7 +1502,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MultiplayerManager
   hostLocally: 1
-  hostLocalTargetScene: Game
+  hostLocalTargetScene: Testing
   editorIsClient: 0
   manuallySetRegion: 1
   region: europe-north1

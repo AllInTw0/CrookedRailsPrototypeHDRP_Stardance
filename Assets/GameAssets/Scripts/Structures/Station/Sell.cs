@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
+using Unity.Netcode;
 using UnityEngine;
 
-public class Sell : MonoBehaviour
+public class Sell : NetworkBehaviour
 {
     [SerializeField]
     private MonitorArm sellMonitor;
@@ -20,8 +23,18 @@ public class Sell : MonoBehaviour
         }
         public int GetSingleItemValue()
         {
-            itemSO.EvaluateCurves(GameStateManager.currentLevel);
+            itemSO.EvaluateCurves(GameStateManager.currentLevel.Value);
             return itemSO.sell;
+        }
+
+        public void RecalculateCount()
+        {
+            int _count = 0;
+            foreach (Item item in linkedItemList)
+            {
+                _count += item.count;
+            }
+            count = _count;
         }
         public int GetAllItemValue()
         {
@@ -35,20 +48,69 @@ public class Sell : MonoBehaviour
         sellEntryList = new List<SellEntry>();
         sellMonitor.onInteract.AddListener(() =>
         {
-            int sum = 0;
-            foreach (SellEntry entry in sellEntryList)
+            if (GetTotalSellValue() > 0)
             {
-                sum += entry.GetAllItemValue();
-                foreach (Item item in entry.linkedItemList)
+                sellMonitor.printer.ClearNotifications();
+                sellMonitor.DisableMonitor();
+                SellRpc();
+            }
+        });
+        Money.onMoneyChanged.AddListener(() =>
+        {
+            UpdateMonitor();
+        });
+    }
+
+    private void Update()
+    {
+        //remove items that have been destroyed. Mostly meant for clients
+        bool refreshMonitor = false;
+        for (int i = 0; i < sellEntryList.Count; i++)
+        {
+            for (int j = 0; j < sellEntryList[i].linkedItemList.Count; j++)
+            {
+                if (sellEntryList[i].linkedItemList[j] == null)
                 {
-                    Destroy(item.gameObject);
+                    sellEntryList[i].linkedItemList.RemoveAt(j);
+                    j--;
+                    refreshMonitor = true;
                 }
             }
 
-            Money.AddMoney(sum);
-            sellEntryList = new List<SellEntry>();
+            if (refreshMonitor)
+            {
+                if (sellEntryList[i].linkedItemList.Count == 0)
+                {
+                    sellEntryList.RemoveAt(i);
+                    i--;
+                }
+                else
+                {
+                    sellEntryList[i].RecalculateCount();
+                }
+            }
+        }
+        if(refreshMonitor)
             UpdateMonitor();
-        });
+    }
+
+    [Rpc(SendTo.Server)]
+    private void SellRpc()
+    {
+        int sum = 0;
+        foreach (SellEntry entry in sellEntryList)
+        {
+            sum += entry.GetAllItemValue();
+            foreach (Item item in entry.linkedItemList)
+            {
+                Destroy(item.gameObject);
+            }
+        }
+        
+        sellEntryList = new List<SellEntry>();
+        
+        Money.AddMoney(sum);
+        //UpdateMonitor();
     }
     private void AddItem(Item item)
     {

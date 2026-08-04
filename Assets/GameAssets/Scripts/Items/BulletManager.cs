@@ -56,7 +56,7 @@ public class BulletManager : MonoBehaviour
                             spreadDir.normalized * (bulletDamage * forcePerDamage));
                         HitSound.active.HandleHitSound(healthScript, damageDone, hit.point);
 
-                        if (damageDone > 0 && healthScript.health == 0)
+                        if (damageDone > 0 && healthScript.GetHealth() == 0)
                         {
                             Debug.Log("Killed! " + shooterType);
                             if (shooterType == ShooterType.Player)
@@ -149,7 +149,7 @@ public class BulletManager : MonoBehaviour
                     float damageDone = health.TakeDamage(distDamage,
                         dir.normalized * (distDamage * forcePerDamage) + Vector3.up * ((distDamage * forcePerDamage)));
                     HitSound.active.HandleHitSound(health, damageDone, collider.transform.position);
-                    if (damageDone > 0 && health.health == 0)
+                    if (damageDone > 0 && health.GetHealth() == 0)
                     {
                         Debug.Log("Killed! " + shooterType);
                         if (shooterType == ShooterType.Player)

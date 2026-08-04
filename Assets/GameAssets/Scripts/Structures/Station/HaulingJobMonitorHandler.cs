@@ -7,7 +7,7 @@ using UnityEngine;
 public class HaulingJobMonitorHandler : NetworkBehaviour
 {
     public static HaulingJobMonitorHandler active;
-    public static bool haulingJobPicked;
+    public static NetworkVariable<bool> haulingJobPicked = new(writePerm:NetworkVariableWritePermission.Server);
     enum State
     {
         Welcome,
@@ -41,7 +41,7 @@ public class HaulingJobMonitorHandler : NetworkBehaviour
     private void Start()
     {
         active = this;
-        haulingJobPicked = false;
+        if(IsServer) haulingJobPicked.Value = false;
         
         networkData.OnValueChanged += ServerStateChanged;
     }
@@ -290,7 +290,7 @@ public class HaulingJobMonitorHandler : NetworkBehaviour
     public void LoadHaulingJob(HaulingJob haulingJob)
     {
         GameStateManager.currentHaulingJob = haulingJob;
-        haulingJobPicked = true;
+        haulingJobPicked.Value = true;
         foreach (HaulingJobEntry haulingJobEntry in haulingJob.haulingJobEntryList)
         {
             RailCar railCar = Train.playerTrain.AddRailCar(haulingJobEntry.railCar, 2); // 2 because 0-locomotive, 1-tender
@@ -303,7 +303,7 @@ public class HaulingJobMonitorHandler : NetworkBehaviour
     {
         if (active == this) {
             active = null;
-            haulingJobPicked = false;
+            haulingJobPicked.Value = false;
         }
     }
 }

@@ -86,24 +86,29 @@ public class PlayerMovement : GroundMovement
 
     public override float GetTargetSpeed()
     {
-        if (player != Player.localPlayer)
-            return 0f;
-        
         if (tooFarFromTrain)
             return 0f;
         
-        float speed = (InputManager.sprintAction.IsPressed() && stamina > 0f) ? sprintingSpeed : baseSpeed;
-        if (crouched)
-            speed = crouchingSpeed;
-        return speed;
+        
+        if (player != Player.localPlayer)
+        {
+            float speed = (player.playerNetworkData.Value.sprinting && stamina > 0f) ? sprintingSpeed : baseSpeed;
+            //if (crouched)
+                //speed = crouchingSpeed;
+            return speed;
+        }
+        else
+        {
+            float speed = (InputManager.sprintAction.IsPressed() && stamina > 0f) ? sprintingSpeed : baseSpeed;
+            if (crouched)
+                speed = crouchingSpeed;
+            return speed;
+        }
     }
 
     public override Vector2 GetMovementVector()
     {
-        if (player != Player.localPlayer)
-            return Vector3.zero;
-        
-        moveInput = InputManager.active.moveInput;
+        moveInput = player == Player.localPlayer ? InputManager.active.moveInput : player.playerNetworkData.Value.moveInput;
         Vector2 mag = FindVelRelativeToLook();
         float xMag = mag.x, zMag = mag.y;
 
@@ -146,88 +151,96 @@ public class PlayerMovement : GroundMovement
                 else
                     EnableNoclip();
             }
+        }
 
-            moveInput = InputManager.active.moveInput;
-            if (noclip)
+        moveInput = player == Player.localPlayer ? InputManager.active.moveInput : player.playerNetworkData.Value.moveInput;
+        bool sprinting = player == Player.localPlayer ? InputManager.sprintAction.IsPressed() : player.playerNetworkData.Value.sprinting;
+        bool jumping = player == Player.localPlayer ? InputManager.jumpAction.IsPressed() : player.playerNetworkData.Value.jumping;
+        bool crouching = player == Player.localPlayer ? InputManager.crouchAction.IsPressed() : player.playerNetworkData.Value.crouching;
+        
+        if (noclip)
+        {
+            //Noclip
+            rb.MovePosition(transform.position + GetNoclipVector() * Time.deltaTime);
+        }
+        else
+        {
+            //Player specific movement
+
+            //Crouching 
+            if (crouched == false && crouching)
             {
-                //Noclip
-                rb.MovePosition(transform.position + GetNoclipVector() * Time.deltaTime);
+                crouched = true;
+                capsuleCollider.height = colliderCrouchHeight;
+                capsuleCollider.center = new Vector3(0, capsuleCollider.height * 0.5f, 0);
+                cameraTransform.localPosition = new Vector3(0, cameraCrouchHeight, 0);
+
+                //if (grounded == false)
+                //rb.position += new Vector3(0, cameraStandingHeight - cameraCrouchHeight, 0);
             }
-            else
+            else if (crouched && crouching == false)
             {
-                //Player specific movement
+                crouched = false;
+                capsuleCollider.height = colliderStandingHeight;
+                capsuleCollider.center = new Vector3(0, capsuleCollider.height * 0.5f, 0);
+                cameraTransform.localPosition = new Vector3(0, cameraStandingHeight, 0);
 
-                //Crouching 
-                if (crouched == false && InputManager.crouchAction.IsPressed())
-                {
-                    crouched = true;
-                    capsuleCollider.height = colliderCrouchHeight;
-                    capsuleCollider.center = new Vector3(0, capsuleCollider.height * 0.5f, 0);
-                    cameraTransform.localPosition = new Vector3(0, cameraCrouchHeight, 0);
+                //if (grounded == false)
+                //rb.position -= new Vector3(0, cameraStandingHeight - cameraCrouchHeight, 0);
+            }
 
-                    //if (grounded == false)
-                    //rb.position += new Vector3(0, cameraStandingHeight - cameraCrouchHeight, 0);
-                }
-                else if (crouched && InputManager.crouchAction.IsPressed() == false)
+            //Calculating Stamina
+            if (sprinting == false)
+            {
+                //Not Sprinting
+                staminaGainDelayTime += Time.deltaTime;
+                if (staminaGainDelayTime >= staminaGainDelay)
                 {
-                    crouched = false;
-                    capsuleCollider.height = colliderStandingHeight;
-                    capsuleCollider.center = new Vector3(0, capsuleCollider.height * 0.5f, 0);
-                    cameraTransform.localPosition = new Vector3(0, cameraStandingHeight, 0);
-
-                    //if (grounded == false)
-                    //rb.position -= new Vector3(0, cameraStandingHeight - cameraCrouchHeight, 0);
-                }
-
-                //Calculating Stamina
-                if (InputManager.sprintAction.IsPressed() == false)
-                {
-                    //Not Sprinting
-                    staminaGainDelayTime += Time.deltaTime;
-                    if (staminaGainDelayTime >= staminaGainDelay)
-                    {
-                        stamina += staminaGain * Time.deltaTime;
-                        stamina = Mathf.Clamp(stamina, 0, maxStamina);
-                    }
-                }
-                else if (moveInput != Vector2.zero)
-                {
-                    //Sprinting
-                    staminaGainDelayTime = 0;
-                    stamina -= staminaLoss * Time.deltaTime;
+                    stamina += staminaGain * Time.deltaTime;
                     stamina = Mathf.Clamp(stamina, 0, maxStamina);
                 }
-
+            }
+            else if (moveInput != Vector2.zero)
+            {
+                //Sprinting
+                staminaGainDelayTime = 0;
+                stamina -= staminaLoss * Time.deltaTime;
+                stamina = Mathf.Clamp(stamina, 0, maxStamina);
+            }
+            
+            if(player == Player.localPlayer)
                 StatUI.active.UpdateStamina(Mathf.FloorToInt(stamina), maxStamina);
 
 
-                //Jumping
-                jumpTimer += Time.deltaTime;
-                if (InputManager.jumpAction.WasPressedThisFrame() && grounded && jumpTimer >= jumpCoolDown)
-                {
-                    float force = jumpForce;
-                    if (IsInWater())
-                        force *= (1f - GetPercentUnderWater() * waterSlowDownMult);
+            //Jumping
+            jumpTimer += Time.deltaTime;
+            if (jumping && grounded && jumpTimer >= jumpCoolDown)
+            {
+                float force = jumpForce;
+                if (IsInWater())
+                    force *= (1f - GetPercentUnderWater() * waterSlowDownMult);
 
-                    rb.AddForce(0f, crouched ? force * 0.5f : force, 0f);
+                rb.AddForce(0f, crouched ? force * 0.5f : force, 0f);
 
-                    jumpTimer = 0f;
+                jumpTimer = 0f;
 
-                    DisableGrounded();
+                DisableGrounded();
 
-                    if (IsInWater())
-                        SoundManager.active.PlayAtPos(transform.position, "Water - Impact");
-                    else
-                        SoundManager.active.PlayAtPos(transform.position, "Jump");
-                }
+                if (IsInWater())
+                    SoundManager.active.PlayAtPos(transform.position, "Water - Impact");
+                else
+                    SoundManager.active.PlayAtPos(transform.position, "Jump");
+            }
 
-                //Distance walked statistic
+            //Distance walked statistic
+            if (player == Player.localPlayer)
+            {
                 float distKM = (new Vector3(rb.linearVelocity.x, 0, rb.linearVelocity.z).magnitude * Time.deltaTime) /
                                1000f;
                 GameStateManager.AddToStatistic("Distance Walked", distKM,
                     GameStateManager.StatisticType.DistanceKilometers);
-
             }
+
         }
     }
 
@@ -238,68 +251,68 @@ public class PlayerMovement : GroundMovement
         
         if (currentLadder != null) 
         {
-            if (player == Player.localPlayer)
+
+            //Ladder
+            targetSpeed = climbingSpeed;
+
+            Vector3 forceVector = Vector3.zero;
+            Vector3 ladderDir = currentLadder.GetLadderDir();
+
+            void CheckIfVectorIsClimbing(Vector3 vector)
             {
-                //Ladder
-                targetSpeed = climbingSpeed;
+                if (vector == Vector3.zero) return;
 
-                Vector3 forceVector = Vector3.zero;
-                Vector3 ladderDir = currentLadder.GetLadderDir();
-
-                void CheckIfVectorIsClimbing(Vector3 vector)
+                float angle = Vector2.Angle(new Vector2(vector.x, vector.z), new Vector2(ladderDir.x, ladderDir.z));
+                if (angle < climbingAngleThreshold)
                 {
-                    if (vector == Vector3.zero) return;
-
-                    float angle = Vector2.Angle(new Vector2(vector.x, vector.z), new Vector2(ladderDir.x, ladderDir.z));
-                    if (angle < climbingAngleThreshold)
-                    {
-                        forceVector += new Vector3(0f, vector.y + 0.3f, 0f); // +0.3f bias to climbing upwards
-                    }
-                    else
-                    {
-                        forceVector += vector;
-                    }
+                    forceVector += new Vector3(0f, vector.y + 0.3f, 0f); // +0.3f bias to climbing upwards
                 }
-
-                CheckIfVectorIsClimbing(PlayerCamera.active.GetDir() * moveInput.y);
-                CheckIfVectorIsClimbing(orientation.right * moveInput.x);
-
-                forceVector = forceVector.normalized;
-
-                rb.AddForce(forceVector * ((targetSpeed / baseSpeed) * acceleration));
-
-                //Limit speed
-                float velocity = rb.linearVelocity.magnitude;
-                if (velocity > targetSpeed && moveInput != Vector2.zero)
+                else
                 {
-                    Vector3 n = rb.linearVelocity.normalized * targetSpeed;
-                    rb.linearVelocity = new Vector3(n.x, n.y, n.z);
-                }
-
-                //Drag
-                if (moveInput == Vector2.zero && velocity > 0.1f)
-                {
-                    rb.AddForce(-rb.linearVelocity.normalized * ((targetSpeed / baseSpeed) * deceleration));
-                }
-                else if (moveInput == Vector2.zero)
-                {
-                    rb.linearVelocity = new Vector3(0, 0, 0);
+                    forceVector += vector;
                 }
             }
+
+            CheckIfVectorIsClimbing(PlayerCamera.active.GetDir() * moveInput.y);
+            CheckIfVectorIsClimbing(orientation.right * moveInput.x);
+
+            forceVector = forceVector.normalized;
+
+            rb.AddForce(forceVector * ((targetSpeed / baseSpeed) * acceleration));
+
+            //Limit speed
+            float velocity = rb.linearVelocity.magnitude;
+            if (velocity > targetSpeed && moveInput != Vector2.zero)
+            {
+                Vector3 n = rb.linearVelocity.normalized * targetSpeed;
+                rb.linearVelocity = new Vector3(n.x, n.y, n.z);
+            }
+
+            //Drag
+            if (moveInput == Vector2.zero && velocity > 0.1f)
+            {
+                rb.AddForce(-rb.linearVelocity.normalized * ((targetSpeed / baseSpeed) * deceleration));
+            }
+            else if (moveInput == Vector2.zero)
+            {
+                rb.linearVelocity = new Vector3(0, 0, 0);
+            }
+            
         }
         else
         {
+            bool jumping = player == Player.localPlayer ? InputManager.jumpAction.IsPressed() : player.playerNetworkData.Value.jumping;
+            
+            if (jumpTimer >= variableJumpTime.x && jumpTimer <= variableJumpTime.y &&
+                jumping == false && grounded == false)
+            {
+                rb.AddForce(Vector3.down * variableJumpGravityForce);
+            }
+
             if (player == Player.localPlayer)
             {
-                if (jumpTimer >= variableJumpTime.x && jumpTimer <= variableJumpTime.y &&
-                    InputManager.jumpAction.IsPressed() == false && grounded == false)
-                {
-                    rb.AddForce(Vector3.down * variableJumpGravityForce);
-                }
-
-
                 //Max Distance 
-                if (maxDistanceLimitEnabled && Train.playerTrain != null && GameStateManager.gameStarted)
+                if (maxDistanceLimitEnabled && Train.playerTrain != null && GameStateManager.gameStarted.Value)
                 {
                     DistanceWaypoint closestWaypoint = null;
                     float distanceToWaypoint = float.MaxValue;
@@ -371,6 +384,7 @@ public class PlayerMovement : GroundMovement
                             tooFarFromTrain = false;
                         }
                     }
+
                 }
             }
 

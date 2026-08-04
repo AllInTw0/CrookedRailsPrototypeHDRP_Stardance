@@ -1,3 +1,4 @@
+using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
@@ -14,16 +15,26 @@ public enum HealthType
 
 public class Health : NetworkBehaviour
 {
+    private int health;
+    public int GetHealth()
+    {
+        return health - clientSideDamage;
+    }
+    
     [Header("Health")]
     public HealthType healthType;
-    public float health = 100;
-    public float maxHealth = 100;
+    public int startingHealth = 100;
+    public int maxHealth = 100;
     public string audioOnDamageTaken;
     [Header("Origin")]
     public Transform origin;
-
+    [Header("Debug")] 
+    public bool invulnerable;
+    
     private Vector3 forceSum;
-
+    private int damageSum;
+    public int clientSideDamage;
+    
     public UnityEvent<float,Vector3> onTakeDamage;
     private void Awake()
     {
@@ -33,6 +44,13 @@ public class Health : NetworkBehaviour
     {
         AddHealthToGlobalList();
     }
+
+    public override void OnNetworkSpawn()
+    {
+        if(IsServer)
+            SetHealthRpc(startingHealth);
+    }
+
     public void AddHealthToGlobalList()
     {
         if(EnemyManager.active != null)
@@ -44,38 +62,75 @@ public class Health : NetworkBehaviour
     }
     public void UpdateCall()
     {
-        forceSum = Vector3.zero;
+        if (damageSum != 0)
+        {
+            TakeDamageServerRpc(damageSum, forceSum);
+            damageSum = 0;
+            forceSum = Vector3.zero;
+        }
     }
-    public float TakeDamage(float damage, Vector3 force = default)
+    public int TakeDamage(float damage, Vector3 force = default)
     {
-        if (health == 0 && damage > 0)
+        if (GetHealth() == 0 && damage > 0)
             return 0;
 
-        if (audioOnDamageTaken != "" && damage > 0)
-            SoundManager.active.PlayAtPos(transform.position,audioOnDamageTaken);
+        int damageRounded = Mathf.RoundToInt(damage);
+        int damageDone = ClampDamage(damageRounded);
+        Debug.Log(damageRounded+","+damageDone + "," + GetHealth());
+        damageSum += damageDone;
+        if(IsServer == false)
+            clientSideDamage += damageDone;
+        forceSum += force;
+        
+        return damageDone;
+    }
+    [Rpc(SendTo.Server)]
+    private void TakeDamageServerRpc(int damage, Vector3 force = default)
+    {
+        damage = ClampDamage(damage);
         
         health -= damage;
-        forceSum += force;
-        if (health <= 0)
+
+        SetHealthRpc(health, force);
+    }
+
+    [Rpc(SendTo.Everyone)]
+    private void SetHealthRpc(int target, Vector3 force = default)
+    {
+        clientSideDamage = 0;
+        
+        int previousHealth = health;
+        health = target;
+
+        if (previousHealth > health)
         {
-            HealthReachedZero(forceSum);
-            damage += health;
-            health = 0;
-            onTakeDamage.Invoke(damage,force);
-            return damage;
+            onTakeDamage.Invoke(previousHealth - health,force);
+            
+            if (audioOnDamageTaken != "")
+                SoundManager.active.PlayAtPos(transform.position,audioOnDamageTaken);
         }
-        else if (health > maxHealth)
+        
+        if (GetHealth() <= 0)
         {
-            damage = damage + health - maxHealth;
-            health = maxHealth;
-            onTakeDamage.Invoke(damage,force);
-            return damage;
+            HealthReachedZero(force);
         }
-        else
-        {
-            onTakeDamage.Invoke(damage,force);
-            return damage;
-        }
+    }
+    private int ClampDamage(int damage)
+    {
+        Vector2Int minMax = new Vector2Int(0, maxHealth);
+        if (invulnerable)
+            minMax.x = 1;
+
+        damage = -damage;
+        
+        Vector2Int minMaxDamage = new Vector2Int(minMax.x - GetHealth(), minMax.y - GetHealth());
+        
+        if(damage < minMaxDamage.x)
+            return -minMaxDamage.x;
+        if (damage > minMaxDamage.y)
+            return -minMaxDamage.y;
+        
+        return -damage;
     }
     public virtual void HealthReachedZero(Vector3 force = default)   
     {

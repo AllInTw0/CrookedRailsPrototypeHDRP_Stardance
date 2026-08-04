@@ -133,7 +133,7 @@ public class Sentry : Item
 
         sentryHealth.onTakeDamage.AddListener((float dammage, Vector3 force) =>
         {
-            if (sentryHealth.health == 0)
+            if (sentryHealth.GetHealth() == 0)
             {
                 //Destroy Sentry
 
@@ -267,7 +267,7 @@ public class Sentry : Item
         {
             foreach (Health health in EnemyManager.active.healthTypeArray[(int)healthTypeFilterList[i]])
             {
-                if (health.health <= 0f)
+                if (health.GetHealth() <= 0f)
                     continue;
 
                 float distance = Vector3.Distance(transform.position, health.transform.position);

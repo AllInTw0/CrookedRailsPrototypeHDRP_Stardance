@@ -119,7 +119,9 @@ public class GenerationManager : NetworkBehaviour
     }
     public override void OnNetworkSpawn()
     {
-        Debug.Log("Is Server: " + IsServer);
+        if(isActiveAndEnabled == false)
+            return;
+        //Debug.Log("Is Server: " + IsServer);
         WaitForScripts();
     }
 
@@ -204,7 +206,7 @@ public class GenerationManager : NetworkBehaviour
         Vector3 targetPos;
         lock (stationSpawnDistance)
         {
-            targetPos = lastPoint.position + new Vector3(0, 0, stationSpawnDistance.Evaluate(GameStateManager.currentLevel));
+            targetPos = lastPoint.position + new Vector3(0, 0, stationSpawnDistance.Evaluate(GameStateManager.currentLevel.Value));
         }
         TerrainGeneration.Chunk chunk = terrainGeneration.FindFittingChunk(0.5f, 0.4f, 3f, -2f, terrainGeneration.GetChunkCoord(targetPos), 2);
         List<NodePath> nodePathList = trackGeneration.FindPaths(lastPoint.position, chunk.GetWorldPos(0.5f, 0.5f), pathSeeds, returnCount, loadingBarTime);
@@ -403,7 +405,8 @@ public class GenerationManager : NetworkBehaviour
                 LoadingScreen.active.SetProgress(1f, $"Waiting For Clients {clientsFinishedGenerating}/{NetworkManager.Singleton.ConnectedClients.Count-1}");
                 await Task.Delay(50);
             }
-
+            
+            GameStateManager.gameStarted.Value = true;
             FinishGenerationRpc();
         }
         catch (Exception e)
@@ -435,7 +438,6 @@ public class GenerationManager : NetworkBehaviour
     [Rpc(SendTo.Everyone)]
     public void FinishGenerationRpc()
     {
-        GameStateManager.gameStarted = true;
         EnemySpawner.ResetWaveValues(5f);
         terrainGeneration.SetUpdateRenderDistance(true);
         LoadingScreen.active.Disable();
@@ -495,7 +497,7 @@ public class GenerationManager : NetworkBehaviour
         //Ran only on server
         
         //GameStateManager.isStartingLocationSpawned = true;
-        GameStateManager.currentLevel = 0;
+        GameStateManager.currentLevel.Value = 0;
 
         TerrainGeneration.Chunk chunk = terrainGeneration.FindFittingChunk(0.5f, 0.6f, 3f, -2f, Vector2Int.zero, 5);
  
@@ -545,7 +547,7 @@ public class GenerationManager : NetworkBehaviour
     }
     private void GenerateStation()
     {
-        GameStateManager.currentLevel++;
+        GameStateManager.currentLevel.Value++;
 
         List<PathPoint> ListOfPathPoints = new List<PathPoint>();
 
@@ -567,7 +569,7 @@ public class GenerationManager : NetworkBehaviour
 
         //Station Track
         float startionTrackLength = playerTrain.GetConsistLenght() + 10f;
-        generatedSection = GenerateStraightSection(startionTrackLength,110f);
+        generatedSection = GenerateStraightSection(startionTrackLength,startionTrackLength * 0.4f);
         generatedSectionList.Add(generatedSection);
         ListOfPathPoints.AddRange(generatedSection.path);
         SpawnStructureNearTrack(generatedSection.length - 2, generatedSection, stationSO);

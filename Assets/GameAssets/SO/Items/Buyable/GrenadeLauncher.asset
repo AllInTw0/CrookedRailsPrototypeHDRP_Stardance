@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: GrenadeLauncher
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   nameOverride: 
-  prefab: {fileID: 919132149155446097, guid: 58ed9b7ba538d9a4397c9d301c3af015, type: 3}
+  prefab: {fileID: 5062412172767849501, guid: ae0f54626e3a6800f94e3efbe76ae5c2, type: 3}
   description: A powerfull grenade launcher.
   probabilityCurve:
     serializedVersion: 2

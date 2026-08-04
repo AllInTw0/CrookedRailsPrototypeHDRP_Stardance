@@ -40,7 +40,7 @@ public class EnemyDamageCollider : MonoBehaviour
         if (coolDownTime < 0f)
         {
             Health healthScript = other.GetComponent<Health>();
-            if (healthScript != null && healthScript.health > 0f && healthTypeFilterList.Contains(healthScript.healthType))
+            if (healthScript != null && healthScript.GetHealth() > 0f && healthTypeFilterList.Contains(healthScript.healthType))
             {
                 SoundManager.active.PlayAtPos(transform.position,attackSoundName);
 
