@@ -127,12 +127,14 @@ MonoBehaviour:
   renderLayer:
     serializedVersion: 2
     m_Bits: 256
-  probability: 0
-  price: 0
-  stock: 0
-  sell: 0
-  randomness: 0
+  probability: 1.0751804
+  price: 250
+  stock: 1
+  sell: 3
+  randomness: 1
   upgradeList:
   - trainStat: 2
     upgradeType: 0
     value: -0.2
+  replaceList:
+  - {fileID: 11400000, guid: 52ac713c42b4e6b5f80903a434cb95d2, type: 2}

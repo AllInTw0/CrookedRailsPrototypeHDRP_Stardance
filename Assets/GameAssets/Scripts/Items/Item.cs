@@ -74,7 +74,7 @@ public class Item : NetworkBehaviour
         DropFromPos(transform.position);
         
         eventInteractable = GetComponent<EventInteractable>();
-        eventInteractable.interactEvent.AddListener(() =>
+        eventInteractable.interactEventLocal.AddListener(() =>
         {
             if (TryEquipping())
             {

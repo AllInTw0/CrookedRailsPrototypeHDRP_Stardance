@@ -45,13 +45,11 @@ public class TrainUpgradeHandler : MonoBehaviour
 
     [SerializeField]
     private List<DefaultStats> defaultStatsList;
-    [SerializeField]
-    private List<UpgradeVisual> upgradeVisualList = new List<UpgradeVisual>();
     //Run time
-    private List<UpgradeSO> boughtUpgradeList = new List<UpgradeSO>();
+    private TrainUpgrade[] trainUpgradeArray;
 
     private Dictionary<TrainStatType, DefaultStats> defaultStatsDict = new Dictionary<TrainStatType, DefaultStats>();
-    private Dictionary<TrainStatType, List<Upgrade>> currentUpgradeDict = new Dictionary<TrainStatType, List<Upgrade>>();
+    public Dictionary<TrainStatType, List<Upgrade>> currentUpgradeDict = new Dictionary<TrainStatType, List<Upgrade>>();
     void Awake()
     {
         foreach (DefaultStats defaultStats in defaultStatsList)
@@ -59,37 +57,38 @@ public class TrainUpgradeHandler : MonoBehaviour
             defaultStatsDict.Add(defaultStats.trainStat, defaultStats);
             currentUpgradeDict.Add(defaultStats.trainStat, new List<Upgrade>());
         }
-        UpdateVisuals();
         active = this;
+        trainUpgradeArray = GetComponentsInChildren<TrainUpgrade>();
     }
 
     void Update()
     {
         
     }
-
+    
     public void AddUpgrade(UpgradeSO upgradeInfo)
     {
-        boughtUpgradeList.Add(upgradeInfo);
-        foreach (Upgrade upgrade in upgradeInfo.upgradeList)
+        for (int i = 0; i < trainUpgradeArray.Length; i++)
         {
-            currentUpgradeDict[upgrade.trainStat].Add(upgrade);
+            if (trainUpgradeArray[i].linkedUpgradeSO == upgradeInfo)
+            {
+                trainUpgradeArray[i].SetUnlocked(true);
+            }
         }
 
-        UpdateVisuals();
-    }
-    private void UpdateVisuals()
-    {
-        foreach (UpgradeVisual visual in upgradeVisualList)
+        for (int i = 0; i < upgradeInfo.replaceList.Count; i++)
         {
-            foreach (GameObject obj in visual.enableObjectList)
+            RemoveUpgrade(upgradeInfo.replaceList[i]);
+        }
+    }
+
+    public void RemoveUpgrade(UpgradeSO upgradeInfo)
+    {
+        for (int i = 0; i < trainUpgradeArray.Length; i++)
+        {
+            if (trainUpgradeArray[i].linkedUpgradeSO == upgradeInfo)
             {
-                obj.SetActive(boughtUpgradeList.Contains(visual.linkedUpgrade));
-            }
-            foreach (GameObject obj in visual.disableObjectList)
-            {
-                if(boughtUpgradeList.Contains(visual.linkedUpgrade))
-                    obj.SetActive(false);
+                trainUpgradeArray[i].SetUnlocked(false);
             }
         }
     }

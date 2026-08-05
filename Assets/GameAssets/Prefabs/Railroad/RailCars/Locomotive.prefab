@@ -358,6 +358,9 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
+  interactEvent:
+    m_PersistentCalls:
+      m_Calls: []
   leverType: 0
   startAxis: {x: 15, y: 0, z: 0}
   endAxis: {x: -15, y: 0, z: 0}
@@ -6536,6 +6539,9 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
+  interactEvent:
+    m_PersistentCalls:
+      m_Calls: []
   leverType: 0
   startAxis: {x: 0, y: 90, z: 0}
   endAxis: {x: 0, y: 0, z: 0}
@@ -7864,10 +7870,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RailCarHealth
   ShowTopMostFoldoutHeaderGroup: 1
   healthType: 2
-  health: 1000
+  startingHealth: 1000
   maxHealth: 1000
   audioOnDamageTaken: 
   origin: {fileID: 0}
+  invulnerable: 0
+  clientSideDamage: 0
   onTakeDamage:
     m_PersistentCalls:
       m_Calls: []
@@ -7896,8 +7904,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8692011977264388937}
-  - component: {fileID: 7377246268674100006}
   - component: {fileID: 2010722330746405711}
+  - component: {fileID: 7377246268674100006}
   - component: {fileID: 6443168305811202456}
   - component: {fileID: 2347285896684240729}
   - component: {fileID: 2745094267146870667}
@@ -7931,27 +7939,6 @@ Transform:
   - {fileID: 4847168072240329759}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7377246268674100006
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6367483308797791140}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d0650ba239bc3bd41bd3e118270697b2, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LocomotiveControls
-  train: {fileID: 0}
-  throttle: {fileID: 4578470473910767816}
-  reverser: {fileID: 4707054429297882395}
-  locoBreaks: {fileID: 1727348770812098857}
-  supersonicSpeed: 50
-  supersonicAcceleration: 25
-  supersonicDeceleration: 25
-  currentState: 0
-  onSetOffTriggerGenerationReset: 0
 --- !u!114 &2010722330746405711
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7978,6 +7965,36 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
+--- !u!114 &7377246268674100006
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6367483308797791140}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0650ba239bc3bd41bd3e118270697b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LocomotiveControls
+  ShowTopMostFoldoutHeaderGroup: 1
+  train: {fileID: 0}
+  throttle: {fileID: 4578470473910767816}
+  reverser: {fileID: 4707054429297882395}
+  locoBreaks: {fileID: 1727348770812098857}
+  supersonicSpeed: 50
+  supersonicAcceleration: 25
+  supersonicDeceleration: 25
+  currentState:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
+  onSetOffTriggerGenerationReset:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
+    m_InternalValue: 0
 --- !u!114 &6443168305811202456
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7991,16 +8008,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailCar
   ShowTopMostFoldoutHeaderGroup: 1
-  trainID:
+  networkData:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
-  consistIndex:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
   railCarSO: {fileID: 11400000, guid: e70d30f70047ab14cabcce1ae6cdb5c0, type: 2}
   isPlayerRailCar: 1
   derailVisualAngle: 5
@@ -8351,6 +8362,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 924f6ddfd538c8e4ca3043eb86396005, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AutoStopUpgrade
+  ShowTopMostFoldoutHeaderGroup: 1
+  linkedUpgradeSO: {fileID: 0}
+  unlockedAtStart: 0
   targetTrain: {fileID: 0}
   leverInteractable: {fileID: 0}
   notchAutoStopFilterList:
@@ -9091,6 +9105,9 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
+  interactEvent:
+    m_PersistentCalls:
+      m_Calls: []
   leverType: 0
   startAxis: {x: 0, y: 0, z: 0}
   endAxis: {x: 0, y: 25, z: 0}

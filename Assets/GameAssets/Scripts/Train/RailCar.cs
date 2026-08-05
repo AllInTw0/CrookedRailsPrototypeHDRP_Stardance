@@ -54,8 +54,8 @@ public class CargoInfo
 public class RailCar : NetworkBehaviour
 {
     private Train linkedTrain;
-    private NetworkVariable<RailCarNetworkData> networkData = new(writePerm: NetworkVariableWritePermission.Server);
-    private struct RailCarNetworkData : INetworkSerializable
+    public NetworkVariable<RailCarNetworkData> networkData = new(writePerm: NetworkVariableWritePermission.Server);
+    public struct RailCarNetworkData : INetworkSerializable
     {
         public ushort trainID;
         public int consistIndex;
@@ -123,13 +123,14 @@ public class RailCar : NetworkBehaviour
     {
         if(IsServer) 
             return;
-        
+        Debug.Log("ServerValuesChanged: " + current.consistIndex+", " + current.trainID);
         //Sync linked train and consist index
         //Will be called when the consist changes (Server spawns in railcars)
         for (int i = 0; i < Train.activeTrainList.Count; i++)
         {
             if (Train.activeTrainList[i].NetworkBehaviourId == current.trainID)
             {
+                Debug.Log("Found Train");
                 linkedTrain = Train.activeTrainList[i];
                 
                 List<RailCar> consist = linkedTrain.GetConsist();
@@ -162,6 +163,7 @@ public class RailCar : NetworkBehaviour
                 return;
             }
         }
+        Debug.Log("Did not find train");
     }
     private void Awake()
     {
@@ -293,6 +295,19 @@ public class RailCar : NetworkBehaviour
         }
         
         GetComponent<NetworkObject>().Despawn();
+    }
+
+    public override void OnDestroy()
+    {
+        if (IsServer == false)
+        {
+            List<RailCar> newConsist = linkedTrain.GetConsist();
+            newConsist.Remove(this);
+            linkedTrain.SetConsist(newConsist);
+            Debug.Log("Removed railCar from consist");
+        }
+
+        base.OnDestroy();
     }
 
     public float GetWeight()

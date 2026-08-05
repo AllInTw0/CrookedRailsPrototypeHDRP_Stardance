@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AutoStopUpgrade : MonoBehaviour
+public class AutoStopUpgrade : TrainUpgrade
 {
     [Header("Train")]
     [SerializeField]
@@ -33,7 +33,7 @@ public class AutoStopUpgrade : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if(targetTrain.IsInitialized() == false)
+        if(IsUnlocked() == false || targetTrain.IsInitialized() == false)
             return;
         
         AutoStopFilter currentFilter;

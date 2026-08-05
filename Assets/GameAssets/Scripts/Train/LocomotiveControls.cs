@@ -195,7 +195,7 @@ public class LocomotiveControls : NetworkBehaviour
             {
                 throttle.SetActionNameOverride("");
                 throttle.SetLocked(false);
-                currentState.Value = State.normal;
+                if(IsServer) currentState.Value = State.normal;
             }
         }
         else if (currentState.Value == State.normal) 
@@ -205,7 +205,7 @@ public class LocomotiveControls : NetworkBehaviour
                 throttle.SetActionNameOverride("No " + depletedFuelSourceName + "!");
                 throttle.SetLocked(true);
                 throttle.SetCurrentNotch(0);
-                currentState.Value = State.depletedFuel;
+                if(IsServer) currentState.Value = State.depletedFuel;
             }
         }
 

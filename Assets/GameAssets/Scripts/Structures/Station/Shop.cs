@@ -292,6 +292,15 @@ public class Shop : NetworkBehaviour
                     description += "\n" + TrainUpgradeHandler.active.GetUpgradeDescription(upgrade);
                 }
             }
+
+            if (((UpgradeSO)itemInfo).replaceList.Count > 0)
+            {
+                description += "\nREPLACES:";
+                foreach (UpgradeSO upgradeSO in ((UpgradeSO)itemInfo).replaceList)
+                {
+                    description += "\n" + upgradeSO.GetName();
+                }
+            }
         }
         return description;
     }

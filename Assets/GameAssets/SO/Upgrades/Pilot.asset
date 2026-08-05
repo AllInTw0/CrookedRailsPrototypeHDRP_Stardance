@@ -137,3 +137,5 @@ MonoBehaviour:
   - trainStat: 7
     upgradeType: 0
     value: -1
+  replaceList:
+  - {fileID: 11400000, guid: 4098e84322158caef892217a352a40e4, type: 2}

@@ -53,7 +53,7 @@ public class Teleporter : Item
             }
         });
 
-        teleportInteractable.interactEvent.AddListener(() =>
+        teleportInteractable.interactEventLocal.AddListener(() =>
         {
             if (IsPaired())
             {

@@ -91,13 +91,12 @@ public class Train : NetworkBehaviour
         if (isPlayerTrain)
             playerTrain = this;
         activeTrainList.Add(this);
-        
-        RecalculateConsistLength();
     }
 
     public override void OnNetworkSpawn()
     {
         trainNetworkData.OnValueChanged += SyncTrainClient;
+        RecalculateConsistLength();
     }
 
     private void SyncTrainClient(TrainNetworkData previous, TrainNetworkData current)
@@ -439,7 +438,7 @@ public class Train : NetworkBehaviour
         consist = listFront;
         consist.Add(railCarCopy);
         consist.AddRange(listBack);
-
+        
         //Sync to client
         railCarCopy.GetComponent<NetworkObject>().Spawn(true);
         

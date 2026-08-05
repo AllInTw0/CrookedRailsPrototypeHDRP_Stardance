@@ -6,4 +6,6 @@ public class UpgradeSO : ShopItemSO
 {
     [Header("UpgradeSO")]
     public List<Upgrade> upgradeList = new List<Upgrade>();
+    
+    public List<UpgradeSO> replaceList = new List<UpgradeSO>();
 }

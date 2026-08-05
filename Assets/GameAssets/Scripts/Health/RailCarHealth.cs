@@ -37,7 +37,7 @@ public class RailCarHealth : Health
 
         foreach (EventInteractable interactable in rerailInteractableList)
         {
-            interactable.interactEvent.AddListener(() =>
+            interactable.interactEventLocal.AddListener(() =>
             {
                 Rerail();
             });

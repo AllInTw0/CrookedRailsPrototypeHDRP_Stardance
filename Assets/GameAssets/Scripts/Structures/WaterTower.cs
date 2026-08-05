@@ -69,7 +69,7 @@ public class WaterTower : MonoBehaviour
         float distance = Vector2.Distance(new Vector2(spoutTransform.position.x, spoutTransform.position.z), new Vector2(Tender.active.waterHatch.position.x, Tender.active.waterHatch.position.z));
         bool fillWater = false;
 
-        if(distance > maxDistance || lowered == false || Tender.active.hatchOpened == false)
+        if(distance > maxDistance || lowered == false || Tender.active.IsHatchOpen() == false)
         {
             spoutRotY = Quaternion.Slerp(Quaternion.Euler(0, spoutRotY, 0), transform.rotation, Time.deltaTime * spoutSpeed).eulerAngles.y;
             fillWater = false;

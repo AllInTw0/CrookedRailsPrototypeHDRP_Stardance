@@ -14,12 +14,10 @@ public class Tender : MonoBehaviour
     public float notificationDuration = 3f;
 
     [Header("Water Hatch")]
-    public Animator animator;
+    public LeverInteractable hatchLeverInteractable;
     public Transform waterHatch;
     public float waterHatchOffset;
     //Run Time
-    [HideInInspector]
-    public bool hatchOpened;
 
     private float lastWaterLevel;
     private float lastFuelLevel;
@@ -57,12 +55,8 @@ public class Tender : MonoBehaviour
         lastWaterLevel = waterLevel.GetHealth();
         lastFuelLevel = fuelLevel.GetHealth();
     }
-    public void HatchInteract()
+    public bool IsHatchOpen()
     {
-        hatchOpened = !hatchOpened;
-        if (hatchOpened)
-            animator.SetBool("open", true);
-        else
-            animator.SetBool("open", false);
+        return hatchLeverInteractable.GetCurrentNotch() == 1;
     }
 }

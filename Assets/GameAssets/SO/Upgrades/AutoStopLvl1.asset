@@ -134,3 +134,5 @@ MonoBehaviour:
   sell: 1
   randomness: 0.008345127
   upgradeList: []
+  replaceList:
+  - {fileID: 11400000, guid: 60f553e3cc426310eb0ba791784e167d, type: 2}

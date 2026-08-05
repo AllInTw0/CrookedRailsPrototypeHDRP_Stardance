@@ -43,6 +43,17 @@ public class Health : NetworkBehaviour
     private void Start()
     {
         AddHealthToGlobalList();
+        NetworkManager.Singleton.OnConnectionEvent += OnConnection;
+    }
+
+    private void OnConnection(NetworkManager networkManager, ConnectionEventData connectionEventData)
+    {
+        if (IsServer && connectionEventData.ClientId != NetworkManager.Singleton.LocalClientId)
+        {
+            //Client connected. Send health
+            Debug.Log("Sending health to client");
+            SetHealthRpc(health);
+        }
     }
 
     public override void OnNetworkSpawn()
@@ -102,15 +113,16 @@ public class Health : NetworkBehaviour
         int previousHealth = health;
         health = target;
 
+        onTakeDamage.Invoke(previousHealth - health,force);
+
+        
         if (previousHealth > health)
         {
-            onTakeDamage.Invoke(previousHealth - health,force);
-            
             if (audioOnDamageTaken != "")
                 SoundManager.active.PlayAtPos(transform.position,audioOnDamageTaken);
         }
         
-        if (GetHealth() <= 0)
+        if (previousHealth > 0 && health <= 0)
         {
             HealthReachedZero(force);
         }

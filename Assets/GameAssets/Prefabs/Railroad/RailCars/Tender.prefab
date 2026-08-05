@@ -432,10 +432,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RailCarHealth
   ShowTopMostFoldoutHeaderGroup: 1
   healthType: 2
-  health: 500
+  startingHealth: 500
   maxHealth: 500
   audioOnDamageTaken: 
   origin: {fileID: 0}
+  invulnerable: 0
+  clientSideDamage: 0
   onTakeDamage:
     m_PersistentCalls:
       m_Calls: []
@@ -506,7 +508,10 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventSynced:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &7057756617861738062
@@ -801,8 +806,8 @@ GameObject:
   - component: {fileID: 1468337465935696781}
   - component: {fileID: 4611707253836840727}
   - component: {fileID: 5895215962089394402}
-  - component: {fileID: 3339143080319920106}
   - component: {fileID: 8480433829343693302}
+  - component: {fileID: 5814535605366621931}
   m_Layer: 7
   m_Name: TenderHatch
   m_TagString: Untagged
@@ -883,41 +888,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &3339143080319920106
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3969795864404767787}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2589ef97385237b4a99fa6146c09d6ee, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EventInteractable
-  ShowTopMostFoldoutHeaderGroup: 1
-  objectName: Water Hatch
-  actionName: Open
-  timeToInteract: 0.25
-  iconPosition: {fileID: 5845918528653528838}
-  interactSound: Click
-  objectNameOverride: 
-  actionNameOverride: 
-  interactEvent:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 7793126293332924045}
-        m_TargetAssemblyTypeName: Tender, Assembly-CSharp
-        m_MethodName: HatchInteract
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!65 &8480433829343693302
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -939,6 +909,38 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.6, y: 0.1, z: 0.6}
   m_Center: {x: 0, y: 0.05, z: 0.3}
+--- !u!114 &5814535605366621931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3969795864404767787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ead24d7e0d3bc9488b3b6cc6242f4ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LeverInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
+  objectName: Water Hatch
+  actionName: Interact
+  timeToInteract: 0.25
+  iconPosition: {fileID: 5845918528653528838}
+  interactSound: Click
+  objectNameOverride: 
+  actionNameOverride: 
+  interactEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  leverType: 2
+  startAxis: {x: 0, y: 0, z: 0}
+  endAxis: {x: 0, y: 0, z: 0}
+  speed: 0
+  animator: {fileID: 4586710806889795088}
+  animatorBoolStr: open
+  targetObject: {fileID: 0}
+  notches: 1
+  displayNotches: 0
 --- !u!1 &4391468871803666737
 GameObject:
   m_ObjectHideFlags: 0
@@ -1167,10 +1169,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   ShowTopMostFoldoutHeaderGroup: 1
   healthType: 0
-  health: 100
+  startingHealth: 100
   maxHealth: 100
   audioOnDamageTaken: 
   origin: {fileID: 0}
+  invulnerable: 0
+  clientSideDamage: 0
   onTakeDamage:
     m_PersistentCalls:
       m_Calls: []
@@ -1683,16 +1687,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailCar
   ShowTopMostFoldoutHeaderGroup: 1
-  trainID:
+  networkData:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
-  consistIndex:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
   railCarSO: {fileID: 11400000, guid: 4b6e685f31014c845b8386bbafd91566, type: 2}
   isPlayerRailCar: 1
   derailVisualAngle: 5
@@ -1774,10 +1772,9 @@ MonoBehaviour:
   - 15
   - 5
   notificationDuration: 5
-  animator: {fileID: 4586710806889795088}
+  hatchLeverInteractable: {fileID: 5814535605366621931}
   waterHatch: {fileID: 6482637776791147129}
   waterHatchOffset: 1.7
-  hatchOpened: 0
 --- !u!95 &4586710806889795088
 Animator:
   serializedVersion: 7
@@ -1927,7 +1924,10 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventSynced:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &7661115004277086338
@@ -2064,10 +2064,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Health
   ShowTopMostFoldoutHeaderGroup: 1
   healthType: 0
-  health: 4600
+  startingHealth: 5000
   maxHealth: 5000
   audioOnDamageTaken: 
   origin: {fileID: 0}
+  invulnerable: 0
+  clientSideDamage: 0
   onTakeDamage:
     m_PersistentCalls:
       m_Calls: []

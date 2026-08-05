@@ -22,7 +22,7 @@ public class MonitorArm : AnimationPlayer
 
     private void Awake()
     {
-        if (buttonInteractable != null) buttonInteractable.interactEvent.AddListener(() => { onInteract.Invoke(); });
+        if (buttonInteractable != null) buttonInteractable.interactEventLocal.AddListener(() => { onInteract.Invoke(); });
         buttonEnabled = true;
         DisableButton();
     }

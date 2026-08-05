@@ -18,6 +18,7 @@ public class DebugHelper : MonoBehaviour
     [Header("Health")] 
     public bool debugHealth;
     public bool debugEnemies;
+    public bool debugTrain;
     private void OnGUI()
     {
         Camera playerCam = PlayerCamera.active.GetComponent<Camera>();
@@ -55,6 +56,14 @@ public class DebugHelper : MonoBehaviour
                         Label(health.transform.position + Vector3.up, "Owner:" + (Player.localPlayer.OwnerClientId == health.OwnerClientId));
                     }
                 }
+            }
+        }
+
+        if (debugTrain)
+        {
+            foreach (RailCar railCar in Train.playerTrain.GetConsist())
+            {
+                Label(railCar.transform.position + Vector3.up, "i: " +railCar.networkData.Value.consistIndex +", t: " + railCar.networkData.Value.trainID);
             }
         }
     }

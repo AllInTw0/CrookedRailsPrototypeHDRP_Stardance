@@ -661,6 +661,8 @@ MonoBehaviour:
   shakeSpring: 1
   shakeDamp: 1
   debugHealth: 0
+  debugEnemies: 0
+  debugTrain: 1
 --- !u!1 &6799618200178374423
 GameObject:
   m_ObjectHideFlags: 0
@@ -719,7 +721,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 229873088
+  GlobalObjectIdHash: 1708868192
   InScenePlacedSourceGlobalObjectIdHash: 229873088
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1502,7 +1504,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MultiplayerManager
   hostLocally: 1
-  hostLocalTargetScene: Testing
+  hostLocalTargetScene: Game
   editorIsClient: 0
   manuallySetRegion: 1
   region: europe-north1

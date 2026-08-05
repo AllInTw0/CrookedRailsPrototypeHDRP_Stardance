@@ -13,19 +13,31 @@ public class LeverInteractable : Interactable
     enum LeverType
     {
         Rotation,
-        Position
+        Position,
+        Animator,
+        Object
     }
-    [Header("Lever")]
+    [Header("Lever Type")]
     [SerializeField]
     private LeverType leverType;
+    [Header("Rotation & Position")]
     [SerializeField] 
     private Vector3 startAxis;
     [SerializeField]
     private Vector3 endAxis;
     [SerializeField] 
-    public int notches;
-    [SerializeField] 
     private float speed;
+    [Header("Animator")] 
+    [SerializeField]
+    private Animator animator;
+    [SerializeField]
+    private string animatorBoolStr;
+    [Header("Object")] 
+    [SerializeField]
+    private GameObject targetObject;
+    [Header("Notches")]
+    [SerializeField] 
+    public int notches;
     [SerializeField] 
     private bool displayNotches = true;
     //RunTime
@@ -33,6 +45,7 @@ public class LeverInteractable : Interactable
     private List<byte> localCurrentNotchHistoryList = new List<byte>();
     private bool locked = false;
 
+    private int lastNotch = -1;
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
@@ -67,11 +80,31 @@ public class LeverInteractable : Interactable
     }
     private void Update()
     {
-        Vector3 targetVector = Vector3.Lerp(startAxis,endAxis, GetCurrentNotch() / (float)notches);
+        
         if (leverType == LeverType.Rotation)
+        {
+            Vector3 targetVector = Vector3.Lerp(startAxis,endAxis, GetCurrentNotch() / (float)notches);
             transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(targetVector), speed * Time.deltaTime);
-        else
+        }
+        else if (leverType == LeverType.Rotation)
+        {
+            Vector3 targetVector = Vector3.Lerp(startAxis,endAxis, GetCurrentNotch() / (float)notches);
             transform.localPosition = Vector3.MoveTowards(transform.localPosition, targetVector, speed * Time.deltaTime);
+        }
+
+        if (GetCurrentNotch() != lastNotch)
+        {
+            if (leverType == LeverType.Animator)
+            {
+                animator.SetBool(animatorBoolStr, GetCurrentNotch() == 1);
+            }
+            else if (leverType == LeverType.Object)
+            {
+                targetObject.SetActive(GetCurrentNotch() == 1);
+            }
+        }
+
+        lastNotch = GetCurrentNotch();
     }
 
     public override bool Interact()

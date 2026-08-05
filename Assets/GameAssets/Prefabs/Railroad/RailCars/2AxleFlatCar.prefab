@@ -161,16 +161,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailCar
   ShowTopMostFoldoutHeaderGroup: 1
-  trainID:
+  networkData:
     UpdateTraits:
       MinSecondsBetweenUpdates: 0
       MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
-  consistIndex:
-    UpdateTraits:
-      MinSecondsBetweenUpdates: 0
-      MaxSecondsBetweenUpdates: 0
-    m_InternalValue: 0
   railCarSO: {fileID: 11400000, guid: e1b57eeabcc8afe4482d17364ce7a8b7, type: 2}
   isPlayerRailCar: 0
   derailVisualAngle: 5
@@ -731,10 +725,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::RailCarHealth
   ShowTopMostFoldoutHeaderGroup: 1
   healthType: 2
-  health: 500
+  startingHealth: 500
   maxHealth: 500
   audioOnDamageTaken: 
   origin: {fileID: 0}
+  invulnerable: 0
+  clientSideDamage: 0
   onTakeDamage:
     m_PersistentCalls:
       m_Calls: []

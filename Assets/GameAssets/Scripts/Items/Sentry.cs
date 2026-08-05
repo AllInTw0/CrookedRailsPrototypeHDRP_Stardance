@@ -70,7 +70,7 @@ public class Sentry : Item
     {
         helperTransform = new GameObject().transform;
 
-        itemInteractable.interactEvent.AddListener(() =>
+        itemInteractable.interactEventLocal.AddListener(() =>
         {
             if (equipedGun == null)
             {
@@ -120,7 +120,7 @@ public class Sentry : Item
             }
         });
 
-        ammoFillInteractable.interactEvent.AddListener(() =>
+        ammoFillInteractable.interactEventLocal.AddListener(() =>
         {
             int targetCount = Mathf.Clamp(maxAmmoCount - ammoCount, 0, equipedGun.ammoItem.maxCount / 2);
             if (targetCount > 0 && Player.localPlayer.inventory.RemoveItem(equipedGun.ammoItem, out int itemCountRemoved, targetCount))

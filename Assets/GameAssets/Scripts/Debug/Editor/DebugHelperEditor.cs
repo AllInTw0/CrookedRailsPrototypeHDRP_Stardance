@@ -35,5 +35,9 @@ public class DebugHelperEditor : Editor
         {
             PlayerCamera.active.Shake(debugHelper.shakeStrength, debugHelper.shakeSpring, debugHelper.shakeDamp);
         }
+        if (GUILayout.Button("Add 1000$"))
+        {
+            Money.AddMoney(1000);
+        }
     }
 }

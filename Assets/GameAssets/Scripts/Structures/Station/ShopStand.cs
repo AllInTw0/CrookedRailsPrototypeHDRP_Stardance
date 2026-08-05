@@ -39,7 +39,7 @@ public class ShopStand : AnimationPlayer
         nameText.text = "";
         priceText.text = "";
 
-        if (buttonInteractable != null) buttonInteractable.interactEvent.AddListener(() => { onInteract.Invoke(); });
+        if (buttonInteractable != null) buttonInteractable.interactEventLocal.AddListener(() => { onInteract.Invoke(); });
     }
 
     void Update()
