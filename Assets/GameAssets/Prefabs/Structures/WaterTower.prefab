@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7407941332413433582}
   - component: {fileID: 4910872627144470285}
-  - component: {fileID: 4225296494058978762}
+  - component: {fileID: 2068834437733981031}
   m_Layer: 7
   m_Name: SpoutOrigin
   m_TagString: Untagged
@@ -58,7 +58,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.5, y: 3.5, z: 0.5}
   m_Center: {x: -0.25, y: 1.75, z: 0}
---- !u!114 &4225296494058978762
+--- !u!114 &2068834437733981031
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -67,29 +67,29 @@ MonoBehaviour:
   m_GameObject: {fileID: 246183436535125390}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2589ef97385237b4a99fa6146c09d6ee, type: 3}
+  m_Script: {fileID: 11500000, guid: 6ead24d7e0d3bc9488b3b6cc6242f4ea, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EventInteractable
+  m_EditorClassIdentifier: Assembly-CSharp::LeverInteractable
+  ShowTopMostFoldoutHeaderGroup: 1
   objectName: Spout
   actionName: Lower
   timeToInteract: 0.5
   iconPosition: {fileID: 1043748943731734675}
   interactSound: Click
+  objectNameOverride: 
+  actionNameOverride: 
   interactEvent:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2255950623643259387}
-        m_TargetAssemblyTypeName: WaterTower, Assembly-CSharp
-        m_MethodName: Interact
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
+  leverType: 2
+  startAxis: {x: 0, y: 0, z: 0}
+  endAxis: {x: 0, y: 0, z: 0}
+  speed: 0
+  animator: {fileID: 8603384269339299867}
+  animatorBoolStr: lowered
+  targetObject: {fileID: 0}
+  notches: 1
+  displayNotches: 0
 --- !u!1 &817225833670528104
 GameObject:
   m_ObjectHideFlags: 0
@@ -155,7 +155,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &1952789612687362028
 LineRenderer:
-  serializedVersion: 2
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -201,6 +201,7 @@ LineRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 1}
@@ -259,7 +260,6 @@ LineRenderer:
     textureScale: {x: 1.8, y: 1.8}
     shadowBias: 0.5
     generateLightingData: 0
-  m_MaskInteraction: 0
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
@@ -5021,7 +5021,7 @@ ParticleSystem:
     vectorLabel1_3: W
 --- !u!199 &5327549866609598030
 ParticleSystemRenderer:
-  serializedVersion: 6
+  serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5067,6 +5067,7 @@ ParticleSystemRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_RenderMode: 0
   m_MeshDistribution: 0
   m_SortMode: 0
@@ -5098,7 +5099,6 @@ ParticleSystemRenderer:
   m_MeshWeighting1: 1
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
-  m_MaskInteraction: 0
 --- !u!1 &2201096066739471924
 GameObject:
   m_ObjectHideFlags: 0
@@ -5218,6 +5218,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &3409113424161998415
 GameObject:
@@ -5273,7 +5274,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 807deb6d2f915bc49b2b2f2f6541e2c4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WaterTower
-  interactable: {fileID: 4225296494058978762}
+  interactable: {fileID: 2068834437733981031}
   waterLevel: {fileID: 7095985931290249254}
   maxDistance: 3.6
   spoutTransform: {fileID: 7407941332413433582}
@@ -5323,10 +5324,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c09d14bdc42a11245a7400fd9c9992b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
+  ShowTopMostFoldoutHeaderGroup: 1
   healthType: 0
-  health: 5000
+  startingHealth: 5000
   maxHealth: 12000
   audioOnDamageTaken: 
+  origin: {fileID: 0}
+  invulnerable: 0
+  clientSideDamage: 0
+  onTakeDamage:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &6981157680991006243
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5340,13 +5348,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HealthDisplay
   healthTarget: {fileID: 7095985931290249254}
-  displayTransform: {fileID: 5579018252406747887}
-  displayType: 0
-  disableTransformOnZero: 0
-  startTransform: {fileID: 8291051598708555966}
-  endTransform: {fileID: 6046434297067922822}
-  startSize: {x: 0, y: 0, z: 0}
-  endSize: {x: 0, y: 0, z: 0}
+  displayEntryList:
+  - displayType: 0
+    targetTransform: {fileID: 5579018252406747887}
+    startTransform: {fileID: 8291051598708555966}
+    endTransform: {fileID: 6046434297067922822}
+    startSize: {x: 0, y: 0, z: 0}
+    endSize: {x: 0, y: 0, z: 0}
+    healthRange: {x: 0, y: 0}
 --- !u!1 &4624828873301134550
 GameObject:
   m_ObjectHideFlags: 0
@@ -5466,6 +5475,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &5077421889492929904
 GameObject:
@@ -5555,6 +5565,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &6107014801949666537
 GameObject:
@@ -5590,7 +5601,7 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!120 &8094028877502515942
 LineRenderer:
-  serializedVersion: 2
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -5636,6 +5647,7 @@ LineRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
   - {x: 0, y: 0, z: 1}
@@ -5694,7 +5706,6 @@ LineRenderer:
     textureScale: {x: 1.8, y: 1.8}
     shadowBias: 0.5
     generateLightingData: 0
-  m_MaskInteraction: 0
   m_UseWorldSpace: 1
   m_Loop: 0
   m_ApplyActiveColorSpace: 1
@@ -5820,6 +5831,7 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
+  m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!64 &3549743216407402640
 MeshCollider:

@@ -16,11 +16,11 @@ public class ItemBucket : Item
     private bool filled;
     public override bool TryEquipping(Player targetPlayer = null, bool sendRpc = true)
     {
-        bool equiped = base.TryEquipping();
+        bool equiped = base.TryEquipping(targetPlayer,sendRpc);
 
-        if (equiped && Player.localPlayer.inventory.tool == this)
+        if (equiped)
         {
-            ToolAnimationInfo toolAnimInfo = PlayerAvatar.active.GetAnimationInfo();
+            ToolAnimationInfo toolAnimInfo = targetPlayer.avatar.GetAnimationInfo();
             toolAnimInfo.animatedObject.transform.GetChild(0).Find("BucketFluid").gameObject.SetActive(filled);
         }
 
@@ -43,7 +43,7 @@ public class ItemBucket : Item
 
     public void Fill()
     {
-        ToolAnimationInfo toolAnimInfo = PlayerAvatar.active.GetAnimationInfo();
+        ToolAnimationInfo toolAnimInfo = playerWhoHasItem.avatar.GetAnimationInfo();
         SoundManager.active.PlayAtPos(toolAnimInfo.animatedObject.transform.position, fillUpSound);
 
         toolAnimInfo.animatedObject.transform.GetChild(0).Find("BucketFluid").gameObject.SetActive(true);
@@ -53,7 +53,7 @@ public class ItemBucket : Item
     }
     public void Empty()
     {
-        ToolAnimationInfo toolAnimInfo = PlayerAvatar.active.GetAnimationInfo();
+        ToolAnimationInfo toolAnimInfo = playerWhoHasItem.avatar.GetAnimationInfo();
         SoundManager.active.PlayAtPos(toolAnimInfo.animatedObject.transform.position, emptySound);
 
         toolAnimInfo.animatedObject.transform.GetChild(0).Find("BucketFluid").gameObject.SetActive(false);

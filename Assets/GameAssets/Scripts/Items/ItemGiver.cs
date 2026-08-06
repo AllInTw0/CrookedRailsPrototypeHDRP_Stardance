@@ -1,43 +1,79 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class ItemGiver : Interactable
 {
+    private NetworkVariable<int> itemCount = new(writePerm: NetworkVariableWritePermission.Server);
+    private int clientCountDiff = 0;
+
+    private int GetItemCount()
+    {
+        return itemCount.Value + clientCountDiff;
+    }
     [Header("Item Giver")]
     [SerializeField]
     private ItemSO itemInfo;
     [SerializeField]
-    private int itemCount;
+    private int startingItemCount = 50;
     [SerializeField]
     private int maxGiveCount;
     [Header("Item Display")]
     [SerializeField]
     private ItemDisplay itemDisplay;
-    private void Start()
+    public override void OnNetworkSpawn()
     {
-        itemDisplay.SetTarget(itemCount);
+        if(IsServer)
+            itemCount.Value = startingItemCount;
+        UpdateVisual();
+        itemCount.OnValueChanged += CountChanged;
+    }
+
+    private void UpdateVisual()
+    {
+        itemDisplay.SetTarget(GetItemCount());
+    }
+    private void CountChanged(int previous, int current)
+    {
+        clientCountDiff = 0;
+        UpdateVisual();
     }
     public override bool Interact()
     {
         bool sucessfull = false;
-        if (itemCount > 0)
+        if (GetItemCount() > 0)
         {
-            Item item = Item.SpawnItem(itemInfo, Vector3.zero, Quaternion.identity, Mathf.Min(maxGiveCount, itemCount));
+            GiveItemServerRpc(NetworkManager.Singleton.LocalClientId);
+            //if(IsServer == false)
+                //clientCountDiff -= Mathf.Min(maxGiveCount, GetItemCount());
 
-            sucessfull = Player.localPlayer.inventory.TryEquipping(item);
-
-            int countGiven = maxGiveCount;
-            Debug.Log(Player.localPlayer.inventory.items.Contains(item) + ": " + item.count);
-            if (Player.localPlayer.inventory.items.Contains(item) == false)
-            {
-                countGiven -= item.count;
-                Destroy(item.gameObject);
-            }
-
-            itemCount -= countGiven;
-            itemDisplay.SetTarget(itemCount);
+            UpdateVisual();
+            sucessfull = true;
         }
 
         SoundManager.active.PlayAtPos(iconPosition.position, interactSound);
         return sucessfull;
+    }
+
+    [Rpc(SendTo.Server)]
+    private void GiveItemServerRpc(ulong clientID)
+    {
+        if (GetItemCount() > 0)
+        {
+            Player targetPlayer = Player.GetPlayerByClientID(clientID);
+            
+            Item item = Item.SpawnItem(itemInfo, Vector3.zero, Quaternion.identity, Mathf.Min(maxGiveCount, GetItemCount()));
+
+            item.TryEquipping(targetPlayer,true);
+
+            int countGiven = maxGiveCount;
+            Debug.Log(targetPlayer.inventory.items.Contains(item) + ": " + item.count);
+            if (targetPlayer.inventory.items.Contains(item) == false)
+            {
+                countGiven -= item.count;
+                item.DestroyItem();
+            }
+
+            itemCount.Value -= countGiven;
+        }
     }
 }

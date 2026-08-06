@@ -291,15 +291,15 @@ public class RailCar : NetworkBehaviour
     {
         if (currentCargo != null && currentCargo.cargoObject != null)
         {
-            currentCargo.cargoObject.GetComponent<NetworkObject>().Despawn();
+            currentCargo.cargoObject.GetComponent<NetworkObject>().Despawn(true);
         }
         
-        GetComponent<NetworkObject>().Despawn();
+        GetComponent<NetworkObject>().Despawn(true);
     }
 
     public override void OnDestroy()
     {
-        if (IsServer == false)
+        if (IsServer == false && linkedTrain != null)
         {
             List<RailCar> newConsist = linkedTrain.GetConsist();
             newConsist.Remove(this);

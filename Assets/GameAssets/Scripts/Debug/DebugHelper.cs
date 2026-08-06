@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class DebugHelper : MonoBehaviour
 {
@@ -19,6 +20,23 @@ public class DebugHelper : MonoBehaviour
     public bool debugHealth;
     public bool debugEnemies;
     public bool debugTrain;
+
+    private void Update()
+    {
+        if (Keyboard.current[Key.P].wasPressedThisFrame)
+        {
+            debugHealth = !debugHealth;
+        }
+        if (Keyboard.current[Key.O].wasPressedThisFrame)
+        {
+            debugEnemies = !debugEnemies;
+        }
+        if (Keyboard.current[Key.I].wasPressedThisFrame)
+        {
+            debugTrain = !debugTrain;
+        }
+    }
+
     private void OnGUI()
     {
         Camera playerCam = PlayerCamera.active.GetComponent<Camera>();

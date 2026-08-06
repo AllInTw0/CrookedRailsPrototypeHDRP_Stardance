@@ -25,8 +25,8 @@ public class HealthKit : Item
                 {
                     Player.localPlayer.inventory.UnEquipTool();
                     healSoundSource.Stop();
-                    PlayerHealth.active.TakeDamage(-healAmmount);
-                    Destroy(gameObject);
+                    Player.localPlayer.health.TakeDamage(-healAmmount);
+                    DestroyItem();
                     time = -99f;
                     return;
                 }

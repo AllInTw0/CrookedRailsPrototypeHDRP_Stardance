@@ -99,9 +99,9 @@ public class Item : NetworkBehaviour
             DisablePhysics();
             onPickedUp.Invoke();
             MovingPlatformManager.active.RemoveEntry(transform);
-            if (sendRpc && targetPlayer == Player.localPlayer)
+            if (sendRpc)
             {
-                EquipItemServerRpc();
+                EquipItemServerRpc(targetPlayer.OwnerClientId);
             }
             return true;
         }
@@ -109,12 +109,12 @@ public class Item : NetworkBehaviour
     }
     //Equipping Multiplayer
     [Rpc(SendTo.Server)]
-    private void EquipItemServerRpc(RpcParams receiveParams = default)
+    private void EquipItemServerRpc(ulong clientID)
     {
-        Player senderPlayer = Player.GetPlayerByClientID(receiveParams.Receive.SenderClientId);
-        if (playerWhoHasItem == senderPlayer || TryEquipping(senderPlayer, false))
+        Player targetPlayer = Player.GetPlayerByClientID(clientID);
+        if (playerWhoHasItem == targetPlayer || TryEquipping(targetPlayer, false))
         {
-            EquipItemClientRpc(receiveParams.Receive.SenderClientId);
+            EquipItemClientRpc(clientID);
             Debug.Log("[Item Server] Server Agrees On Equip");
         }
         else
@@ -359,8 +359,30 @@ public class Item : NetworkBehaviour
         return item;
     }
 
+    public void DestroyItem()
+    {
+        DestroyItemServerRpc();
+        
+        if(IsServer == false)
+            Destroy(gameObject);
+    }
+
+    [Rpc(SendTo.Server)]
+    private void DestroyItemServerRpc()
+    {
+        NetworkObject.Despawn(true);
+    }
+    
     public override void OnDestroy()
     {
+        if (playerWhoHasItem)
+        {
+            if (playerWhoHasItem.inventory.tool == this)
+                playerWhoHasItem.inventory.UnEquipTool();
+            else
+                playerWhoHasItem.inventory.UnEquipItem(this);
+        }
+
         transform.position = Vector3.zero;
         //ItemManager.RemoveItem(this);
     }

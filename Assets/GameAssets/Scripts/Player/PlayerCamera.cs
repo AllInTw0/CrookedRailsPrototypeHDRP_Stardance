@@ -104,7 +104,7 @@ public class PlayerCamera : MonoBehaviour
             if (Cursor.lockState != CursorLockMode.None)
                 Cursor.lockState = CursorLockMode.None;
 
-            GameObject ragdoll = PlayerHealth.active.ragdoll;
+            GameObject ragdoll = Player.localPlayer.health.ragdoll;
             Vector3 ragdollPosition = ragdoll.GetComponentInChildren<Rigidbody>().transform.position;
 
             if (ragdollCamPos == Vector3.zero)

@@ -500,7 +500,12 @@ public class GenerationManager : NetworkBehaviour
         GameStateManager.currentLevel.Value = 0;
 
         TerrainGeneration.Chunk chunk = terrainGeneration.FindFittingChunk(0.5f, 0.6f, 3f, -2f, Vector2Int.zero, 5);
- 
+
+        if (chunk == null)
+        {
+            chunk = terrainGeneration.CreateOrGetChunk(Vector2Int.zero);
+        }
+        
         Vector3 pos = chunk.GetWorldPos(0.5f, 1f);
         if (pos.y < 0f)
             pos.y = 0f;

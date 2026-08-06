@@ -15,10 +15,21 @@ public enum HealthType
 
 public class Health : NetworkBehaviour
 {
-    private int health;
+    private NetworkVariable<HealthNetworkData> healthNetworkData = new(writePerm: NetworkVariableWritePermission.Server);
+    public struct HealthNetworkData : INetworkSerializable
+    {
+        public int health;
+        public Vector3 force;
+        
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref health);
+            serializer.SerializeValue(ref force);
+        }
+    }
     public int GetHealth()
     {
-        return health - clientSideDamage;
+        return healthNetworkData.Value.health - clientSideDamage;
     }
     
     [Header("Health")]
@@ -43,23 +54,46 @@ public class Health : NetworkBehaviour
     private void Start()
     {
         AddHealthToGlobalList();
-        NetworkManager.Singleton.OnConnectionEvent += OnConnection;
     }
 
-    private void OnConnection(NetworkManager networkManager, ConnectionEventData connectionEventData)
+    private void HealthChanged(HealthNetworkData previous, HealthNetworkData current)
     {
-        if (IsServer && connectionEventData.ClientId != NetworkManager.Singleton.LocalClientId)
+        InvokeEvents(previous.health - clientSideDamage, current.health, current.force);
+        clientSideDamage = 0;
+    }
+
+    private void InvokeEvents(int previousHealth, int currentHealth, Vector3 currentForce)
+    {
+        
+        onTakeDamage.Invoke(previousHealth - currentHealth, currentForce);
+
+        
+        if (previousHealth > currentHealth)
         {
-            //Client connected. Send health
-            Debug.Log("Sending health to client");
-            SetHealthRpc(health);
+            if (audioOnDamageTaken != "")
+                SoundManager.active.PlayAtPos(transform.position,audioOnDamageTaken);
+        }
+        
+        if (previousHealth > 0 && currentHealth <= 0)
+        {
+            HealthReachedZero(currentForce);
         }
     }
-
     public override void OnNetworkSpawn()
     {
-        if(IsServer)
-            SetHealthRpc(startingHealth);
+        healthNetworkData.OnValueChanged += HealthChanged;
+        
+        if (IsServer)
+        {
+            healthNetworkData.Value = new HealthNetworkData()
+            {
+                health = startingHealth
+            };
+        }
+        else
+        {
+            InvokeEvents(GetHealth(), GetHealth(), Vector3.zero);
+        }
     }
 
     public void AddHealthToGlobalList()
@@ -85,13 +119,19 @@ public class Health : NetworkBehaviour
         if (GetHealth() == 0 && damage > 0)
             return 0;
 
+        int previousHealth = GetHealth();
+        
         int damageRounded = Mathf.RoundToInt(damage);
         int damageDone = ClampDamage(damageRounded);
+        
         Debug.Log(damageRounded+","+damageDone + "," + GetHealth());
+        
         damageSum += damageDone;
         if(IsServer == false)
             clientSideDamage += damageDone;
         forceSum += force;
+        
+        InvokeEvents(previousHealth, GetHealth(), force);
         
         return damageDone;
     }
@@ -99,34 +139,14 @@ public class Health : NetworkBehaviour
     private void TakeDamageServerRpc(int damage, Vector3 force = default)
     {
         damage = ClampDamage(damage);
-        
-        health -= damage;
 
-        SetHealthRpc(health, force);
-    }
-
-    [Rpc(SendTo.Everyone)]
-    private void SetHealthRpc(int target, Vector3 force = default)
-    {
-        clientSideDamage = 0;
-        
-        int previousHealth = health;
-        health = target;
-
-        onTakeDamage.Invoke(previousHealth - health,force);
-
-        
-        if (previousHealth > health)
+        healthNetworkData.Value = new HealthNetworkData()
         {
-            if (audioOnDamageTaken != "")
-                SoundManager.active.PlayAtPos(transform.position,audioOnDamageTaken);
-        }
-        
-        if (previousHealth > 0 && health <= 0)
-        {
-            HealthReachedZero(force);
-        }
+            health = GetHealth() - damage,
+            force = force
+        };
     }
+    
     private int ClampDamage(int damage)
     {
         Vector2Int minMax = new Vector2Int(0, maxHealth);

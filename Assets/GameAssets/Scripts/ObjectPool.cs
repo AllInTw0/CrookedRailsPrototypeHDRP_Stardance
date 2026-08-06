@@ -33,20 +33,23 @@ public class ObjectPool
 
     public GameObject Get()
     {
-        if(poolList.Count > 0)
+        while(poolList.Count > 0)
         {
             GameObject pooledObject = poolList[poolList.Count - 1];
             poolList.RemoveAt(poolList.Count - 1);
-            return pooledObject;
+            
+            if(pooledObject != null)
+                return pooledObject;
         }
-        else
-        {
-            return InstantiatePrefab();
-        }
+
+        return InstantiatePrefab();
     }
 
     public void Add(GameObject gameObject)
     {
+        if(gameObject == null)
+            return;
+        
         if(poolList.Count < maxCapacity)
         {
             poolList.Add(gameObject);

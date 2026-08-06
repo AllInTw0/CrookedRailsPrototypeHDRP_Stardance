@@ -64,7 +64,10 @@ public class EnemyDamageCollider : MonoBehaviour
     IEnumerator DamageDelayed(Health healthScript, float damage, Vector3 force, float delay)
     {
         yield return new WaitForSeconds(delay);
-        healthScript.TakeDamage(damage,force);
+        
+        if(enemyBehaviour.IsOwner) healthScript.TakeDamage(damage,force);
+        
         SoundManager.active.PlayAtPos(transform.position,attackImpactSoundName);
+        
     }
 }

@@ -469,13 +469,16 @@ public class TerrainGeneration : NetworkBehaviour
         private void SpawnFoliageAtPos(Vector3 pos)
         {
             //Check distance from track
+            float noise = foliageNoise.SampleNoise(pos.x, pos.z);
             TrackManager.active.GetClosestTrackSection(pos, out TrackSection trackSection, out float distance);
             float dist = TrackManager.active.GetDistanceFromPath(trackSection.path, pos);
-            if (foliageNoise.SampleNoise(pos.x,pos.z) > active.foliageSpawnProbability_DistanceFromTrack.Evaluate(dist))
+            if (noise > active.foliageSpawnProbability_DistanceFromTrack.Evaluate(dist))
                 return;
 
+            System.Random rng = new System.Random(Mathf.RoundToInt(noise * 1000));
+            
             //Debug.DrawLine(pos, pos + Vector3.up * 20f, Color.coral, 60f);
-            Vector2 randomDir = Random.insideUnitCircle;
+            Vector2 randomDir = new Vector2((float)rng.NextDouble() * 2f - 1f, (float)rng.NextDouble() * 2f - 1f);
             pos += new Vector3(randomDir.x * active.foliageDensity, 0, randomDir.y * active.foliageDensity);
 
             if (Physics.SphereCast(new Vector3(pos.x, 50f, pos.z), 2.5f, Vector3.down, out RaycastHit hit, 75f, active.foliageRaycastLayerMask))
@@ -501,7 +504,7 @@ public class TerrainGeneration : NetworkBehaviour
                 }
                 
                 
-                FoliageData foliageData = active.foliageProbabilityList.PickNext();
+                FoliageData foliageData = active.foliageProbabilityList.PickNext(true,Mathf.RoundToInt(foliageNoise.SampleNoise(pos.x,pos.z) * 10000));
                 if (foliageData == null) return;
                 
                 
@@ -511,7 +514,7 @@ public class TerrainGeneration : NetworkBehaviour
                     Mathf.Clamp(copy.position.y, foliageData.heightClamp.x, foliageData.heightClamp.y),
                     copy.position.z);
                 
-                copy.rotation = Quaternion.Euler(Random.Range(-5f, 5f), Random.Range(0f, 360f), Random.Range(-5f, 5f));
+                copy.rotation = Quaternion.Euler(rng.Next(-5,5), rng.Next(0,360), rng.Next(-5,5));
 
                 if (poolDictionary.TryGetValue(foliageData.objectPool, out List<GameObject> objectList))
                 {

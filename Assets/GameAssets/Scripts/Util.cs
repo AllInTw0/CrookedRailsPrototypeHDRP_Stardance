@@ -216,11 +216,11 @@ public static class Util
         {
             probabilitySum += addition;
         }
-        public T PickNext(bool increasePickCount = true)
+        public T PickNext(bool increasePickCount = true, int seed = -1)
         {
             if (probabilityList.Count == 0) return default(T);
 
-            float randomProbability = Random.Range(0f, probabilitySum);
+            float randomProbability = seed == -1 ? Random.Range(0f, probabilitySum) : (float)new System.Random(seed).NextDouble() * probabilitySum;
             //`Debug.Log("randomProbability: " + randomProbability+", max: " + probabilitySum);
             for (int i = 0; i < probabilityList.Count; i++)
             {

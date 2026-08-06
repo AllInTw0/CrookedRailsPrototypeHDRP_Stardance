@@ -51,7 +51,7 @@ public class InventoryUI : MonoBehaviour
 
     private void Update()
     {
-        if (itemSlots.Count < Player.localPlayer.inventory.slotCount)
+        if (itemSlots.Count < Player.localPlayer.inventory.GetSlotCount())
         {
             AddItemSlot();
         }

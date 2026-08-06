@@ -103,7 +103,7 @@ public class Sell : NetworkBehaviour
             sum += entry.GetAllItemValue();
             foreach (Item item in entry.linkedItemList)
             {
-                Destroy(item.gameObject);
+                item.DestroyItem();
             }
         }
         

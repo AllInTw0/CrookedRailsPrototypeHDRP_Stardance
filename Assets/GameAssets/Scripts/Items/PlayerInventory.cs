@@ -6,13 +6,19 @@ using Random = UnityEngine.Random;
 
 public class PlayerInventory : NetworkBehaviour
 {
-   
+    private NetworkVariable<int> slotCount = new (writePerm:NetworkVariableWritePermission.Server);
+
+    public int GetSlotCount()
+    {
+        return slotCount.Value;
+    }
+    
     [NonSerialized]
     public Item tool; //The hand held item
     [NonSerialized]
     public List<Item> items = new List<Item>(); //Items in inventory
     
-    public int slotCount = 3;
+    public int startingSlotCount = 3;
     private int filledSlots = 0;
     
     [NonSerialized]
@@ -20,6 +26,12 @@ public class PlayerInventory : NetworkBehaviour
 
     [NonSerialized] 
     public Player player;
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsServer)
+            slotCount.Value = startingSlotCount;
+    }
 
     private void Update()
     {
@@ -91,7 +103,7 @@ public class PlayerInventory : NetworkBehaviour
             }
         }
         
-        if(item.itemInfo.slotCount <= (slotCount - filledSlots))
+        if(item.itemInfo.slotCount <= (GetSlotCount() - filledSlots))
         {
             EquipAsItem(item);
             return true;
@@ -269,10 +281,10 @@ public class PlayerInventory : NetworkBehaviour
                 selectIndex = 1; 
         }
     }
-    [Rpc(SendTo.Everyone)]
+    [Rpc(SendTo.Server)]
     public void ModifySlotCountRpc(int amount)
     {
-        slotCount = amount;
+        slotCount.Value += amount;
     }
     public void UnEquipAll()
     {

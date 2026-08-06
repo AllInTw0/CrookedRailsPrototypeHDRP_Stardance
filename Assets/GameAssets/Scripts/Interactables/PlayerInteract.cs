@@ -30,7 +30,7 @@ public class PlayerInteract : MonoBehaviour
 
     void Update()
     {
-        if (PlayerHealth.active.isAlive == false)
+        if (Player.localPlayer.health.isAlive == false)
         {
             if(currentTarget != null)
                 StopInteracting();

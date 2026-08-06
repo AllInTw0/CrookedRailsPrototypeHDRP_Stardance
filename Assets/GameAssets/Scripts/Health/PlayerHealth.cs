@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class PlayerHealth : Health
 {
-    public static PlayerHealth active;
     [Header("Player")] 
     [SerializeField] 
     private GameObject ragdollPrefab;
@@ -34,7 +33,6 @@ public class PlayerHealth : Health
     private float timeSinceDammageTick;
     private void Start()
     {
-        active = this;
         isAlive = true;
         AddHealthToGlobalList();
         onTakeDamage.AddListener((float damage, Vector3 force) => {

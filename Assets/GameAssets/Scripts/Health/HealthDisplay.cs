@@ -44,12 +44,12 @@ public class HealthDisplay : MonoBehaviour
         {
             if (entry.displayType == DisplayType.Position)
             {
-                float time = healthTarget.GetHealth() / healthTarget.maxHealth;
+                float time = (float)healthTarget.GetHealth() / healthTarget.maxHealth;
                 entry.targetTransform.position = Vector3.Lerp(entry.startTransform.position, entry.endTransform.position, time);
             }
             else if (entry.displayType == DisplayType.Scale)
             {
-                float time = healthTarget.GetHealth() / healthTarget.maxHealth;
+                float time = (float)healthTarget.GetHealth() / healthTarget.maxHealth;
                 entry.targetTransform.localScale = Vector3.Lerp(entry.startSize, entry.endSize, time);
             }
             else if(entry.displayType == DisplayType.Enable)

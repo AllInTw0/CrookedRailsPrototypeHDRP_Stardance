@@ -79,7 +79,7 @@ public class Enemy : NetworkBehaviour
         if (IsServer)
         {
             Transform target = GetComponent<PathFindingGroundMovement>().GetTargetTransform();
-            if (target.TryGetComponent(out Player player) && NetworkObject.OwnerClientId != player.OwnerClientId)
+            if (target && target.TryGetComponent(out Player player) && NetworkObject.OwnerClientId != player.OwnerClientId)
             {
                 NetworkObject.ChangeOwnership(player.OwnerClientId);
                 Debug.Log("Changed ownership");

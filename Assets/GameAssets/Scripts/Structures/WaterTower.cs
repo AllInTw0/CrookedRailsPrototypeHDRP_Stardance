@@ -1,10 +1,11 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class WaterTower : MonoBehaviour
 {
     //Variables
     [SerializeField]
-    private EventInteractable interactable;
+    private LeverInteractable interactable;
     [SerializeField]
     private Health waterLevel;
     [SerializeField]
@@ -36,8 +37,7 @@ public class WaterTower : MonoBehaviour
     //Run time
     private Vector3 originalWaterSize;
     private float waterSize;
-
-    private bool lowered;
+    
     private float timeSinceLowered;
 
     private float spoutRotY;
@@ -48,6 +48,21 @@ public class WaterTower : MonoBehaviour
         originalWaterSize = waterTransform.localScale;
         waterMesh.enabled = false;
         waterParticle.gameObject.SetActive(false);
+        
+        interactable.interactEvent.AddListener(()=>
+        {
+            if (IsLowered())
+                interactable.actionName = "Raise";
+            else
+                interactable.actionName = "Lower";
+            
+            timeSinceLowered = 0f;
+        });
+    }
+
+    private bool IsLowered()
+    {
+        return interactable.GetCurrentNotch() == 1;
     }
     private void LateUpdate()
     {
@@ -63,13 +78,13 @@ public class WaterTower : MonoBehaviour
         if (Tender.active == null)
             return;
 
-        if (lowered)
+        if (IsLowered())
             timeSinceLowered += Time.deltaTime;
 
         float distance = Vector2.Distance(new Vector2(spoutTransform.position.x, spoutTransform.position.z), new Vector2(Tender.active.waterHatch.position.x, Tender.active.waterHatch.position.z));
         bool fillWater = false;
 
-        if(distance > maxDistance || lowered == false || Tender.active.IsHatchOpen() == false)
+        if(distance > maxDistance || IsLowered() == false || Tender.active.IsHatchOpen() == false)
         {
             spoutRotY = Quaternion.Slerp(Quaternion.Euler(0, spoutRotY, 0), transform.rotation, Time.deltaTime * spoutSpeed).eulerAngles.y;
             fillWater = false;
@@ -100,11 +115,11 @@ public class WaterTower : MonoBehaviour
                 waterParticle.gameObject.SetActive(true);
 
             //Add water
-            if(waterSize > 0.5f)
+            if(waterSize > 0.5f && NetworkManager.Singleton.IsServer)
             {
                 float change = fillSpeed * Time.deltaTime;
                 change = Mathf.Clamp(change, 0f, Mathf.Min(Tender.active.waterLevel.maxHealth - Tender.active.waterLevel.GetHealth(), waterLevel.GetHealth()));
-
+                
                 Tender.active.waterLevel.TakeDamage(-change);
                 waterLevel.TakeDamage(change);
             }
@@ -121,17 +136,5 @@ public class WaterTower : MonoBehaviour
             if (waterParticle.gameObject.activeSelf)
                 waterParticle.gameObject.SetActive(false);
         }
-    }
-    public void Interact()
-    {
-        lowered = !lowered;
-
-        if (lowered)
-            interactable.actionName = "Raise";
-        else
-            interactable.actionName = "Lower";
-
-        animator.SetBool("lowered", lowered);
-        timeSinceLowered = 0f;
     }
 }

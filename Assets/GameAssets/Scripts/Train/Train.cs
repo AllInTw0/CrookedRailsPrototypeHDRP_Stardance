@@ -15,6 +15,19 @@ public class Train : NetworkBehaviour
         public TrainStatType consumptionRate;
         public Health targetHealth;
         public string fuelName;
+
+        public float depletion;
+        public void Deplete(float value)
+        {
+            depletion += value;
+            int intDepletion = Mathf.FloorToInt(depletion);
+            if (intDepletion > 0)
+            {
+                depletion -= intDepletion;
+                targetHealth.TakeDamage(intDepletion);
+            }
+
+        }
     }
 
     //Variables
@@ -194,11 +207,12 @@ public class Train : NetworkBehaviour
         
  
         //Fuel
+        Debug.Log("Consume fuel: " + consumeFuel);
         if(IsServer && consumeFuel && acceleration > 0f && (controlls == null || controlls.currentState.Value == LocomotiveControls.State.normal))
         {
             foreach (FuelSource fuelSource in fuelSourceList)
             {
-                fuelSource.targetHealth.TakeDamage(Mathf.Abs(distanceTravelled) * TrainUpgradeHandler.active.GetStatValue(fuelSource.consumptionRate));
+                fuelSource.Deplete(Mathf.Abs(distanceTravelled) * TrainUpgradeHandler.active.GetStatValue(fuelSource.consumptionRate));
                 //Not having enough fuel handles LocomotiveControls.cs
             }
         }
