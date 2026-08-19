@@ -49,6 +49,9 @@ public class HaulingJobMonitorHandler : NetworkBehaviour
     {
         if (IsServer)
         {
+            if(previous.state == State.Welcome && current.state == State.Stats)
+                Player.ReviveDeadPlayers();
+            
             if (previous.state == State.Stats && current.state == State.ChooseHaulingJob)
             {
                 Debug.Log("Reciept");

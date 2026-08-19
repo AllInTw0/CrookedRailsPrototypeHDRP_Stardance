@@ -315,7 +315,13 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventEveryone:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventServer:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &8173942383336385617
@@ -448,7 +454,13 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventEveryone:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventServer:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &1217925513164619411
@@ -1087,7 +1099,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1257274604
+  GlobalObjectIdHash: 4045832240
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1331,7 +1343,7 @@ GameObject:
   - component: {fileID: 8944107400590727972}
   m_Layer: 15
   m_Name: Collisison_Exploded
-  m_TagString: Untagged
+  m_TagString: Moving
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

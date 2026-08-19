@@ -23,11 +23,28 @@ public class Item : NetworkBehaviour
     //[SerializeField] 
     [NonSerialized]
     public Collider interactableCollider;
+    
+    private NetworkVariable<int> count = new(writePerm: NetworkVariableWritePermission.Server);
+    [SerializeField]
+    private int spawnCount = 1;
+    public void SetSpawnCount(int value)
+    {
+        spawnCount = value;
+    }
 
-    public int count = 1;
+    public int GetCount()
+    {
+        return count.Value;
+    }
 
+    [Rpc(SendTo.Server)]
+    public void SetCountServerRpc(int value)
+    {
+        count.Value = value;
+    }
     //Run time
-    private EventInteractable eventInteractable;
+    [NonSerialized]
+    public EventInteractable eventInteractable;
     
     [HideInInspector]
     public bool falling;
@@ -47,6 +64,18 @@ public class Item : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         //ItemManager.AddItem(this);
+        if(IsServer)
+            SetCountServerRpc(spawnCount);
+
+        count.OnValueChanged += CountChanged;
+    }
+
+    private void CountChanged(int previous, int current)
+    {
+        if (playerWhoHasItem == Player.localPlayer)
+        {
+            InventoryUI.active.UpdateItemIcons();
+        }
     }
 
     public virtual void Awake()
@@ -101,7 +130,8 @@ public class Item : NetworkBehaviour
             MovingPlatformManager.active.RemoveEntry(transform);
             if (sendRpc)
             {
-                EquipItemServerRpc(targetPlayer.OwnerClientId);
+                if(IsSpawned && isActiveAndEnabled) // When picking up a Stackable item it gets destroyed by the server and the server increases the count of another item
+                    EquipItemServerRpc(targetPlayer.OwnerClientId);
             }
             return true;
         }
@@ -114,6 +144,7 @@ public class Item : NetworkBehaviour
         Player targetPlayer = Player.GetPlayerByClientID(clientID);
         if (playerWhoHasItem == targetPlayer || TryEquipping(targetPlayer, false))
         {
+            NetworkObject.ChangeOwnership(clientID);
             EquipItemClientRpc(clientID);
             Debug.Log("[Item Server] Server Agrees On Equip");
         }
@@ -150,6 +181,9 @@ public class Item : NetworkBehaviour
                 else
                     playerWhoHasItem.inventory.UnEquipItem(this);
             }
+            
+            NetworkObject.ChangeOwnership(NetworkManager.ServerClientId);
+            
             Debug.Log("[Item Server] Server Agrees On UnEquip");
         }
         else
@@ -180,12 +214,13 @@ public class Item : NetworkBehaviour
     private void Update()
     {
         UpdateItem();
-        if (itemInfo.maxCount > 1)
-            eventInteractable.SetObjectNameOverride(eventInteractable.objectName + " [" + count + "]");
     }
 
     public void UpdateItem()
     {
+        if (itemInfo.maxCount > 1)
+            eventInteractable.SetObjectNameOverride(eventInteractable.objectName + " [" + GetCount() + "]");
+        
         if (physicsEnabled)
         {
             falling = false;
@@ -338,11 +373,6 @@ public class Item : NetworkBehaviour
     {
         return physicsEnabled;
     }
-    [Rpc(SendTo.Everyone)]// Could be temp. Might need to convert count to a NetworkVariable with client side prediction if it somehow goes of sync
-    private void SetCountRpc(int value)
-    {
-        count = value;
-    }
     public static Item SpawnItem(ItemSO itemSO, Vector3 pos, Quaternion rot, int stackCount = 1, bool dropSound = true)
     {
         
@@ -350,11 +380,12 @@ public class Item : NetworkBehaviour
 
         Item item = copy.GetComponent<Item>();
         
+        item.SetSpawnCount(Mathf.Clamp(stackCount, 1, item.itemInfo.maxCount));
+        
         NetworkObject networkObject = copy.GetComponent<NetworkObject>();
         networkObject.Spawn(true);
         
         item.DropFromPosRpc(pos, dropSound);
-        item.SetCountRpc(Mathf.Clamp(stackCount, 1, item.itemInfo.maxCount));
 
         return item;
     }

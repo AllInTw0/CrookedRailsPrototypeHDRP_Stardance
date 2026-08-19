@@ -146,10 +146,13 @@ public class EnemyManager : MonoBehaviour
             float dist = Vector3.Distance(Player.localPlayer.transform.position, enemyList[i].transform.position);
             if(dist > maxDistanceFromPlayer)
             {
-                Destroy(enemyList[i].gameObject);
-                enemyList.RemoveAt(i);
-                i--;
-                Debug.Log("Enemy To Far! Destroying");
+                if (NetworkManager.Singleton.IsServer)
+                {
+                    enemyList[i].NetworkObject.Despawn(true);
+                    enemyList.RemoveAt(i);
+                    i--;
+                    Debug.Log("Enemy To Far! Destroying");
+                }
             }
             else
                 enemyList[i].UpdateCall();

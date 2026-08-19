@@ -207,7 +207,21 @@ public class Player : NetworkBehaviour
         if (IsOwner) return camera.rotationX;
         return rotX;
     }
-    
+
+    public void GetCameraVectors(out Vector3 origin, out Vector3 dir)
+    {
+        if (IsOwner)
+        {
+            origin = PlayerCamera.active.transform.position;
+            dir = PlayerCamera.active.transform.forward;
+        }
+        else
+        {
+            origin = transform.position + Vector3.up * movement.cameraStandingHeight;
+            dir = Quaternion.AngleAxis(orientation.rotation.eulerAngles.y, Vector3.up) *
+                  (Quaternion.AngleAxis(GetRotX(), Vector3.right) * Vector3.forward);
+        }
+    }
     public struct PlayerNetworkData : INetworkSerializable
     {
         public Vector3 position;
@@ -247,5 +261,25 @@ public class Player : NetworkBehaviour
         }
         Debug.LogWarning("Couldn't find player by ID: " + clientID);
         return null;
+    }
+
+    public static List<Player> GetDeadPlayers()
+    {
+        List<Player> deadList = new List<Player>();
+        foreach (Player player in playerList)
+        {
+            if(player.health.isAlive == false)
+                deadList.Add(player);
+        }
+        return deadList;
+    }
+
+    public static void ReviveDeadPlayers(int reviveHealth = 50)
+    {
+        foreach (Player player in GetDeadPlayers())
+        {
+            player.health.TakeDamage(-reviveHealth);
+            player.health.ReviveRpc();
+        }
     }
 }

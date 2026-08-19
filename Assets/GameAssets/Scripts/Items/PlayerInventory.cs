@@ -67,21 +67,28 @@ public class PlayerInventory : NetworkBehaviour
             {
                 Item toolRefrence = tool == null ? null : UnEquipTool();
                 Item newTool = UnEquipItem(items[selectIndex - 1]);
-
-                if (newTool != null)
-                    newTool.TryEquipping();
-                if (toolRefrence != null)
-                    toolRefrence.TryEquipping();
-
-                //TryEquipping(newTool);
-                //TryEquipping(toolRefrence);
-
+                
+                SwapToolRpc(toolRefrence, newTool);
+                
                 selectIndex = items.Count;
                 UpdateSelectIndexInterval();
             }
         }
     }
-
+    [Rpc(SendTo.Everyone)]
+    private void SwapToolRpc(NetworkBehaviourReference _oldTool, NetworkBehaviourReference _newTool)
+    {
+        _oldTool.TryGet(out Item oldTool);
+        _newTool.TryGet(out Item newTool);
+        
+        if (oldTool == tool)
+            UnEquipTool();
+        UnEquipItem(newTool);
+        
+        TryEquipping(newTool);
+        if(oldTool)
+            TryEquipping(oldTool);
+    }
     public bool TryEquipping(Item item)
     {
         if(item.itemInfo.isTool && tool == null)
@@ -95,7 +102,7 @@ public class PlayerInventory : NetworkBehaviour
             //Stackable Item
             foreach (var equippedItem in items)
             {
-                if (equippedItem.itemInfo == item.itemInfo && equippedItem.count < equippedItem.itemInfo.maxCount)
+                if (equippedItem.itemInfo == item.itemInfo && equippedItem.GetCount() < equippedItem.itemInfo.maxCount)
                 {
                     EquipStackableItem(equippedItem, item);
                     return true;
@@ -143,27 +150,28 @@ public class PlayerInventory : NetworkBehaviour
     private void EquipStackableItem(Item equippedItem, Item item)
     {
         Debug.Log(item + " Equipped As Stackable Item");
-        
-        int sum = equippedItem.count + item.count;
-        if (sum <= equippedItem.itemInfo.maxCount)
-        {
-            equippedItem.count = sum;
-            item.count = 0;
-            MovingPlatformManager.active.RemoveEntry(item.transform);
-            if(IsOwner) PlayerInteract.active.StopInteracting();
-            Destroy(item.gameObject);
-        }
-        else
-        {
-            int leftover = sum - equippedItem.itemInfo.maxCount;
-            equippedItem.count = equippedItem.itemInfo.maxCount;
 
-            item.count = leftover;
+        if (IsServer)
+        {
+            int sum = equippedItem.GetCount() + item.GetCount();
+            if (sum <= equippedItem.itemInfo.maxCount)
+            {
+                equippedItem.SetCountServerRpc(sum);
+                MovingPlatformManager.active.RemoveEntry(item.transform);
+                if(IsOwner) PlayerInteract.active.StopInteracting();
+                item.DestroyItem();
+            }
+            else
+            {
+                int leftover = sum - equippedItem.itemInfo.maxCount;
+                equippedItem.SetCountServerRpc(equippedItem.itemInfo.maxCount);
+
+                item.SetCountServerRpc(leftover);
             
-            InteractIcon.active.Refresh();//Update the item.count on the interact icon
-            
-            item.playerWhoHasItem = player;
+                InteractIcon.active.Refresh();//Update the item.count on the interact icon
+            }
         }
+
         InventoryUI.active.UpdateItemIcons();
     }
     public Item UnEquipTool()
@@ -198,28 +206,33 @@ public class PlayerInventory : NetworkBehaviour
     }
     public Item UnEquipItem(Item item)
     {
-        items.Remove(item);
-        filledSlots -= item.itemInfo.slotCount;
-        
-        item.BecomeVisible();
+        if (items.Contains(item))
+        {
+            items.Remove(item);
+            filledSlots -= item.itemInfo.slotCount;
 
-        ItemSO itemInfo = item.itemInfo;
-        Transform orientation = Player.localPlayer.orientation;
-        item.transform.rotation = Quaternion.Euler(Random.Range(-90f, 90f), itemInfo.randomYRot ? Random.Range(0f, 360f) : orientation.eulerAngles.y, Random.Range(-90f, 90f));
-        item.DropFromPos(transform.position + Vector3.up + orientation.forward * itemInfo.dropOffset.z + orientation.up * itemInfo.dropOffset.y + orientation.right * itemInfo.dropOffset.x);
+            item.BecomeVisible();
 
-        item.playerWhoHasItem = null;
-        
-        if(selectIndex > items.Count)
-            selectIndex--;
-        UpdateSelectIndexInterval();
-        InventoryUI.active.UpdateItemIcons();
-        Debug.Log(item + " Dropped As Item");
+            ItemSO itemInfo = item.itemInfo;
+            Transform orientation = player.orientation;
+            item.transform.rotation = Quaternion.Euler(Random.Range(-90f, 90f),
+                itemInfo.randomYRot ? Random.Range(0f, 360f) : orientation.eulerAngles.y, Random.Range(-90f, 90f));
+            item.DropFromPos(transform.position + Vector3.up + orientation.forward * itemInfo.dropOffset.z +
+                             orientation.up * itemInfo.dropOffset.y + orientation.right * itemInfo.dropOffset.x);
+
+            item.playerWhoHasItem = null;
+
+            if (selectIndex > items.Count)
+                selectIndex--;
+            UpdateSelectIndexInterval();
+            InventoryUI.active.UpdateItemIcons();
+            Debug.Log(item + " Dropped As Item");
+        }
 
         return item;
     }
 
-    public bool RemoveItem(ItemSO itemInfo, out int itemCountRemoved, int targetCount = 1)
+    public bool RemoveItem(ItemSO itemInfo, out int itemCountRemoved, int targetCount = 1, bool changeCount = true)
     {
         itemCountRemoved = 0;
 
@@ -230,13 +243,14 @@ public class PlayerInventory : NetworkBehaviour
             if (item.itemInfo == itemInfo)
             {
                 int ammoToFind = targetCount - itemCountRemoved;
+                int count = item.GetCount();
                 for (int j = 0; j < ammoToFind; j++)
                 {
-                    item.count--;
+                    count--;
                     itemCountRemoved++;
-                    if (item.count <= 0)
+                    if (count <= 0 && changeCount)
                     {
-                        DestroyItem(item);
+                        item.DestroyItem();
                         i--;
                         break;
                     }
@@ -244,6 +258,8 @@ public class PlayerInventory : NetworkBehaviour
                     if (itemCountRemoved == targetCount)
                         break;
                 }
+                if(item && changeCount && item.IsSpawned) //IsSpawned cheks if item wasnt destroyed
+                    item.SetCountServerRpc(count);
             }
             if (itemCountRemoved == targetCount)
                 break;
@@ -290,11 +306,12 @@ public class PlayerInventory : NetworkBehaviour
     {
         if (tool != null)
         {
-            UnEquipTool();
+            tool.UnEquipItemServerRpc();
         }
-
+        
         while ( items.Count > 0)
         {
+            items[0].UnEquipItemServerRpc();
             UnEquipItem(items[0]);
         }
     }

@@ -146,7 +146,13 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventEveryone:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventServer:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &7304170566500177626
@@ -7968,7 +7974,13 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventEveryone:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventServer:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &4541297786568935606
@@ -8090,6 +8102,10 @@ PrefabInstance:
       propertyPath: objectName
       value: Sentry
       objectReference: {fileID: 0}
+    - target: {fileID: 3140944376010762303, guid: 221c75568a78042c8892ba8727f1af62, type: 3}
+      propertyPath: timeToInteract
+      value: 0.8
+      objectReference: {fileID: 0}
     - target: {fileID: 3751801714539862511, guid: 221c75568a78042c8892ba8727f1af62, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -8174,13 +8190,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Sentry
   ShowTopMostFoldoutHeaderGroup: 1
   itemInfo: {fileID: 11400000, guid: 1457224a86245a9478a0cd1917d563cf, type: 2}
-  count: 1
   falling: 0
   rotYTransform: {fileID: 1300975833585217093}
   rotYSpeed: 240
   rotXTransform: {fileID: 7341587407338015958}
   rotXSpeed: 240
   healthTypeFilterList: 03000000
+  raycastLayer:
+    serializedVersion: 2
+    m_Bits: 38307905
   maxDistance: 27.5
   maxAngleDiff: 2
   angleMode: 1
@@ -8207,7 +8225,6 @@ MonoBehaviour:
   itemInteractable: {fileID: 9102570108827747905}
   ammoFillInteractable: {fileID: 3503277982061666369}
   maxAmmoCount: 50
-  ammoCount: 0
   sentryHealth: {fileID: 4984717743948685180}
   destroyedSentryItem: {fileID: 11400000, guid: 9503d2b63f40dec4f997c459db0a86bd, type: 2}
   ammoRefillString: Shotgun Reload

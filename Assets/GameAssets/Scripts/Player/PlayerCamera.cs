@@ -49,6 +49,8 @@ public class PlayerCamera : MonoBehaviour
     private Vector3 shakeVelocity;
     private float shakeSpring;
     private float shakeDamp;
+
+    private float deathCamTime;
     
     //New Input Package
     private InputAction lookAction;
@@ -82,7 +84,7 @@ public class PlayerCamera : MonoBehaviour
             rotationX -= Settings.invertedY ? -lookInput.y * Settings.sensitivity : lookInput.y * Settings.sensitivity;
             rotationX = Mathf.Clamp(rotationX, minRotX, maxRotX);
             transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
-
+            
             player.orientation.rotation *= Quaternion.Euler(0, Settings.invertedX ? -lookInput.x * Settings.sensitivity : lookInput.x * Settings.sensitivity, 0);
         }
 
@@ -99,10 +101,10 @@ public class PlayerCamera : MonoBehaviour
 
     private void LateUpdate()
     {
-        if (GameOverScreen.IsGameOver())
+        if (Player.localPlayer.health.isAlive == false && deathCamTime < 5f)
         {
-            if (Cursor.lockState != CursorLockMode.None)
-                Cursor.lockState = CursorLockMode.None;
+            //if (Cursor.lockState != CursorLockMode.None)
+            //    Cursor.lockState = CursorLockMode.None;
 
             GameObject ragdoll = Player.localPlayer.health.ragdoll;
             Vector3 ragdollPosition = ragdoll.GetComponentInChildren<Rigidbody>().transform.position;
@@ -132,6 +134,13 @@ public class PlayerCamera : MonoBehaviour
             camera.transform.LookAt(ragdollPosition);
             Quaternion end = camera.transform.rotation;
             camera.transform.rotation = Quaternion.RotateTowards(start, end, ragdollCameraRotSpeed * Time.deltaTime);
+
+            deathCamTime += Time.deltaTime;
+        }
+        else if (Player.localPlayer.health.isAlive)
+        {
+            deathCamTime = 0f;
+            ragdollCamPos = Vector3.zero;
         }
     }
     private void CameraBob()

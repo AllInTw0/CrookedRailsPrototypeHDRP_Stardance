@@ -31,7 +31,7 @@ public class PlayerMovement : GroundMovement
     [SerializeField]
     private float colliderCrouchHeight;
     [SerializeField]
-    private float cameraCrouchHeight;
+    public float cameraCrouchHeight;
     [Header("Max Distance From Objects")]
     [SerializeField]
     private float maxDistanceFromTrain;
@@ -59,7 +59,8 @@ public class PlayerMovement : GroundMovement
     
     //Runtime References
     private float colliderStandingHeight;
-    private float cameraStandingHeight;
+    [NonSerialized]
+    public float cameraStandingHeight;
     
     //Player States
     [NonSerialized]
@@ -76,7 +77,7 @@ public class PlayerMovement : GroundMovement
     //Input
     private Vector2 moveInput;
     private bool noclip;
-    private void Start()
+    private void Awake()
     {
         rb = GetComponent<Rigidbody>();
         
@@ -414,6 +415,8 @@ public class PlayerMovement : GroundMovement
         capsuleCollider.enabled = false;
         noclip = true;
         ExitLadder();
+        rb.linearVelocity = Vector3.zero;
+
     }
     public void DisableNoclip()
     {

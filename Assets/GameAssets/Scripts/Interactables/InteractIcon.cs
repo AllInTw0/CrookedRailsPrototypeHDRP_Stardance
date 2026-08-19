@@ -34,7 +34,7 @@ public class InteractIcon : MonoBehaviour
         active = this;
     }
     
-    private void LateUpdate()
+    private void Update()
     {
         if (activeTarget)
         {

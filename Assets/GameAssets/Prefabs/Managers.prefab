@@ -82,9 +82,9 @@ MonoBehaviour:
   - structureInfoList:
     - {fileID: 11400000, guid: 53277ed3d6046724b9d3dfdd3113b6c8, type: 2}
     distanceType: 1
-    distanceTypeValue: {x: 0.8, y: 0.9}
+    distanceTypeValue: {x: 0.75, y: 0.85}
     repeating: 1
-    minStationDistance: 15
+    minStationDistance: 5
     distanceTillStructure: 0
     spawningDisabled: 0
   - structureInfoList:
@@ -115,7 +115,7 @@ MonoBehaviour:
   - structureInfoList:
     - {fileID: 11400000, guid: 74d7eb2e4728b69489619a067d303b48, type: 2}
     distanceType: 0
-    distanceTypeValue: {x: 100, y: 150}
+    distanceTypeValue: {x: 150, y: 200}
     repeating: 0
     minStationDistance: 100
     distanceTillStructure: 0
@@ -186,6 +186,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 6b98a312017cbb842bc8e70f44ed800f, type: 2}
   - {fileID: 11400000, guid: 06d20398068acf749b0fe7c6451fbd07, type: 2}
   - {fileID: 11400000, guid: 87440df6cc1e6d1459dc096d6139979d, type: 2}
+  - {fileID: 11400000, guid: 6b98a312017cbb842bc8e70f44ed800f, type: 2}
+  - {fileID: 11400000, guid: 04966b570f156e94f8df143d47a58ea2, type: 2}
 --- !u!1 &1124741988899856918
 GameObject:
   m_ObjectHideFlags: 0
@@ -653,16 +655,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e646b9dc73f6af19a9056f7d1fdb52f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DebugHelper
-  railCar: {fileID: 11400000, guid: 56e8af232a5f402b1aa937f4db311341, type: 2}
-  cargo: {fileID: 11400000, guid: 4715cc542e4088448b6041c9ea8e2fa9, type: 2}
+  railCar: {fileID: 11400000, guid: 0b9737e8447e9f34a8d8cf8704479988, type: 2}
+  cargo: {fileID: 11400000, guid: 9e5ccac0b40767a48ad247eeea535c71, type: 2}
   enemy: {fileID: 11400000, guid: fb00dc0c533df4d4a9b006ca29b43a84, type: 2}
-  item: {fileID: 11400000, guid: 517ca367be1565a4294aa7684a1e17ae, type: 2}
+  item: {fileID: 11400000, guid: 1457224a86245a9478a0cd1917d563cf, type: 2}
   shakeStrength: 1
   shakeSpring: 1
   shakeDamp: 1
   debugHealth: 0
   debugEnemies: 0
-  debugTrain: 1
+  debugTrain: 0
+  debugTeleporter: 0
 --- !u!1 &6799618200178374423
 GameObject:
   m_ObjectHideFlags: 0
@@ -721,7 +724,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1708868192
+  GlobalObjectIdHash: 229873088
   InScenePlacedSourceGlobalObjectIdHash: 229873088
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1129,15 +1132,33 @@ MonoBehaviour:
   foliageNoiseSettingsList:
   - ignore: 0
     scale: 0.1
-    octaveCount: 2
-    amplitudeMult: 0.8
-    frequencyMult: 2
+    octaveCount: 1
+    amplitudeMult: 1
+    frequencyMult: 1
     useHeightCurve: 0
     heightCurve:
       serializedVersion: 2
-      m_Curve: []
-      m_PreInfinity: 0
-      m_PostInfinity: 0
+      m_Curve:
+      - serializedVersion: 3
+        time: -0.49741045
+        value: -0.0037990212
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.5025896
+        value: 0.996201
+        inSlope: 1
+        outSlope: 1
+        tangentMode: 34
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
       m_RotationOrder: 0
     octaveOffsetArray: []
     octaveAmplitudeArray: []
@@ -1209,45 +1230,45 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 1.5223882
-      value: -0.008331537
-      inSlope: 0.28204933
-      outSlope: 0.28204933
+      time: 4.945342
+      value: -0.97973603
+      inSlope: 0.2004644
+      outSlope: 0.2004644
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 2.723993
-      value: 0.3305803
-      inSlope: 0.28204933
-      outSlope: 0.8685837
+      time: 7.2571244
+      value: -0.516306
+      inSlope: 0.2004644
+      outSlope: 1.7633747
       tangentMode: 69
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 3.2026982
-      value: 0.7463758
-      inSlope: 0.8685837
-      outSlope: -0.00038728898
+      time: 7.840894
+      value: 0.51309884
+      inSlope: 1.7633747
+      outSlope: -0.0016951723
       tangentMode: 69
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 12.282931
-      value: 0.7428591
-      inSlope: -0.00038728898
-      outSlope: -0.031646546
+      time: 25.141485
+      value: 0.48377135
+      inSlope: -0.0016951723
+      outSlope: -0.031646542
       tangentMode: 69
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 20.060902
-      value: 0.49671322
-      inSlope: -0.031646546
+      time: 32.919456
+      value: 0.23762545
+      inSlope: -0.031646542
       outSlope: 0.032048587
       tangentMode: 69
       weightedMode: 0
@@ -1504,7 +1525,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MultiplayerManager
   hostLocally: 1
-  hostLocalTargetScene: Game
+  hostLocalTargetScene: Testing
   editorIsClient: 0
-  manuallySetRegion: 1
+  manuallySetRegion: 0
   region: europe-north1

@@ -32,7 +32,7 @@ public class Sell : NetworkBehaviour
             int _count = 0;
             foreach (Item item in linkedItemList)
             {
-                _count += item.count;
+                _count += item.GetCount();
             }
             count = _count;
         }
@@ -117,12 +117,12 @@ public class Sell : NetworkBehaviour
         SellEntry sellEntry = FindSellEntry(item.itemInfo);
         if (sellEntry != null)
         {
-            sellEntry.count += item.count;
+            sellEntry.count += item.GetCount();
             sellEntry.linkedItemList.Add(item);
         }
         else
         {
-            sellEntryList.Add(new SellEntry(item.itemInfo, item.count, new List<Item>() { item }));
+            sellEntryList.Add(new SellEntry(item.itemInfo, item.GetCount(), new List<Item>() { item }));
         }
 
         UpdateMonitor();
@@ -130,7 +130,7 @@ public class Sell : NetworkBehaviour
     private void RemoveItem(Item item)
     {
         SellEntry sellEntry = FindSellEntry(item.itemInfo);
-        sellEntry.count -= item.count;
+        sellEntry.count -= item.GetCount();
         sellEntry.linkedItemList.Remove(item);
 
         if(sellEntry.count <= 0)

@@ -120,9 +120,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 98d9db9626104da59357651088226725, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Multiplayer.Tools.NetworkSimulator.Runtime::Unity.Multiplayer.Tools.NetworkSimulator.Runtime.NetworkSimulator
-  m_PresetAsset: {fileID: 0}
+  m_PresetAsset: {fileID: 11400000, guid: 3bac8a458aed3e9e48dcb8bf83b802e0, type: 2}
   m_PresetReference:
-    rid: 2323079035953349087
+    rid: -2
   m_Scenario:
     rid: -2
   m_IsScenarioSettingsFolded: 0
@@ -132,13 +132,3 @@ MonoBehaviour:
     RefIds:
     - rid: -2
       type: {class: , ns: , asm: }
-    - rid: 2323079035953349087
-      type: {class: NetworkSimulatorPreset, ns: Unity.Multiplayer.Tools.NetworkSimulator.Runtime, asm: Unity.Multiplayer.Tools.NetworkSimulator.Runtime}
-      data:
-        <Name>k__BackingField: 'Home Broadband [WIFI, Cable, Console, PC]'
-        <Description>k__BackingField: Typical of desktop and console platforms (and
-          generally speaking most mobile players too).
-        <PacketDelayMs>k__BackingField: 32
-        <PacketJitterMs>k__BackingField: 12
-        <PacketLossInterval>k__BackingField: 0
-        <PacketLossPercent>k__BackingField: 2

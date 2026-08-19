@@ -20,7 +20,7 @@ public class DebugHelper : MonoBehaviour
     public bool debugHealth;
     public bool debugEnemies;
     public bool debugTrain;
-
+    public bool debugTeleporter;
     private void Update()
     {
         if (Keyboard.current[Key.P].wasPressedThisFrame)
@@ -34,6 +34,10 @@ public class DebugHelper : MonoBehaviour
         if (Keyboard.current[Key.I].wasPressedThisFrame)
         {
             debugTrain = !debugTrain;
+        }
+        if (Keyboard.current[Key.U].wasPressedThisFrame)
+        {
+            debugTeleporter = !debugTeleporter;
         }
     }
 
@@ -81,7 +85,15 @@ public class DebugHelper : MonoBehaviour
         {
             foreach (RailCar railCar in Train.playerTrain.GetConsist())
             {
-                Label(railCar.transform.position + Vector3.up, "i: " +railCar.networkData.Value.consistIndex +", t: " + railCar.networkData.Value.trainID);
+                Label(railCar.transform.position + Vector3.up, "i: " +railCar.networkData.Value.consistIndex +", t: " + railCar.networkData.Value.train);
+            }
+        }
+
+        if (debugTeleporter)
+        {
+            foreach (Teleporter teleporter in Teleporter.activeTeleporterList)
+            {
+                Label(teleporter.transform.position, "p: " +teleporter.IsPaired() +", t: " + teleporter.IsTeleporting(out bool reciever, out float timeTillTeleport) +", tt:" + timeTillTeleport +", cd:" + teleporter.GetCooldown());
             }
         }
     }

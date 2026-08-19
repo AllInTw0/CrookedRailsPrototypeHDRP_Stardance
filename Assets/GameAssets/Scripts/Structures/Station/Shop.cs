@@ -61,12 +61,11 @@ public class Shop : NetworkBehaviour
     private List<ShopItemSO> shopItemEntryList;
     [SerializeField] 
     private bool forceSingleStock;
+    [SerializeField] 
+    private bool ignoreNeededUnlocks;
     [Header("Missing")]
     [SerializeField]
     private Texture2D missingIcon;
-
-    [Header("Debug")] 
-    public int debugLevel;
     
     private ShopItem[] shopItemArray;
 
@@ -112,20 +111,29 @@ public class Shop : NetworkBehaviour
         {
             if (selectedShopItem.stock > 0 && Money.CanAfford(selectedShopItem.price))
             {
-                if (selectedShopItem.itemInfo is ItemSO) 
+                List<ShopItemSO> itemList = new List<ShopItemSO>();
+                itemList.Add(selectedShopItem.itemInfo);
+                itemList.AddRange(selectedShopItem.itemInfo.bonusItems);
+                foreach (ShopItemSO item in itemList)
                 {
-                    Vector3 pos = itemSpawnPos.position + new Vector3(Random.Range(-0.4f, 0.4f), 0, Random.Range(-0.4f, 0.4f));
-                    Quaternion rot = Quaternion.Euler(Random.Range(-90f, 90), Random.Range(-90f, 90), Random.Range(-90f, 90));
-                    Item.SpawnItem((ItemSO)selectedShopItem.itemInfo, pos, rot);
-                }
-                else if (selectedShopItem.itemInfo is UpgradeSO)
-                {
-                    TrainUpgradeHandler.active.AddUpgrade((UpgradeSO)selectedShopItem.itemInfo);
-                }
+                    if (item is ItemSO)
+                    {
+                        Vector3 pos = itemSpawnPos.position +
+                                      new Vector3(Random.Range(-0.4f, 0.4f), 0, Random.Range(-0.4f, 0.4f));
+                        Quaternion rot = Quaternion.Euler(Random.Range(-90f, 90), Random.Range(-90f, 90),
+                            Random.Range(-90f, 90));
+                        Item.SpawnItem((ItemSO)item, pos, rot,((ItemSO)item).maxCount);
+                    }
+                    else if (item is UpgradeSO)
+                    {
+                        TrainUpgradeHandler.active.AddUpgrade((UpgradeSO)item);
+                    }
 
-                if(GameStateManager.boughtItemList.Contains(selectedShopItem.itemInfo) == false)
+                }
+                
+                if (GameStateManager.boughtItemList.Contains(selectedShopItem.itemInfo) == false)
                     GameStateManager.boughtItemList.Add(selectedShopItem.itemInfo);
-
+                
                 selectedShopItem.stock--;
                 Money.AddMoney(-selectedShopItem.price);
                 
@@ -159,8 +167,8 @@ public class Shop : NetworkBehaviour
                 shopItemEntryList[i].stock = 1;
             else
                 shopItemEntryList[i].EvaluateStock(currentLevel);
-            
-            if (GameStateManager.IsItemUnlocked(shopItemEntryList[i]) && shopItemEntryList[i].probability > 0)
+            Debug.Log(shopItemEntryList[i] + ", " + shopItemEntryList[i].probability);
+            if ((ignoreNeededUnlocks || GameStateManager.IsItemUnlocked(shopItemEntryList[i])) && shopItemEntryList[i].probability > 0)
             {
                 shopItemProbabilityList.Add(new ProbabilityListElement<ShopItemSO>(shopItemEntryList[i], shopItemEntryList[i].probability, 1));
             }
@@ -300,6 +308,18 @@ public class Shop : NetworkBehaviour
                 {
                     description += "\n" + upgradeSO.GetName();
                 }
+            }
+        }
+
+        if (itemInfo.bonusItems.Count > 0)
+        {
+            description += "\nBONUS:";
+            foreach (ShopItemSO bonusItem in itemInfo.bonusItems)
+            {
+                if (bonusItem is ItemSO)
+                    description += "\n - " + ((ItemSO)bonusItem).maxCount + " " + bonusItem.GetName();
+                else
+                    description += "\n - " + bonusItem.GetName();
             }
         }
         return description;

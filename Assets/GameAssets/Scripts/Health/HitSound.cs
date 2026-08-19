@@ -69,6 +69,9 @@ public class HitSound : MonoBehaviour
 
     public void HandleHitSound(Health targetHealth, float damage, Vector3 position)
     {
+        if(damage == 0)
+            return;
+        
         foreach (var hitInfo in hitInfoList)
         {
             if (hitInfo.healthScript == targetHealth && hitInfo.timeSinceUpdate <= hitUpdateLifeLenght)

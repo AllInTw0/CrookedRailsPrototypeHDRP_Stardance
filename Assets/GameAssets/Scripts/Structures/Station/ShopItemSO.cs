@@ -16,7 +16,8 @@ public class ShopItemSO : ScriptableObject
     public AnimationCurve sellCurve;
     public List<ShopItemSO> neededBoughtItems;
     public int maxCountBought = -1;
-
+    [Header("Shop Bonus")] 
+    public List<ShopItemSO> bonusItems;
     [Header("Icon Rendering")]
     public Vector3 offset = new Vector3(0.5f, 0.5f, 0.5f);
     public Vector3 origin;
@@ -37,6 +38,11 @@ public class ShopItemSO : ScriptableObject
     [HideInInspector] public int sell;
     [HideInInspector] public float randomness;
     private int lastEvaluationLevel = -1;
+
+    public void ResetLastEvaluation()
+    {
+        lastEvaluationLevel = -1;
+    }
     public void EvaluateCurves(int level)
     {
         System.Random rng = new System.Random(GameStateManager.gameSeed.Value + description.Length + level);

@@ -1,9 +1,79 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using static UnityEngine.Rendering.HighDefinition.CameraSettings;
 
 public class Sentry : Item
 {
+    
+    private NetworkVariable<int> ammoCount = new(writePerm:NetworkVariableWritePermission.Server);
+    private void OnAmmoCountChanged(int previous, int current)
+    {
+        if(current > previous)
+            SoundManager.active.PlayAtPos(ammoFillInteractable.transform.position, ammoRefillString);
+        UpdateAmmoLights();
+    }
+
+    private NetworkVariable<NetworkBehaviourReference> equippedGun = new(writePerm: NetworkVariableWritePermission.Server);
+    private void OnEquippedGunChanged(NetworkBehaviourReference previous, NetworkBehaviourReference current)
+    {
+        if (current.TryGet(out ItemGun itemGun))
+        {
+            if(itemGun.playerWhoHasItem)
+                itemGun.playerWhoHasItem.inventory.UnEquipTool();
+            
+            itemGun.BecomeInvisible();
+            foreach (GunVisual visual in gunVisualList)
+            {
+                if (visual.itemInfo == itemGun.itemInfo)
+                {
+                    visual.visualParent.SetActive(true);
+                    gunPistonFollow.target = visual.pistonTarget.transform;
+
+                    equipedGunVisual = visual;
+                }
+            }
+            itemInteractable.SetObjectNameOverride(itemGun.itemInfo.name);
+            itemInteractable.SetActionNameOverride("Pick Up");
+
+            ammoFillInteractable.gameObject.SetActive(true);
+            interactableCollider.enabled = false;
+        }
+
+        if (previous.TryGet(out ItemGun itemGun2))
+        {
+            //UnEquip Tool
+            foreach (GunVisual visual in gunVisualList)
+            {
+                visual.visualParent.SetActive(false);
+            }
+            
+            //DropAmmo();
+
+            itemInteractable.ClearOverrides();
+            
+            equipedGunVisual = null;
+            ammoFillInteractable.gameObject.SetActive(false);
+            interactableCollider.enabled = true;
+            
+            itemGun2.BecomeVisible();
+            itemGun2.DropFromPos(transform.position + Vector3.up);
+        }
+    }
+
+    private ItemGun GetEquippedGun()
+    {
+        if (equippedGun.Value.TryGet(out ItemGun itemGun))
+            return itemGun;
+        return null;
+    }
+    private NetworkVariable<NetworkBehaviourReference> target = new(writePerm: NetworkVariableWritePermission.Server);
+    private Health GetTarget()
+    {
+        if (target.Value.TryGet(out Health health))
+            return health;
+        return null;
+    }
     [Header("Rotation")]
     [SerializeField]
     private Transform rotYTransform;
@@ -16,6 +86,8 @@ public class Sentry : Item
     [Header("Targeting")]
     [SerializeField]
     private List<HealthType> healthTypeFilterList;
+    [SerializeField] 
+    private LayerMask raycastLayer;
     [SerializeField]
     private float maxDistance;
     [SerializeField]
@@ -48,8 +120,6 @@ public class Sentry : Item
     [Header("Ammo")]
     [SerializeField]
     private int maxAmmoCount;
-    [SerializeField]
-    private int ammoCount;
     [Header("Health")]
     [SerializeField]
     private Health sentryHealth;
@@ -61,92 +131,69 @@ public class Sentry : Item
     [SerializeField]
     private string sentryBreakString;
     //RunTime
-    private ItemGun equipedGun;
     private GunVisual equipedGunVisual;
 
     private Vector2 targetRot;
     private Transform helperTransform;
-    void Start()
+    public override void Start()
     {
+        base.Start();
+        
         helperTransform = new GameObject().transform;
 
-        itemInteractable.interactEventLocal.AddListener(() =>
+        ammoCount.OnValueChanged += OnAmmoCountChanged;
+        equippedGun.OnValueChanged += OnEquippedGunChanged;
+        
+        itemInteractable.interactEventServer.AddListener((ulong clientID) =>
         {
-            if (equipedGun == null)
+            Player senderPlayer = Player.GetPlayerByClientID(clientID);
+            if (GetEquippedGun() == null)
             {
-                if (Player.localPlayer.inventory.tool && Player.localPlayer.inventory.tool is ItemGun)
+                if (senderPlayer.inventory.tool && senderPlayer.inventory.tool is ItemGun)
                 {
-                    //Equip Tool
-                    ItemGun tool = (ItemGun)Player.localPlayer.inventory.UnEquipTool();
-                    tool.BecomeInvisible();
-                    foreach (GunVisual visual in gunVisualList)
-                    {
-                        if (visual.itemInfo == tool.itemInfo)
-                        {
-                            visual.visualParent.SetActive(true);
-                            gunPistonFollow.target = visual.pistonTarget.transform;
-
-                            equipedGunVisual = visual;
-                        }
-                    }
-                    itemInteractable.SetObjectNameOverride(tool.itemInfo.name);
-                    itemInteractable.SetActionNameOverride("Pick Up");
-                    equipedGun = tool;
-                    ammoFillInteractable.gameObject.SetActive(true);
-                    interactableCollider.enabled = false;
+                    equippedGun.Value = (ItemGun)senderPlayer.inventory.tool;
                 }
             }
             else
             {
-
-                if (Player.localPlayer.inventory.TryEquipping(equipedGun))
+                if (GetEquippedGun().TryEquipping(senderPlayer))
                 {
                     //UnEquip Tool
-                    foreach (GunVisual visual in gunVisualList)
-                    {
-                        visual.visualParent.SetActive(false);
-                    }
                     DropAmmo();
-
-                    itemInteractable.ClearOverrides();
-                    equipedGun = null;
-                    equipedGunVisual = null;
-                    ammoFillInteractable.gameObject.SetActive(false);
-                    interactableCollider.enabled = true;
-
-                    UpdateAmmoLights();
+                    equippedGun.Value = null;
                 }
-                
             }
         });
 
-        ammoFillInteractable.interactEventLocal.AddListener(() =>
+        ammoFillInteractable.interactEventServer.AddListener((ulong clientID) =>
         {
-            int targetCount = Mathf.Clamp(maxAmmoCount - ammoCount, 0, equipedGun.ammoItem.maxCount / 2);
-            if (targetCount > 0 && Player.localPlayer.inventory.RemoveItem(equipedGun.ammoItem, out int itemCountRemoved, targetCount))
+            Player senderPlayer = Player.GetPlayerByClientID(clientID);
+            int targetCount = Mathf.Clamp(maxAmmoCount - ammoCount.Value, 0, GetEquippedGun().ammoItem.maxCount / 2);
+            if (targetCount > 0 && senderPlayer.inventory.RemoveItem(GetEquippedGun().ammoItem, out int itemCountRemoved, targetCount))
             {
-                SoundManager.active.PlayAtPos(ammoFillInteractable.transform.position, ammoRefillString);
-                ammoCount += itemCountRemoved;
-                UpdateAmmoLights();
+                ammoCount.Value += itemCountRemoved;
             }
         });
-
+        
         sentryHealth.onTakeDamage.AddListener((float dammage, Vector3 force) =>
         {
             if (sentryHealth.GetHealth() == 0)
             {
                 //Destroy Sentry
 
-                if (equipedGun)
+                if (GetEquippedGun() && IsServer)
                 {
                     DropAmmo();
-                    equipedGun.BecomeVisible();
-                    equipedGun.transform.rotation = transform.rotation;
-                    equipedGun.DropFromPos(transform.position + Vector3.up);
+                    equippedGun.Value = null;
                 }
+                
                 SoundManager.active.PlayAtPos(transform.position, sentryBreakString);
-                Item.SpawnItem(destroyedSentryItem, transform.position + Vector3.up * 0.2f, transform.rotation);
-                Destroy(gameObject);
+                
+                if (IsServer)
+                {
+                    Item.SpawnItem(destroyedSentryItem, transform.position + Vector3.up * 0.2f, transform.rotation);
+                    DestroyItem();
+                }
             }
         });
 
@@ -159,27 +206,39 @@ public class Sentry : Item
     }
     private void DropAmmo()
     {
-        if (equipedGun == null)
+        //Server only
+        
+        if (GetEquippedGun() == null)
             return;
         //Drop ammo
-        while (ammoCount > 0)
+        while (ammoCount.Value > 0)
         {
-            int count = Mathf.Clamp(equipedGun.ammoItem.maxCount, 0, ammoCount);
-            Item.SpawnItem(equipedGun.ammoItem, transform.position + Random.onUnitSphere + Vector3.up, Quaternion.Euler(0f, 0f, 0f), count);
-            ammoCount -= count;
+            int count = Mathf.Clamp(GetEquippedGun().ammoItem.maxCount, 0, ammoCount.Value);
+            Item.SpawnItem(GetEquippedGun().ammoItem, transform.position + Random.onUnitSphere + Vector3.up, Quaternion.Euler(0f, 0f, 0f), count);
+            ammoCount.Value -= count;
         }
     }
     void Update()
     {
         UpdateItem();
-        if (equipedGun == null)
+        if (GetEquippedGun() == null)
             return;
 
-        if (CheckForTargets(out Health closestHealth))
+        if (IsServer)
+        {
+            if (CheckForTargets(out Health closestHealth))
+            {
+                target.Value = closestHealth;
+            }
+            else
+                target.Value = null;
+        }
+        
+        if (GetTarget())
         {
             bool canShoot = true;
-            Vector3 targetPos = closestHealth.GetOrigin();
-            if (equipedGun.bulletPrefab == null)
+            Vector3 targetPos = GetTarget().GetOrigin();
+            if (GetEquippedGun().bulletPrefab == null)
             {
                 //HitScan
                 helperTransform.position = rotXTransform.position;
@@ -187,7 +246,7 @@ public class Sentry : Item
 
                 targetRot = new Vector2(helperTransform.eulerAngles.x, helperTransform.eulerAngles.y);
             }
-            else if (equipedGun.bulletPrefab.TryGetComponent(out Grenade grenade))
+            else if (GetEquippedGun().bulletPrefab.TryGetComponent(out Grenade grenade))
             {
                 helperTransform.position = rotXTransform.position;
                 helperTransform.LookAt(targetPos);
@@ -195,30 +254,25 @@ public class Sentry : Item
                 canShoot = Util.SolveTrajectory(grenade.velocity, rotXTransform.position, targetPos, angleMode, out float angle);;
                 targetRot = new Vector2(angle, helperTransform.eulerAngles.y);
             }
-
+            
+            
             if (canShoot)
             {
-                helperTransform.rotation = Quaternion.Euler(targetRot.x, targetRot.y, 0f);
-                if (equipedGun.HasAmmoInClip())
+                if (GetEquippedGun().IsOnCooldown() == false && IsServer)
                 {
-                    //if (Vector3.Angle(rotXTransform.forward, helperTransform.forward) <= maxAngleDiff)
-                        //equipedGun.Shoot(false, equipedGunVisual.bulletSpawn, ShooterType.Sentry);
-                }
-                else
-                {
-                    int count = Mathf.Clamp(ammoCount, 0, equipedGun.clipSize);
-                    if (count > 0)
+                    helperTransform.rotation = Quaternion.Euler(targetRot.x, targetRot.y, 0f);
+                    if (GetEquippedGun().HasAmmoInClip())
                     {
-                        //equipedGun.Reload(count, equipedGunVisual.bulletSpawn);
-                        ammoCount -= count;
+                        if (Vector3.Angle(rotXTransform.forward, helperTransform.forward) <= maxAngleDiff)
+                            ShootRpc();
                     }
                     else
                     {
-                        //Produce SFX
-                        //equipedGun.Shoot(false, equipedGunVisual.bulletSpawn, ShooterType.Sentry);
+                        int count = Mathf.Clamp(ammoCount.Value, 0, GetEquippedGun().clipSize);
+                        ReloadRpc(count);
+                        ammoCount.Value -= count;
                     }
                 }
-                UpdateAmmoLights();
             }
             else
             {
@@ -232,17 +286,28 @@ public class Sentry : Item
         rotYTransform.rotation = Quaternion.RotateTowards(rotYTransform.rotation, Quaternion.Euler(0f, targetRot.y, 0f), rotYSpeed * Time.deltaTime);
         rotXTransform.localRotation = Quaternion.RotateTowards(rotXTransform.localRotation, Quaternion.Euler(targetRot.x, 0f, 0f), rotXSpeed * Time.deltaTime);
     }
+    [Rpc(SendTo.Everyone)]
+    private void ShootRpc()
+    {
+        bool doDamage = IsServer;
+        GetEquippedGun().Shoot(equipedGunVisual.bulletSpawn.position, equipedGunVisual.bulletSpawn.forward, doDamage, ShooterType.Sentry);
+    }
+    [Rpc(SendTo.Everyone)]
+    private void ReloadRpc(int count)
+    {
+        GetEquippedGun().ReloadClient(count, equipedGunVisual.bulletSpawn.position);
+    }
     public void UpdateAmmoLights()
     {
-        ammoFillInteractable.SetObjectNameOverride("Magazine [" + ammoCount + "/" + maxAmmoCount + "]");
+        ammoFillInteractable.SetObjectNameOverride("Magazine [" + ammoCount.Value + "/" + maxAmmoCount + "]");
 
-        float time = (float)ammoCount / (float)maxAmmoCount;
+        float time = (float)ammoCount.Value / (float)maxAmmoCount;
         int lightColorIndex = Mathf.RoundToInt(time * lightColorList.Count);
         lightColorIndex = Mathf.Clamp(lightColorIndex, 0, lightColorList.Count - 1);
         int lightIndex = Mathf.RoundToInt(time * ammoLightList.Count);
         Debug.Log($"{time} : {lightColorIndex} : {lightIndex}");
 
-        if (equipedGun == null)
+        if (GetEquippedGun() == null)
             lightIndex = -1;
 
         for (int i = 0; i < ammoLightList.Count; i++)
@@ -274,8 +339,18 @@ public class Sentry : Item
 
                 if (distance <= maxDistance && distance < closestDistance)
                 {
-                    closestHealth = health;
-                    closestDistance = distance;
+                    if (Physics.Raycast(rotXTransform.position, health.GetOrigin() - rotXTransform.position, out RaycastHit hit, maxDistance,raycastLayer))
+                    {
+                        if (hit.transform == health.transform)
+                        {
+                            closestHealth = health;
+                            closestDistance = distance;
+                        }
+                        else
+                        {
+                            Debug.Log(hit.transform);
+                        }
+                    }
                 }
             }
         }
@@ -288,5 +363,7 @@ public class Sentry : Item
     {
         if(helperTransform)
             Destroy(helperTransform.gameObject);
+        
+        OnEquippedGunChanged(equippedGun.Value, null);
     }
 }

@@ -29,7 +29,7 @@ public class WaterInteractable : Interactable
         {
             if (bucketScript.IsFilled() == false)
             {
-                bucketScript.Fill();
+                bucketScript.FillOwnerRpc();
             }
             else
             {
@@ -44,7 +44,7 @@ public class WaterInteractable : Interactable
                 float waterAmmount = bucketScript.GetWaterAmmount();
                 if(targetHealth.GetHealth() <= targetHealth.maxHealth - waterAmmount)
                 {
-                    bucketScript.Empty();
+                    bucketScript.EmptyOwnerRpc();
                     targetHealth.TakeDamage(-waterAmmount);
                 }
                 else

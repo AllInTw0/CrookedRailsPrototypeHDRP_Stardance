@@ -5,7 +5,7 @@ using UnityEngine.Events;
 
 public class Money : NetworkBehaviour
 {
-    private const int startingMoney = 250;
+    private const int startingMoney = 500;
     
     public static UnityEvent onMoneyChanged = new UnityEvent();
     private static NetworkVariable<int> money = new (writePerm: NetworkVariableWritePermission.Server);

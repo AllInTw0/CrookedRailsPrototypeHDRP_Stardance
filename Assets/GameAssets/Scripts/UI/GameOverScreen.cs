@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
+using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
@@ -10,10 +11,9 @@ public class GameOverScreen : MonoBehaviour
 {
     public static GameOverScreen active;
     public static UnityEvent onGameOver;
-    private static bool gameOver;
     public static bool IsGameOver()
     {
-        return gameOver;
+        return GameStateManager.gameOver.Value;
     }
     [Header("Monitor")]
     [SerializeField]
@@ -44,7 +44,7 @@ public class GameOverScreen : MonoBehaviour
     private void Awake()
     {
         onGameOver = new UnityEvent();
-        gameOver = false;
+        GameStateManager.gameOver.Value = false;
     }
     private void Start()
     {
@@ -66,23 +66,29 @@ public class GameOverScreen : MonoBehaviour
             ignoreInput = true;
             StartCoroutine(LoadScene("MainMenu"));
         });
+
+        GameStateManager.gameOver.OnValueChanged += GameOverChanged;
+    }
+
+    private void GameOverChanged(bool previous, bool current)
+    {
+        if (current)
+        {
+            StartCoroutine(GameOverCoroutine());
+            onGameOver.Invoke();
+        }
     }
     private void Update()
     {
-        if (gameOver == false) return;
+        if (IsGameOver() == false) return;
 
         timmer += Time.unscaledDeltaTime;
         Time.timeScale = Mathf.Clamp(1f - (timmer - 4f) * 0.2f, 0.1f, 1f);
     }
-    public void StartGameOver()
-    {
-        StartCoroutine(GameOverCoroutine());
-        onGameOver.Invoke();
-    }
     private IEnumerator GameOverCoroutine()
     {
-        gameOver = true;
-
+        SpectateUI.active.Disable();
+        
         monitorRenderCamera.enabled = true;
         mainParent.SetActive(true);
 

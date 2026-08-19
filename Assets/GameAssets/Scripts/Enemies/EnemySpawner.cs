@@ -18,6 +18,7 @@ public class WaveEntry
     [Header("CoolDown")]
     public Vector2 minMaxWaveCooldown;
     public Vector2 minMaxTravelDistanceCooldown;
+    public float travelDistanceDecay;
 
     [Header("Probability")]
     public float minDistanceTravelled;
@@ -72,6 +73,7 @@ public class EnemySpawner : MonoBehaviour
     private List<WaveEntry> lastWaves = new List<WaveEntry>();
     private float waveCooldown;
     private float travelDistanceCooldown;
+    private float travelDistanceDecay;
     private float lastTrainDistance;
 
     //Spawning variables
@@ -216,6 +218,7 @@ public class EnemySpawner : MonoBehaviour
             //Next wave is picked
 
             travelDistanceCooldown -= traveledDistance;
+            travelDistanceCooldown -= travelDistanceDecay * Time.deltaTime;
             waveCooldown -= deltaTime;
             if (waveCooldown <= 0f && travelDistanceCooldown <= 0f)
             {
@@ -334,7 +337,8 @@ public class EnemySpawner : MonoBehaviour
 
         waveCooldown = Random.Range(currentWave.minMaxWaveCooldown.x, currentWave.minMaxWaveCooldown.y);
         travelDistanceCooldown = Random.Range(currentWave.minMaxTravelDistanceCooldown.x, currentWave.minMaxTravelDistanceCooldown.y);
-
+        travelDistanceDecay = currentWave.travelDistanceDecay;
+            
         lastWaves.Add(currentWave);
         currentWave = null;
         SetUpdateCoolDown(0.5f);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -109,9 +110,23 @@ public class Train : NetworkBehaviour
     public override void OnNetworkSpawn()
     {
         trainNetworkData.OnValueChanged += SyncTrainClient;
+        AwaitConsist();
+    }
+    private async void AwaitConsist()
+    {
+        bool allSpawned = false;
+        while (allSpawned == false)
+        {
+            allSpawned = true;
+            for (int i = 0; i < consist.Count; i++)
+            {
+                if (consist[i].IsSpawned == false)
+                    allSpawned = false;
+            }
+            await Task.Delay(10);
+        }
         RecalculateConsistLength();
     }
-
     private void SyncTrainClient(TrainNetworkData previous, TrainNetworkData current)
     {
         frontTrackSection = TrackManager.active.FindTrackSectionByID(current.sectionID);
@@ -151,7 +166,7 @@ public class Train : NetworkBehaviour
         bool derailed = false;
         foreach (RailCar railCar in consist)
         {
-            if(railCar.derailed)
+            if(railCar.IsDerailed())
             {
                 derailed = true;
                 break;
@@ -217,7 +232,7 @@ public class Train : NetworkBehaviour
             }
         }
         //Debri
-        if(debriBoxCollider != null && derailed == false && speed > 0.4f)
+        if(IsServer && debriBoxCollider != null && derailed == false && speed > 0.4f)
         {
             Collider[] debriColliders = Util.PhysicsBoxColliderOverlap(debriBoxCollider, debriLayerMask);
             for (int i = 0; i < debriColliders.Length; i++)
@@ -231,13 +246,7 @@ public class Train : NetworkBehaviour
 
                     if (Random.Range(0f, 1f) <= TrainUpgradeHandler.active.GetStatValue(debriDerailChance))
                     {
-                        consist[0].Derail();
-
-                        Override title = new Override("Title", OverrideType.Text, "WARNING");
-                        Override message = new Override("Message", OverrideType.Text, "Train DERAILED! Due to object on track!");
-                        Override subText = new Override("SubText", OverrideType.Text, "Locomotive");
-                        MiniPrinter.active.AddNotification(PaperRenderer.active.RenderPaper("Message", new List<Override>() { title, message, subText }));
-
+                        consist[0].SetDerailed(true);
                         break;
                     }
                 }
@@ -437,7 +446,7 @@ public class Train : NetworkBehaviour
     }
     public RailCar AddRailCar(RailCarSO railCarInfo, int index)
     {
-        RailCar railCarCopy = Instantiate(railCarInfo.prefab,transform).GetComponent<RailCar>();
+        RailCar railCarCopy = Instantiate(railCarInfo.prefab).GetComponent<RailCar>();
         List<RailCar> listFront = new List<RailCar>();
         List<RailCar> listBack = new List<RailCar>();
 

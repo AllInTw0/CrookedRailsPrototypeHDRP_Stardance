@@ -21,17 +21,21 @@ public class ItemGun : Item
     [SerializeField] 
     private float shootCoolDown = 0.5f;
     [SerializeField] 
-    private string reloadSound;
+    public string reloadSound;
     [SerializeField] 
     private string shootSound;
     [SerializeField] 
-    private string failedSound;
+    public string failedSound;
     [SerializeField]
     public GameObject bulletPrefab;
     [SerializeField]
     public List<HealthType> healthTypeFilter = new List<HealthType>();
     //Run Time
     private int clip;
+    private void SetClip(int value)
+    {
+        clip = value;
+    }
     private float coolDown;
     void Update()
     {
@@ -71,31 +75,34 @@ public class ItemGun : Item
     private void ShootRpc(Vector3 aimPos, RpcParams rpcParams = default)
     {
         GetBulletDefiningVariables(aimPos, out Vector3 bulletOrigin, out Vector3 direction);
-        ShooterType shooterType = ShooterType.Player;
         
         if (NetworkManager.Singleton.LocalClientId == rpcParams.Receive.SenderClientId)
         {
             //Damage will be done by gun shooter client
-            if (bulletPrefab == null)
-                BulletManager.active.ShootBullets(bulletOrigin, direction, bulletCount, bulletDamage, spread, healthTypeFilter, shooterType);
-            else
-                BulletManager.active.ShootPrefab(bulletOrigin, direction, bulletPrefab, bulletCount, spread, shooterType);
+            Shoot(bulletOrigin, direction);
         }
         else
         {
             //Damage isn't done. Spawn only visuals
-            if (bulletPrefab == null)
-                BulletManager.active.ShootBullets(bulletOrigin, direction, bulletCount, bulletDamage, spread, healthTypeFilter, shooterType,false);
-            else
-                BulletManager.active.ShootPrefab(bulletOrigin, direction, bulletPrefab, bulletCount, spread, shooterType,false);
+            Shoot(bulletOrigin, direction, false);
         }
         
-        SoundManager.active.PlayAtPos(bulletOrigin, shootSound);   
         playerWhoHasItem.avatar.animator.SetTrigger("Shoot");
+    }
+
+    public void Shoot(Vector3 bulletOrigin, Vector3 direction, bool doDamage = true, ShooterType shooterType = ShooterType.Player)
+    {
+        if (bulletPrefab == null)
+            BulletManager.active.ShootBullets(bulletOrigin, direction, bulletCount, bulletDamage, spread, healthTypeFilter, shooterType, doDamage);
+        else
+            BulletManager.active.ShootPrefab(bulletOrigin, direction, bulletPrefab, bulletCount, spread, shooterType, doDamage);
+        
+        SoundManager.active.PlayAtPos(bulletOrigin, shootSound); 
         
         coolDown = shootCoolDown;
         clip--;
     }
+    
     [Rpc(SendTo.Everyone)]
     private void EmptyClipRpc()
     {
@@ -111,22 +118,34 @@ public class ItemGun : Item
     [Rpc(SendTo.Everyone)]
     private void ReloadRpc()
     {
-        if (playerWhoHasItem.inventory.RemoveItem(ammoItem, out int itemCountRemoved, clipSize - clip))
+        if (playerWhoHasItem.inventory.RemoveItem(ammoItem, out int itemCountRemoved, clipSize - clip, IsServer))
         {
-            SoundManager.active.PlayAtPos(GetBulletOrigin(), reloadSound);
             playerWhoHasItem.avatar.animator.SetTrigger("Reload");
-            
-            coolDown = reloadCoolDown;
-            clip += itemCountRemoved;
+            ReloadClient(itemCountRemoved, GetBulletOrigin());
         }
         else
         {
             SoundManager.active.PlayAtPos(GetBulletOrigin(), failedSound);
         }
     }
+
+    public void ReloadClient(int value, Vector3 bulletOrigin)
+    {
+        if(value > 0)
+            SoundManager.active.PlayAtPos(bulletOrigin, reloadSound);
+        else
+            SoundManager.active.PlayAtPos(bulletOrigin, failedSound);
+        coolDown = reloadCoolDown;
+        clip += value;
+    }
     public bool HasAmmoInClip()
     {
         return clip > 0;
+    }
+
+    public bool IsOnCooldown()
+    {
+        return coolDown > 0f;
     }
     private void UpdateText()
     {

@@ -1,5 +1,6 @@
 using System;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Enemy : NetworkBehaviour
@@ -157,5 +158,10 @@ public class Enemy : NetworkBehaviour
     public State GetState()
     {
         return state;
+    }
+    
+    public void OnDestroy()
+    {
+        EnemyManager.active.RemoveEnemy(this);
     }
 }

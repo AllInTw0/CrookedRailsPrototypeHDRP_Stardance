@@ -155,10 +155,11 @@ public class PaperRenderer : MonoBehaviour
                         else
                             copy.Find("Pay").GetComponent<TMP_Text>().text = "-";
 
-                        if (cargoInfo.cargoInfo != null)
-                            copy.Find("Icon").GetComponent<RawImage>().texture = cargoInfo.cargoInfo.GetIcon(cargoInfo.railCarRefrence.railCarSO);
+                        CargoSO cargoSO = cargoInfo.GetCargoSO();
+                        if (cargoSO != null)
+                            copy.Find("Icon").GetComponent<RawImage>().texture = cargoSO.GetIcon(cargoInfo.GetRailCar().railCarSO);
                         else
-                            copy.Find("Icon").GetComponent<RawImage>().texture = cargoInfo.railCarRefrence.railCarSO.icon;
+                            copy.Find("Icon").GetComponent<RawImage>().texture = cargoInfo.GetRailCar().railCarSO.icon;
 
 
                     }

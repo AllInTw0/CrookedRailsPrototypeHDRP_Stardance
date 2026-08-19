@@ -1,4 +1,5 @@
 using System;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -36,7 +37,7 @@ public class PlayerHealth : Health
         isAlive = true;
         AddHealthToGlobalList();
         onTakeDamage.AddListener((float damage, Vector3 force) => {
-            if(damage > 0)
+            if(damage > 0 && player == Player.localPlayer)
             {
                 Fade.hitFade.FadeTo(targetAlpha, fadeInDuration, 0);
                 Fade.hitFade.FadeTo(0f, fadeOutDuration, fadeInDuration);
@@ -78,16 +79,46 @@ public class PlayerHealth : Health
     public override void HealthReachedZero(Vector3 force = default)
     {
         ragdoll = SpawnRagdoll(player.avatar.animator.gameObject, ragdollPrefab, force);
-        player.inventory.UnEquipAll();
-        player.movement.EnableNoclip();
+        if (IsOwner)
+        {
+            player.inventory.UnEquipAll();
+            player.movement.EnableNoclip();
+        }
+
         player.avatar.Hide();
-        
-        InventoryUI.active.Hide();
-        SpectateUI.active.Enable();
-        StatUI.active.Hide();
-        
+
+        if (IsOwner)
+        {
+            InventoryUI.active.Hide();
+            SpectateUI.active.Enable();
+            StatUI.active.Hide();
+        }
+
         isAlive = false;
 
-        GameOverScreen.active.StartGameOver();
+        
+        if(IsServer && Player.GetDeadPlayers().Count == Player.playerList.Count)
+            GameStateManager.GameOver();
+    }
+    [Rpc(SendTo.Everyone)]
+    public void ReviveRpc()
+    {
+        Destroy(ragdoll);
+        isAlive = true;
+        
+        player.avatar.UnHide();
+        
+        if (IsOwner)
+        {
+            player.movement.DisableNoclip();
+        }
+        
+        if (IsOwner)
+        {
+            InventoryUI.active.UnHide();
+            SpectateUI.active.Disable();
+            StatUI.active.UnHide();
+        }
+
     }
 }

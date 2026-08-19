@@ -66,10 +66,10 @@ public class ItemGiver : Interactable
             item.TryEquipping(targetPlayer,true);
 
             int countGiven = maxGiveCount;
-            Debug.Log(targetPlayer.inventory.items.Contains(item) + ": " + item.count);
-            if (targetPlayer.inventory.items.Contains(item) == false)
+            //IsSpawned checks if the item has been destroyed
+            if (item.IsSpawned && targetPlayer.inventory.items.Contains(item) == false)
             {
-                countGiven -= item.count;
+                countGiven -= item.GetCount();
                 item.DestroyItem();
             }
 

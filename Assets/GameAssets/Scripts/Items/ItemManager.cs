@@ -19,6 +19,7 @@ public class ItemManager : MonoBehaviour
 
         foreach (ShopItemSO shopItem in shopItemList)
         {
+            shopItem.ResetLastEvaluation();
             shopItem.EvaluateCurves(0);
         }
     }

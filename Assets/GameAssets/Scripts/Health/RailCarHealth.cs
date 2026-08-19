@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class RailCarHealth : Health
@@ -30,16 +31,61 @@ public class RailCarHealth : Health
     private List<HealthState> healthStateList;
     private int lastHealthStateIndex = -1;
     
-    private bool brokenDown;
+    private NetworkVariable<bool> derailed = new(writePerm:NetworkVariableWritePermission.Server);
+    private NetworkVariable<bool> brokenDown = new(writePerm:NetworkVariableWritePermission.Server);
+
+    public void SetDerailed(bool _derailed)
+    {
+        derailed.Value = _derailed;
+    }
+    public bool IsDerailed()
+    {
+        return derailed.Value;
+    }
+    public bool IsBroken()
+    {
+        return brokenDown.Value;
+    }
+    private void OnDerailedChanged(bool previous, bool current)
+    {
+        foreach (EventInteractable interactable in rerailInteractableList)
+        {
+            interactable.gameObject.SetActive(current);
+        }
+
+        if (current)
+        {
+            Override title = new Override("Title", OverrideType.Text, "WARNING");
+            Override message = new Override("Message", OverrideType.Text, "Train DERAILED!");
+            Override subText = new Override("SubText", OverrideType.Text, linkedRailCar.railCarSO.GetName());
+            MiniPrinter.active.AddNotification(PaperRenderer.active.RenderPaper("Message", new List<Override>() { title, message, subText }));
+        }
+    }
+
+    private void OnBrokenDownChanged(bool previous, bool current)
+    {
+        foreach (GameObject obj in brokenDownParticles)
+        {
+            obj.SetActive(current);
+        }
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+        derailed.OnValueChanged += OnDerailedChanged;
+        brokenDown.OnValueChanged += OnBrokenDownChanged;
+    }
+
     private void Start()
     {
         AddHealthToGlobalList();
 
         foreach (EventInteractable interactable in rerailInteractableList)
         {
-            interactable.interactEventLocal.AddListener(() =>
+            interactable.interactEventServer.AddListener((ulong clientID) =>
             {
-                Rerail();
+                derailed.Value = false;
             });
 
             interactable.gameObject.SetActive(false);
@@ -99,65 +145,38 @@ public class RailCarHealth : Health
         {
             foreach (GameObject obj in healthStateList[i].enableOnChange)
             {
-                obj.SetActive(currentState == i);
-            }
-
-            if (currentState == i && healthStateList[i].spawnExplosionOnEnable)
-            {
-                BulletManager.active.SpawnExplosion(healthStateList[i].explosionSpawnPoint.position,healthStateList[i].explosionDamage,healthStateList[i].explosionRadius,healthStateList[i].explosionForce, explosionParticleIndex: healthStateList[i].explosionTypeIndex);
+                obj.SetActive(false);
             }
         }
-
+        foreach (GameObject obj in healthStateList[currentState].enableOnChange)
+        {
+            obj.SetActive(true);
+        }
+        
+        if (healthStateList[currentState].spawnExplosionOnEnable)
+        {
+            BulletManager.active.SpawnExplosion(healthStateList[currentState].explosionSpawnPoint.position,healthStateList[currentState].explosionDamage,healthStateList[currentState].explosionRadius,healthStateList[currentState].explosionForce, explosionParticleIndex: healthStateList[currentState].explosionTypeIndex, doDamage: IsServer);
+        }
+        
         lastHealthStateIndex = currentState;
     }
     public override void HealthReachedZero(Vector3 force = default)
     {
-        if (brokenDown) return;
-        
-        brokenDown = true;
-        Derail();
+        if (IsBroken()) return;
+
+        if (IsServer)
+        {
+            brokenDown.Value = true;
+            derailed.Value = true;
+        }
 
         base.HealthReachedZero();
     }
 
-    public void Rerail()
-    {
-        foreach (EventInteractable interactable in rerailInteractableList)
-        {
-            interactable.gameObject.SetActive(false);
-        }
-        linkedRailCar.derailed = false;
-    }
-    public void Derail()
-    {
-        foreach (EventInteractable interactable in rerailInteractableList)
-        {
-            interactable.gameObject.SetActive(true);
-        }
-
-        linkedRailCar.derailed = true;
-
-        if (brokenDown)
-        {
-            foreach (GameObject obj in brokenDownParticles)
-            {
-                obj.SetActive(true);
-            }
-        }
-    }
-
     public void ResetHealth()
     {
-        Rerail();
-        brokenDown = false;
+        derailed.Value = false;
+        brokenDown.Value = false;
         TakeDamage(-999999999); //health = maxHealth;
-        foreach (GameObject obj in brokenDownParticles)
-        {
-            obj.SetActive(false);
-        }
-    }
-    public bool IsBroken()
-    {
-        return brokenDown;
     }
 }

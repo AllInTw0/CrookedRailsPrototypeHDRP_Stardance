@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class ItemTaker : Interactable
@@ -47,5 +48,6 @@ public class ItemTaker : Interactable
             SetActionNameOverride("No Valid Items", 1f);
             return false;
         }
+        
     }
 }

@@ -122,7 +122,7 @@ public class InventoryUI : MonoBehaviour
             if (item.itemInfo.maxCount > 1)
             {
                 RectTransform newCountText = Instantiate(itemCountPrefab, newItemIcon);
-                newCountText.GetComponent<TMP_Text>().text = item.count + "/" + item.itemInfo.maxCount;
+                newCountText.GetComponent<TMP_Text>().text = item.GetCount() + "/" + item.itemInfo.maxCount;
                 newCountText.position = newItemIcon.position;
             }
         }

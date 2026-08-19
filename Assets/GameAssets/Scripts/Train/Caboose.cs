@@ -19,7 +19,7 @@ public class Caboose : MonoBehaviour
 
     private void Update()
     {
-        if (doorInteractableList[0].enabled == false && railCar.GetLinkedTrain().IsInitialized() && railCar.GetLinkedTrain().speed == 0)
+        if (doorInteractableList[0].enabled == false && railCar.GetLinkedTrain() && railCar.GetLinkedTrain().IsInitialized() && railCar.GetLinkedTrain().speed == 0)
         {
             foreach (Interactable door in doorInteractableList)
             {

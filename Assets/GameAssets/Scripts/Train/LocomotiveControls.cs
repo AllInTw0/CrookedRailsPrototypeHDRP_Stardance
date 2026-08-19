@@ -32,14 +32,15 @@ public class LocomotiveControls : NetworkBehaviour
         derailed
     }
     [HideInInspector]
-    public NetworkVariable<State> currentState;
+    public NetworkVariable<State> currentState = new(writePerm:NetworkVariableWritePermission.Server);
 
     public void SetState(State newState)
     {
-        currentState.Value = newState;
+        if(IsServer)
+            currentState.Value = newState;
     }
     [HideInInspector]
-    public NetworkVariable<bool> onSetOffTriggerGenerationReset;
+    public NetworkVariable<bool> onSetOffTriggerGenerationReset = new(writePerm:NetworkVariableWritePermission.Server);
     private void Start()
     {
         throttle.interactEvent.AddListener(() =>

@@ -1273,7 +1273,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerInventory
   ShowTopMostFoldoutHeaderGroup: 1
-  slotCount: 4
+  startingSlotCount: 3
 --- !u!114 &2627708928625353186
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1293,6 +1293,7 @@ MonoBehaviour:
   audioOnDamageTaken: Player Takes Damage
   origin: {fileID: 0}
   invulnerable: 1
+  clientSideDamage: 0
   onTakeDamage:
     m_PersistentCalls:
       m_Calls: []

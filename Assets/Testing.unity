@@ -156,7 +156,7 @@ MonoBehaviour:
   m_LayerMask:
     serializedVersion: 2
     m_Bits: 524289
-  m_UseGeometry: 0
+  m_UseGeometry: 1
   m_DefaultArea: 0
   m_GenerateLinks: 0
   m_IgnoreNavMeshAgent: 1
@@ -729,6 +729,10 @@ PrefabInstance:
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 1773498194
       objectReference: {fileID: 0}
+    - target: {fileID: 5385142076880586676, guid: 40f546bdb3f42e164abf9dfa5821b6aa, type: 3}
+      propertyPath: spawnCount
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 8637808059388908550, guid: 40f546bdb3f42e164abf9dfa5821b6aa, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.2959447
@@ -872,6 +876,35 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
+      propertyPath: 'managedReferences[2323079400520417371]'
+      value: Unity.Multiplayer.Tools.NetworkSimulator.Runtime Unity.Multiplayer.Tools.NetworkSimulator.Runtime.NetworkSimulatorPreset
+      objectReference: {fileID: 0}
+    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
+      propertyPath: managedReferences[2323079400520417371].<Name>k__BackingField
+      value: 'Home Broadband [WIFI, Cable, Console, PC]'
+      objectReference: {fileID: 0}
+    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
+      propertyPath: managedReferences[2323079400520417371].<Description>k__BackingField
+      value: Typical of desktop and console platforms (and generally speaking most
+        mobile players too).
+      objectReference: {fileID: 0}
+    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
+      propertyPath: managedReferences[2323079400520417371].<PacketDelayMs>k__BackingField
+      value: 32
+      objectReference: {fileID: 0}
+    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
+      propertyPath: managedReferences[2323079400520417371].<PacketJitterMs>k__BackingField
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
+      propertyPath: managedReferences[2323079400520417371].<PacketLossPercent>k__BackingField
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
+      propertyPath: managedReferences[2323079400520417371].<PacketLossInterval>k__BackingField
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7850585866279921258, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
       propertyPath: m_Name
       value: NetworkManager
@@ -1863,6 +1896,10 @@ PrefabInstance:
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 3584171341
       objectReference: {fileID: 0}
+    - target: {fileID: 4195205561550728242, guid: 28626b283788467a4916c07053561563, type: 3}
+      propertyPath: spawnCount
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 8549184695684560683, guid: 28626b283788467a4916c07053561563, type: 3}
       propertyPath: m_Name
       value: ShotgunAmmo (1)
@@ -2084,6 +2121,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5385142076880586676, guid: 40f546bdb3f42e164abf9dfa5821b6aa, type: 3}
       propertyPath: count
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385142076880586676, guid: 40f546bdb3f42e164abf9dfa5821b6aa, type: 3}
+      propertyPath: spawnCount
       value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 8637808059388908550, guid: 40f546bdb3f42e164abf9dfa5821b6aa, type: 3}
@@ -2333,6 +2374,10 @@ PrefabInstance:
     - target: {fileID: 5171898398917794702, guid: 40f546bdb3f42e164abf9dfa5821b6aa, type: 3}
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 1773498194
+      objectReference: {fileID: 0}
+    - target: {fileID: 5385142076880586676, guid: 40f546bdb3f42e164abf9dfa5821b6aa, type: 3}
+      propertyPath: spawnCount
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 8637808059388908550, guid: 40f546bdb3f42e164abf9dfa5821b6aa, type: 3}
       propertyPath: m_LocalPosition.x
@@ -3059,6 +3104,30 @@ PrefabInstance:
       propertyPath: waveEntryList.Array.data[0].minMaxDistance.y
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 1170790946270210688, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
+      propertyPath: waveEntryList.Array.data[0].travelDistanceDecay
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1170790946270210688, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
+      propertyPath: waveEntryList.Array.data[1].travelDistanceDecay
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 1170790946270210688, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
+      propertyPath: waveEntryList.Array.data[0].minMaxWaveCooldown.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1170790946270210688, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
+      propertyPath: waveEntryList.Array.data[0].minMaxWaveCooldown.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1170790946270210688, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
+      propertyPath: waveEntryList.Array.data[1].minMaxWaveCooldown.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1170790946270210688, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
+      propertyPath: waveEntryList.Array.data[1].minMaxWaveCooldown.y
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3743170154030684135, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
       propertyPath: m_Enabled
       value: 1
@@ -3426,6 +3495,10 @@ PrefabInstance:
       propertyPath: count
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 4195205561550728242, guid: 28626b283788467a4916c07053561563, type: 3}
+      propertyPath: spawnCount
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 8549184695684560683, guid: 28626b283788467a4916c07053561563, type: 3}
       propertyPath: m_Name
       value: ShotgunAmmo (2)
@@ -3774,6 +3847,10 @@ PrefabInstance:
     - target: {fileID: 3982806212133220360, guid: 28626b283788467a4916c07053561563, type: 3}
       propertyPath: InScenePlacedSourceGlobalObjectIdHash
       value: 3584171341
+      objectReference: {fileID: 0}
+    - target: {fileID: 4195205561550728242, guid: 28626b283788467a4916c07053561563, type: 3}
+      propertyPath: spawnCount
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 8549184695684560683, guid: 28626b283788467a4916c07053561563, type: 3}
       propertyPath: m_Name

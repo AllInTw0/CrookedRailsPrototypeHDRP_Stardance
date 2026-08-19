@@ -1433,7 +1433,7 @@ ParticleSystem:
   emitterVelocityMode: 1
   looping: 1
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -6312,7 +6312,13 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventEveryone:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventServer:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &7240864079072189667
@@ -6671,6 +6677,10 @@ PrefabInstance:
       propertyPath: objectName
       value: Teleporter
       objectReference: {fileID: 0}
+    - target: {fileID: 3140944376010762303, guid: 221c75568a78042c8892ba8727f1af62, type: 3}
+      propertyPath: timeToInteract
+      value: 0.8
+      objectReference: {fileID: 0}
     - target: {fileID: 3751801714539862511, guid: 221c75568a78042c8892ba8727f1af62, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -6760,10 +6770,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Teleporter
   ShowTopMostFoldoutHeaderGroup: 1
   itemInfo: {fileID: 11400000, guid: 04966b570f156e94f8df143d47a58ea2, type: 2}
-  count: 1
   falling: 0
+  networkData:
+    UpdateTraits:
+      MinSecondsBetweenUpdates: 0
+      MaxSecondsBetweenUpdates: 0
   teleportInteractable: {fileID: 6683822674324039556}
   pairString: Teleporter - Paired
+  teleportingString: Teleporter - Teleporting
+  teleportString: Teleporter - Teleport
   animator: {fileID: 3557246065286155742}
   lightFlickerer: {fileID: 1154049394267043084}
   teleportParticles: {fileID: 4152107146495593771}
@@ -6772,6 +6787,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 2240
   topRot: {fileID: 6747513937764035359}
+  teleportTime: 4
   teleportCooldown: 10
 --- !u!114 &1154049394267043084
 MonoBehaviour:

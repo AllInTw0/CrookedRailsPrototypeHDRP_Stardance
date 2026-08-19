@@ -10,6 +10,7 @@ public class SpectateUI : MonoBehaviour
     private void Start()
     {
         active = this;
+        Disable();
     }
 
     public void Enable()

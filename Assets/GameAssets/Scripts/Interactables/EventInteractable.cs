@@ -7,12 +7,23 @@ public class EventInteractable : Interactable
     [SerializeField]
     public UnityEvent interactEventLocal;
     [SerializeField]
-    public UnityEvent interactEventSynced;
+    public UnityEvent interactEventEveryone;
+    [SerializeField]
+    public UnityEvent<ulong> interactEventServer;
     
     private bool interactionFailed;
     public override bool Interact()
     {
         interactEventLocal.Invoke();
+        
+        if(IsSpawned)
+            InteractEveryoneRpc();
+
+        if(IsServer)
+            interactEventServer.Invoke(NetworkManager.LocalClientId);
+        else if(IsSpawned)
+            InteractServerRpc();
+
         base.Interact();
 
         if (interactionFailed)
@@ -20,19 +31,19 @@ public class EventInteractable : Interactable
             interactionFailed = false;
             return false;
         }
-
-        if (interactEventSynced.GetPersistentEventCount() > 0)
-        {
-            InteractRpc();
-        }
         
         return true;
     }
 
     [Rpc(SendTo.Everyone)]
-    public void InteractRpc()
+    public void InteractEveryoneRpc()
     {
-        interactEventSynced.Invoke();
+        interactEventEveryone.Invoke();
+    }
+    [Rpc(SendTo.Server)]
+    public void InteractServerRpc(RpcParams receiveParams = default)
+    {
+        interactEventServer.Invoke(receiveParams.Receive.SenderClientId);
     }
 
     public void InteractionFailed()

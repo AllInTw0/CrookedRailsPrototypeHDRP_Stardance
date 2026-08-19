@@ -214,7 +214,19 @@ MonoBehaviour:
     groupType: 0
   - name: Teleporter - Paired
     AudioClips:
-    - {fileID: 8300000, guid: 46a9a4f3f85c42a4fa1144a48bc80096, type: 3}
+    - {fileID: 8300000, guid: c9a8b08ab5d41624bb81b0c9369bc152, type: 3}
+    volume: 0.7
+    pitch: {x: 0.8, y: 1.2}
+    groupType: 0
+  - name: Teleporter - Teleporting
+    AudioClips:
+    - {fileID: 8300000, guid: 653999d73df7e64c788df1d1dc96cb6e, type: 3}
+    volume: 0.7
+    pitch: {x: 0.8, y: 1.2}
+    groupType: 0
+  - name: Teleporter - Teleport
+    AudioClips:
+    - {fileID: 8300000, guid: 3cbddf98463246fec9becf40e3cc54b3, type: 3}
     volume: 0.7
     pitch: {x: 0.8, y: 1.2}
     groupType: 0

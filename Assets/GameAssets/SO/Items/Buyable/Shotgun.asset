@@ -138,6 +138,8 @@ MonoBehaviour:
   neededBoughtItems:
   - {fileID: 11400000, guid: 1457224a86245a9478a0cd1917d563cf, type: 2}
   maxCountBought: -1
+  bonusItems:
+  - {fileID: 11400000, guid: 37b28eef436127340b96cf8afef5fc0a, type: 2}
   offset: {x: -0.95, y: 0, z: 0.065}
   origin: {x: 0, y: 0, z: 0.065}
   rotation: {x: -25, y: 0, z: 0}
@@ -145,7 +147,7 @@ MonoBehaviour:
   renderLayer:
     serializedVersion: 2
     m_Bits: 256
-  probability: 0.9999496
+  probability: 0.99966514
   price: 300
   stock: 1
   sell: 200

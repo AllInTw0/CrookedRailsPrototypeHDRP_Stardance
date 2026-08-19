@@ -18,13 +18,14 @@ public class GameStateManager : NetworkBehaviour
     public static NetworkVariable<int> gameSeed = new(writePerm: NetworkVariableWritePermission.Server);
     public static HaulingJob currentHaulingJob;
     public static NetworkVariable<bool> gameStarted = new(writePerm:NetworkVariableWritePermission.Server);
+    public static NetworkVariable<bool> gameOver = new(writePerm:NetworkVariableWritePermission.Server);
     
     public static NetworkVariable<int> currentLevel = new(writePerm:NetworkVariableWritePermission.Server);
     
     public static float distanceTravelled = 0f;
     
     public static List<DistanceWaypoint> waypointList = new List<DistanceWaypoint>();
-
+    
     //Shop Stuff
     public static List<ShopItemSO> boughtItemList = new List<ShopItemSO>();
 
@@ -42,6 +43,7 @@ public class GameStateManager : NetworkBehaviour
     }
     public void ResetValues()
     {
+        gameOver.Value = false;
         gameStarted.Value = false;
         currentHaulingJob = null;
         currentLevel.Value = 0;
@@ -66,6 +68,10 @@ public class GameStateManager : NetworkBehaviour
         AddToStatistic("Train's Travelled Distance", 0f, StatisticType.DistanceKilometers);
     }
 
+    public static void GameOver()
+    {
+        gameOver.Value = true;
+    }
     public static bool IsItemUnlocked(ShopItemSO shopItem)
     {
         foreach (ShopItemSO neededBoughtItem in shopItem.neededBoughtItems)

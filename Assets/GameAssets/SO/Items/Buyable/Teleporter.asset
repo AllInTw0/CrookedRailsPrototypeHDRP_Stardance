@@ -14,28 +14,27 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   nameOverride: 
   prefab: {fileID: 5087099552779580148, guid: f899cdc4caeea1df7b93dc683839d613, type: 3}
-  description: Give you 2 teleporter stations to be later paired up and teleported
-    between.
+  description: Two teleporter stations can paired up and teleported between.
   probabilityCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
-      inSlope: 0.49202713
-      outSlope: 0.49202713
+      value: 1
+      inSlope: 0
+      outSlope: 0
       tangentMode: 34
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.33333334
+      outWeight: 0
     - serializedVersion: 3
-      time: 2.0057068
-      value: 0.9868622
-      inSlope: 0.49202713
-      outSlope: 0.49202713
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
       tangentMode: 34
       weightedMode: 0
-      inWeight: 0.33333334
+      inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
@@ -138,6 +137,8 @@ MonoBehaviour:
     m_RotationOrder: 4
   neededBoughtItems: []
   maxCountBought: -1
+  bonusItems:
+  - {fileID: 11400000}
   offset: {x: 2.3, y: 2, z: -1.3}
   origin: {x: 0, y: 1.4, z: 0}
   rotation: {x: 0, y: 0, z: 0}
@@ -146,10 +147,10 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 256
   probability: 0
-  price: 0
-  stock: 0
-  sell: 0
-  randomness: 0
+  price: 250
+  stock: 3
+  sell: 105
+  randomness: 0.2639979
   slotCount: 2
   maxCount: 1
   randomYRot: 0

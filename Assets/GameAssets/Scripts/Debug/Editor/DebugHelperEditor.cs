@@ -29,7 +29,7 @@ public class DebugHelperEditor : Editor
 
         if (GUILayout.Button("Spawn Item"))
         {
-            Item.SpawnItem(debugHelper.item,Player.localPlayer.transform.position + Player.localPlayer.transform.forward + Vector3.up,Quaternion.identity);
+            Item.SpawnItem(debugHelper.item,Player.localPlayer.transform.position + Player.localPlayer.transform.forward + Vector3.up,Quaternion.identity,debugHelper.item.maxCount);
         }
         if (GUILayout.Button("Shake Camera"))
         {

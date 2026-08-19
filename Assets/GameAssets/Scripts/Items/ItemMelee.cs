@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class ItemMelee : Item
@@ -24,30 +25,29 @@ public class ItemMelee : Item
         {
             if (InputManager.attackAction.IsPressed())
             {
-                BeginSwing();
+                BeginSwingRpc();
             }
         }
         if (coolDown > 0f)
             coolDown -= Time.deltaTime;
         UpdateItem();
     }
-    public void BeginSwing()
+    [Rpc(SendTo.Everyone)]
+    public void BeginSwingRpc()
     {
-
         Invoke(nameof(Swing),damageDelay);
         
-        SoundManager.active.PlayAtPos(PlayerAvatar.active.GetAnimationInfo().animatedObject.transform.position, swingSound);
-        PlayerAvatar.active.animator.SetTrigger("Swing");
+        SoundManager.active.PlayAtPos(playerWhoHasItem.avatar.GetAnimationInfo().animatedObject.transform.position, swingSound);
+        playerWhoHasItem.avatar.animator.SetTrigger("Swing");
         
         coolDown = swingCoolDown;
     }
 
     public void Swing()
     {
-        Vector3 startPos = PlayerCamera.active.transform.position;
-        Vector3 dir = PlayerCamera.active.transform.forward;
+        playerWhoHasItem.GetCameraVectors(out Vector3 origin, out Vector3 dir);
 
-        RaycastHit hit = BulletManager.active.ShootInvisibleBullet(startPos,dir,damage,range);
+        RaycastHit hit = BulletManager.active.ShootInvisibleBullet(origin, dir, IsOwner ? damage : 0, range);
         if (hit.transform != null)
         {
             SoundManager.active.PlayAtPos(hit.point, impactSound);

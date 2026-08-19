@@ -166,6 +166,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FollowObject
   target: {fileID: 195458180}
   affectedAxis: {x: 1, y: 1, z: 1}
+  targetIsPlayer: 0
 --- !u!1 &72493066
 GameObject:
   m_ObjectHideFlags: 0
@@ -197,6 +198,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FollowObject
   target: {fileID: 720768345}
   affectedAxis: {x: 1, y: 1, z: 1}
+  targetIsPlayer: 0
 --- !u!4 &72493068
 Transform:
   m_ObjectHideFlags: 0
@@ -246,6 +248,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FollowObject
   target: {fileID: 720768345}
   affectedAxis: {x: 1, y: 0, z: 1}
+  targetIsPlayer: 0
 --- !u!4 &111788071
 Transform:
   m_ObjectHideFlags: 0
@@ -758,7 +761,6 @@ MonoBehaviour:
   - trainStat: 7
     statName: Locomotive derail chance by object
     defaultValue: 0
-  upgradeVisualList: []
 --- !u!114 &354012476
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -771,6 +773,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0902c92610ca108479749bc2cfa85f5a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Train
+  ShowTopMostFoldoutHeaderGroup: 1
   isPlayerTrain: 1
   consist:
   - {fileID: 195458182}
@@ -781,9 +784,11 @@ MonoBehaviour:
   - consumptionRate: 1
     targetHealth: {fileID: 1251123854}
     fuelName: Water
+    depletion: 0
   - consumptionRate: 2
     targetHealth: {fileID: 1251123852}
     fuelName: Fuel (Wood)
+    depletion: 0
   controlls: {fileID: 195458183}
   drag: 0.15
   weightAccelerationPenalty: 0.01
@@ -3608,6 +3613,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4686b0a124828dc40be835af4287fa23, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TrackManager
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!114 &2000399146
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3623,14 +3629,36 @@ MonoBehaviour:
   splineMeshList:
   - mainMesh: {fileID: 6214273265294340009, guid: efded6473127ffe4b9b97928b95c3ea1, type: 3}
     repeatingMeshList:
-    - {fileID: -6229202517416100890, guid: 7ff34c635954f954db5ac522f0ef9638, type: 3}
-    - {fileID: 4065448869268367927, guid: ce3497d0c47adb54f858269c7f0504c6, type: 3}
-    - {fileID: 8609656015869344864, guid: db8373b192dfa544fa48d67679bb1512, type: 3}
     - {fileID: -2432090755550338912, guid: c525f9aba58582f488e4ed65dc3a63ff, type: 3}
+    - {fileID: -2432090755550338912, guid: 93e315dc028c2eaf8a7c2d347a3a92b6, type: 3}
+    - {fileID: -2432090755550338912, guid: d08fdcf2c169283c386e8b618ab4aa03, type: 3}
     repeatingMeshInterval: 0.5
     repeatingMeshMinDistanceFromTrack: 0
     material: {fileID: 2100000, guid: c26c7cc40b6393a4d9708386f93ec79a, type: 2}
     layer: 14
+    scale: {x: 1, y: 1, z: 1}
+  - mainMesh: {fileID: -3578119860870307924, guid: 62cc1cbfba96fc74ba1f4c812bb7078b, type: 3}
+    repeatingMeshList: []
+    repeatingMeshInterval: -1
+    repeatingMeshMinDistanceFromTrack: 0
+    material: {fileID: 2100000, guid: 5c7ddda54fae85542948dd19c096db83, type: 2}
+    layer: 0
+    scale: {x: 1, y: 1, z: 1}
+  - mainMesh: {fileID: 13613315932442246, guid: 6ce10ccddbb3275469849f9e1af2fdb5, type: 3}
+    repeatingMeshList:
+    - {fileID: 5421089186589797301, guid: b35ba27bf64f276448e013759b66d215, type: 3}
+    repeatingMeshInterval: 5
+    repeatingMeshMinDistanceFromTrack: 3
+    material: {fileID: 2100000, guid: 37d108abc47a34c4f9705d811fb652a0, type: 2}
+    layer: 22
+    scale: {x: 1, y: 1, z: 1}
+  - mainMesh: {fileID: -4943990491735104599, guid: 5e78f24700430034fb8ed29f60aeb90c, type: 3}
+    repeatingMeshList:
+    - {fileID: 5666548779406573231, guid: d50b22383f42d3d41bb067621b7b187b, type: 3}
+    repeatingMeshInterval: 5
+    repeatingMeshMinDistanceFromTrack: 0
+    material: {fileID: 2100000, guid: bd5721ba136306649a6b1b7e9dd05ca2, type: 2}
+    layer: 22
     scale: {x: 1, y: 1, z: 1}
 --- !u!1 &2024523196
 GameObject:

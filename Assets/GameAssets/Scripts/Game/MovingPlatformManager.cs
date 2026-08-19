@@ -133,7 +133,13 @@ public class MovingPlatformManager : MonoBehaviour
         {
             if (entries[i].rb != null && Time.timeScale != 0 && applyVelocity)
             {
-                entries[i].rb.linearVelocity += entries[i].velocity;
+                float velocityMag = entries[i].velocity.magnitude;
+                if (velocityMag > 0.00f)
+                {
+                    float clamped = Mathf.Clamp(velocityMag, 0f, 20f);
+                    entries[i].rb.linearVelocity += entries[i].velocity * (clamped / velocityMag);
+                }
+
                 entries[i].rb.interpolation = entries[i].rbInterpolation;
             }
             entries.RemoveAt(i);

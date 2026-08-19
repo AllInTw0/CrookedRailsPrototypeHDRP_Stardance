@@ -1,3 +1,4 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class EnemyHealth : Health
@@ -26,7 +27,18 @@ public class EnemyHealth : Health
         collision.enabled = false;
         SpawnRagdoll(behaviour.animator.gameObject, ragdollPrefab, force, 10f);
         EnemyManager.active.RemoveEnemy(behaviour);
-        //behaviour.Freeze();
-        Destroy(gameObject,0f);
+        
+        transform.position = Vector3.zero;
+        behaviour.Freeze();
+        
+        if (IsServer)
+        {
+            Invoke(nameof(Despawn), 1f);
+        }
+    }
+
+    public void Despawn()
+    {
+        NetworkObject.Despawn(true);
     }
 }

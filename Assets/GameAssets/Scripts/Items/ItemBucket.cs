@@ -1,3 +1,4 @@
+using Unity.Netcode;
 using UnityEngine;
 
 public class ItemBucket : Item
@@ -13,15 +14,22 @@ public class ItemBucket : Item
     [SerializeField]
     private string emptySound;
 
-    private bool filled;
+    private NetworkVariable<bool> filled = new(writePerm:NetworkVariableWritePermission.Owner);
+    public override void OnNetworkSpawn()
+    {
+        filled.OnValueChanged += FilledChanged;
+    }
+
     public override bool TryEquipping(Player targetPlayer = null, bool sendRpc = true)
     {
         bool equiped = base.TryEquipping(targetPlayer,sendRpc);
 
         if (equiped)
         {
+            if (targetPlayer == null)
+                targetPlayer = Player.localPlayer;
             ToolAnimationInfo toolAnimInfo = targetPlayer.avatar.GetAnimationInfo();
-            toolAnimInfo.animatedObject.transform.GetChild(0).Find("BucketFluid").gameObject.SetActive(filled);
+            toolAnimInfo.animatedObject.transform.GetChild(0).Find("BucketFluid").gameObject.SetActive(IsFilled());
         }
 
         return equiped;
@@ -31,9 +39,23 @@ public class ItemBucket : Item
         UpdateItem();
     }
 
+    private void FilledChanged(bool previous, bool current)
+    {
+        UpdateVisual(current);
+    }
+
+    private void UpdateVisual(bool isFilled)
+    {
+        ToolAnimationInfo toolAnimInfo = playerWhoHasItem.avatar.GetAnimationInfo();
+        
+        SoundManager.active.PlayAtPos(toolAnimInfo.animatedObject.transform.position,isFilled ? fillUpSound : emptySound);
+        
+        toolAnimInfo.animatedObject.transform.GetChild(0).Find("BucketFluid").gameObject.SetActive(isFilled);
+        waterObject.SetActive(isFilled);
+    }
     public bool IsFilled()
     {
-        return filled;
+        return filled.Value;
     }
 
     public float GetWaterAmmount()
@@ -41,24 +63,14 @@ public class ItemBucket : Item
         return waterAmmount;
     }
 
-    public void Fill()
+    [Rpc(SendTo.Owner)]
+    public void FillOwnerRpc()
     {
-        ToolAnimationInfo toolAnimInfo = playerWhoHasItem.avatar.GetAnimationInfo();
-        SoundManager.active.PlayAtPos(toolAnimInfo.animatedObject.transform.position, fillUpSound);
-
-        toolAnimInfo.animatedObject.transform.GetChild(0).Find("BucketFluid").gameObject.SetActive(true);
-        waterObject.SetActive(true);
-
-        filled = true;
+        filled.Value = true;
     }
-    public void Empty()
+    [Rpc(SendTo.Owner)]
+    public void EmptyOwnerRpc()
     {
-        ToolAnimationInfo toolAnimInfo = playerWhoHasItem.avatar.GetAnimationInfo();
-        SoundManager.active.PlayAtPos(toolAnimInfo.animatedObject.transform.position, emptySound);
-
-        toolAnimInfo.animatedObject.transform.GetChild(0).Find("BucketFluid").gameObject.SetActive(false);
-        waterObject.SetActive(false);
-
-        filled = false;
+        filled.Value = false;
     }
 }
