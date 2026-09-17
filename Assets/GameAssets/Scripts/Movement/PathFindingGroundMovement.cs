@@ -161,7 +161,7 @@ public class PathFindingGroundMovement : GroundMovement
                     SetTarget(transform.position + transform.forward);
                     return GetTargetPosition();
                 }
-                return targetTransform.position;
+                return targetTransform.position + targetPosition;
             case TargetType.Pack:
                 return targetPack.centerPos + targetPosition; // + offset
         }
@@ -180,7 +180,7 @@ public class PathFindingGroundMovement : GroundMovement
         //currentNavigationType = NavigationType.StraightLine;
         this.targetDistance = targetDistance;
     }
-    public void SetTarget(Transform transform, float targetDistance = 1f)
+    public void SetTarget(Transform transform, float targetDistance = 1f, Vector3 posOffset = default)
     {
         if (IsInPack()) LeavePack();
 
@@ -189,6 +189,7 @@ public class PathFindingGroundMovement : GroundMovement
         
         currentTargetType = TargetType.Transform;
         targetTransform = transform;
+        targetPosition = posOffset;
         //currentNavigationType = NavigationType.StraightLine;
         this.targetDistance = targetDistance;
     }

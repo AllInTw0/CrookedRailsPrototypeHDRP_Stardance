@@ -119,11 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &23168098 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6829916163831001656, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-  m_PrefabInstance: {fileID: 4961204942214180034}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &42050640 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6965105430134681891, guid: df8736e030d2c0b49b4f85f35a36d681, type: 3}
@@ -3087,25 +3082,12 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 6874858873742985183, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
   m_PrefabInstance: {fileID: 4961204942214180034}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 23168098}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a32b359c9dace2742b786eb40287bd8a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::RailCar
---- !u!114 &702286769
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 23168098}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3d000503403aaabc6898560371c42b41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RailCarAudio
-  audioSO: {fileID: 11400000, guid: 6f0efc2cb52903ac2b8586a925aa5723, type: 2}
 --- !u!1 &710171436 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 6423650013474941881, guid: 3f8d429966968834da156b31b8f28db4, type: 3}
@@ -8679,14 +8661,6 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 681763434
       objectReference: {fileID: 0}
-    - target: {fileID: -4688235860746038309, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: SceneMigrationSynchronization
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -4688235860746038309, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: InScenePlacedSourceGlobalObjectIdHash
-      value: 405594729
-      objectReference: {fileID: 0}
     - target: {fileID: 1145095308688977823, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
       propertyPath: m_LocalPosition.x
       value: -10
@@ -8727,66 +8701,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 1687578413202623725, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1687578413202623725, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: m_Center.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1687578413202623725, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: m_Extents.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4693261622873589290, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: m_TileSize
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 4693261622873589290, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: m_VoxelSize
-      value: 0.02
-      objectReference: {fileID: 0}
-    - target: {fileID: 4693261622873589290, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: m_AgentTypeID
-      value: -1372625422
-      objectReference: {fileID: 0}
-    - target: {fileID: 4693261622873589290, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: m_NavMeshData
-      value: 
-      objectReference: {fileID: 23800000, guid: ca2dcc5fcc5a56d1aa5fd3f72543a82b, type: 2}
-    - target: {fileID: 4693261622873589290, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: m_UseGeometry
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4693261622873589290, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: m_CollectObjects
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 4693261622873589290, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: m_LayerMask.m_Bits
-      value: 32768
-      objectReference: {fileID: 0}
-    - target: {fileID: 4693261622873589290, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: m_OverrideTileSize
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 4693261622873589290, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      propertyPath: m_OverrideVoxelSize
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6829916163831001656, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
       propertyPath: m_Name
       value: Tender
       objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects:
-    - {fileID: 8929205804242062067, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
+    m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6829916163831001656, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 702286769}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
 --- !u!1001 &6903901890335869936
 PrefabInstance:
@@ -8796,221 +8718,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: m_PresetAsset
-      value: 
-      objectReference: {fileID: 11400000, guid: 3bac8a458aed3e9e48dcb8bf83b802e0, type: 2}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: m_PresetReference
-      value: -2
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: m_IsScenarioSettingsFolded
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: 'managedReferences[2323079165863526487]'
-      value: Unity.Multiplayer.Tools.NetworkSimulator.Runtime Unity.Multiplayer.Tools.NetworkSimulator.Runtime.NetworkSimulatorPreset
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: 'managedReferences[2323079394971353088]'
-      value: Unity.Multiplayer.Tools.NetworkSimulator.Runtime Unity.Multiplayer.Tools.NetworkSimulator.Runtime.NetworkSimulatorPreset
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: 'managedReferences[2323079394971353089]'
-      value: Unity.Multiplayer.Tools.NetworkSimulator.Runtime Unity.Multiplayer.Tools.NetworkSimulator.Runtime.NetworkSimulatorPreset
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: 'managedReferences[2323079394971353090]'
-      value: Unity.Multiplayer.Tools.NetworkSimulator.Runtime Unity.Multiplayer.Tools.NetworkSimulator.Runtime.NetworkSimulatorPreset
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: 'managedReferences[2323079394971353091]'
-      value: Unity.Multiplayer.Tools.NetworkSimulator.Runtime Unity.Multiplayer.Tools.NetworkSimulator.Runtime.NetworkSimulatorPreset
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: 'managedReferences[2323079394971353092]'
-      value: Unity.Multiplayer.Tools.NetworkSimulator.Runtime Unity.Multiplayer.Tools.NetworkSimulator.Runtime.NetworkSimulatorPreset
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: 'managedReferences[2323079394971353093]'
-      value: Unity.Multiplayer.Tools.NetworkSimulator.Runtime Unity.Multiplayer.Tools.NetworkSimulator.Runtime.NetworkSimulatorPreset
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079165863526487].<Name>k__BackingField
-      value: None
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353088].<Name>k__BackingField
-      value: None
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353089].<Name>k__BackingField
-      value: 'Home Broadband [WIFI, Cable, Console, PC]'
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353090].<Name>k__BackingField
-      value: 'Mobile 2G [CDMA & GSM, ''00]'
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353091].<Name>k__BackingField
-      value: None
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353092].<Name>k__BackingField
-      value: 'Home Broadband [WIFI, Cable, Console, PC]'
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353093].<Name>k__BackingField
-      value: None
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079165863526487].<Description>k__BackingField
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353088].<Description>k__BackingField
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353089].<Description>k__BackingField
-      value: Typical of desktop and console platforms (and generally speaking most
-        mobile players too).
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353090].<Description>k__BackingField
-      value: Extremely poor connection, completely unsuitable for synchronous multiplayer
-        gaming due to exceptionally high ping. Turn based games may work.
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353091].<Description>k__BackingField
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353092].<Description>k__BackingField
-      value: Typical of desktop and console platforms (and generally speaking most
-        mobile players too).
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353093].<Description>k__BackingField
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079165863526487].<PacketDelayMs>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353088].<PacketDelayMs>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353089].<PacketDelayMs>k__BackingField
-      value: 32
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353090].<PacketDelayMs>k__BackingField
-      value: 520
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353091].<PacketDelayMs>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353092].<PacketDelayMs>k__BackingField
-      value: 32
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353093].<PacketDelayMs>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079165863526487].<PacketJitterMs>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353088].<PacketJitterMs>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353089].<PacketJitterMs>k__BackingField
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353090].<PacketJitterMs>k__BackingField
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353091].<PacketJitterMs>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353092].<PacketJitterMs>k__BackingField
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353093].<PacketJitterMs>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079165863526487].<PacketLossPercent>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353088].<PacketLossPercent>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353089].<PacketLossPercent>k__BackingField
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353090].<PacketLossPercent>k__BackingField
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353091].<PacketLossPercent>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353092].<PacketLossPercent>k__BackingField
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353093].<PacketLossPercent>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079165863526487].<PacketLossInterval>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353088].<PacketLossInterval>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353089].<PacketLossInterval>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353090].<PacketLossInterval>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353091].<PacketLossInterval>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353092].<PacketLossInterval>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9154240591974997, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
-      propertyPath: managedReferences[2323079394971353093].<PacketLossInterval>k__BackingField
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7850585866279921258, guid: f498440f7bccd9d2bb98aa0652e7356e, type: 3}
       propertyPath: m_Name
       value: NetworkManager
@@ -9129,6 +8836,10 @@ PrefabInstance:
       propertyPath: playerTrain
       value: 
       objectReference: {fileID: 1593954181}
+    - target: {fileID: 806487001265040362, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
+      propertyPath: trainStartLocation
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6799618200178374423, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
       propertyPath: m_Name
       value: Managers
@@ -9280,38 +8991,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 731245647848201438, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 731245647848201438, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 731245647848201438, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 731245647848201438, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2159571974243094664, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2159571974243094664, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2159571974243094664, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2159571974243094664, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3384198015160938112, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
       propertyPath: monitor
       value: 
@@ -9320,29 +8999,9 @@ PrefabInstance:
       propertyPath: monitorRenderCamera
       value: 
       objectReference: {fileID: 1389800748}
-    - target: {fileID: 6235934892739799868, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 6544608583982824014, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
       propertyPath: m_Name
       value: Canvas
-      objectReference: {fileID: 0}
-    - target: {fileID: 6671509256315543638, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6671509256315543638, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6671509256315543638, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6671509256315543638, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7840779805520594376, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
       propertyPath: m_Pivot.x
@@ -9422,26 +9081,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7840779805520594376, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7995492409946008766, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9028442362503919791, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9028442362503919791, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9028442362503919791, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9028442362503919791, guid: c6298bb9ee5c0358e871a75501825f9e, type: 3}
-      propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

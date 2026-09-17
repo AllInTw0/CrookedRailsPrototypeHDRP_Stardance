@@ -19,7 +19,7 @@ public static class Util
         seed *= seed;
         seed = seed.ToString().GetHashCode() * 0.00005f;
         float noise = Mathf.Clamp01(Mathf.PerlinNoise1D(seed));
-        Debug.Log("Noise: " + noise + " seed: " + seed + " maxIndex: " + maxIndex + " return: " + Mathf.RoundToInt(noise * maxIndex));
+        //Debug.Log("Noise: " + noise + " seed: " + seed + " maxIndex: " + maxIndex + " return: " + Mathf.RoundToInt(noise * maxIndex));
         return Mathf.RoundToInt(noise * maxIndex);
     }
     public static bool SolveTrajectory(float startVelocity, Vector3 startPos, Vector3 targetPos, bool angleMode, out float angle)

@@ -46,6 +46,8 @@ public class Health : NetworkBehaviour
     private int damageSum;
     public int clientSideDamage;
     
+    public bool visible = true;
+    
     public UnityEvent<float,Vector3> onTakeDamage;
     private void Awake()
     {
@@ -210,5 +212,10 @@ public class Health : NetworkBehaviour
         if (origin)
             return origin.position;
         return transform.position;
+    }
+
+    public int GetHealthPercent()
+    {
+        return Mathf.RoundToInt(((float)GetHealth() / (float)maxHealth) * 100f);
     }
 }

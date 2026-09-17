@@ -36,6 +36,17 @@ public class InventoryUI : MonoBehaviour
     private RectTransform selector;
     [SerializeField] 
     private float selectorSpeed;
+    [Header("Color")] 
+    [SerializeField]
+    private Color defaultColor;
+    [SerializeField] 
+    private Color selectedColor;
+    [Header("Size")] 
+    [SerializeField] 
+    private Vector2 targetIconSizes;
+    [SerializeField] 
+    private float sizeChangeSpeed;
+    
     [Header("Temp")]
     [SerializeField] 
     private Sprite itemIconTempSprite;
@@ -61,13 +72,33 @@ public class InventoryUI : MonoBehaviour
             //Has Items
             if(!selector.gameObject.activeSelf)
                 selector.gameObject.SetActive(true);
+
+            //Selector
+            RectTransform[] itemTransformArray = new RectTransform[itemIcons.Count + 1];
+            itemTransformArray[0] = toolImage.rectTransform;
+            for (int i = 0; i < itemIcons.Count; i++)
+            {
+                itemTransformArray[i + 1] = itemIcons[i];
+            }
+
+            for (int i = 0; i < itemTransformArray.Length; i++)
+            {
+                float targetSize;
+                if (Player.localPlayer.inventory.selectIndex == i)
+                {
+                    itemTransformArray[i].GetComponent<RawImage>().color = selectedColor;
+                    targetSize = targetIconSizes.y;
+                }
+                else
+                {
+                    itemTransformArray[i].GetComponent<RawImage>().color = defaultColor;
+                    targetSize = targetIconSizes.x;
+                }
+                float size = Mathf.Lerp(itemTransformArray[i].localScale.x, targetSize, Time.deltaTime * sizeChangeSpeed);
+                itemTransformArray[i].localScale = new Vector3(size, size, size);
+            }
             
-            Vector3 targetPos;
-            if (Player.localPlayer.inventory.selectIndex == 0)
-                targetPos = toolImage.rectTransform.position;
-            else
-                targetPos = itemIcons[Player.localPlayer.inventory.selectIndex - 1].position;
-            
+            Vector3 targetPos = itemTransformArray[Player.localPlayer.inventory.selectIndex].position;
             targetPos = new Vector3(targetPos.x, 0f, 0f);
             selector.position = Vector3.Lerp(selector.position, targetPos, Mathf.Clamp01(selectorSpeed * Time.deltaTime));
         }

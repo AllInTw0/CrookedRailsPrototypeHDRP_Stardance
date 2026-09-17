@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64bc68953b889da448ac35dc44d3b8f3, type: 3}
   m_Name: TankCarTwoAxle
   m_EditorClassIdentifier: Assembly-CSharp::RailCarSO
-  railCarName: 
+  railCarName: TankCar
   prefab: {fileID: 5249489907253271450, guid: 023af48a3802de04ba1d5f11e2a431dd, type: 3}
   icon: {fileID: 21300000, guid: 197872cf989ba1746a262ccbdfa6b00a, type: 3}
   weight: 50

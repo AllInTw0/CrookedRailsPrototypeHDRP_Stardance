@@ -287,7 +287,13 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventEveryone:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventServer:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &445970996724051219
@@ -364,7 +370,13 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventEveryone:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventServer:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &9214733938239270287
@@ -452,6 +464,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 77036282995448333}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3254745668468640918
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5016329430882980243}
+  m_Layer: 0
+  m_Name: db1
+  m_TagString: Untagged
+  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5016329430882980243
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3254745668468640918}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 1.06, y: 1.2, z: -2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8474489242798266076}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &4090484029470622885
 GameObject:
   m_ObjectHideFlags: 0
@@ -617,7 +660,10 @@ MonoBehaviour:
   swaySpring: 0.2
   swayDrag: 0.025
   swayMaxAngle: 5
-  derailed: 0
+  displayBoardPrefab: {fileID: 8520575624907356462, guid: d007001dd44f59d65bb32662aebf4963, type: 3}
+  displayBoardPositionList:
+  - {fileID: 5016329430882980243}
+  - {fileID: 2227321125441306628}
 --- !u!208 &4638340051044080544
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -691,6 +737,37 @@ Transform:
   - {fileID: 5970506596955423248}
   m_Father: {fileID: 77036282995448333}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6390323431525969650
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2227321125441306628}
+  m_Layer: 0
+  m_Name: db2
+  m_TagString: Untagged
+  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2227321125441306628
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6390323431525969650}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -1.06, y: 1.2, z: -2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8474489242798266076}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &6782980130800434212
 GameObject:
   m_ObjectHideFlags: 0
@@ -727,6 +804,7 @@ Transform:
   - {fileID: 8081536321559732752}
   - {fileID: 3873748203768081053}
   - {fileID: 6936692052495222712}
+  - {fileID: 8474489242798266076}
   m_Father: {fileID: 2450666158862302806}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &851540127947231038
@@ -786,6 +864,39 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6960481994723023178
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8474489242798266076}
+  m_Layer: 0
+  m_Name: DisplayBoards
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8474489242798266076
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6960481994723023178}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 5016329430882980243}
+  - {fileID: 2227321125441306628}
+  m_Father: {fileID: 77036282995448333}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8549538124814441801
 GameObject:
   m_ObjectHideFlags: 0

@@ -222,7 +222,7 @@ public class Train : NetworkBehaviour
         
  
         //Fuel
-        Debug.Log("Consume fuel: " + consumeFuel);
+        //Debug.Log("Consume fuel: " + consumeFuel);
         if(IsServer && consumeFuel && acceleration > 0f && (controlls == null || controlls.currentState.Value == LocomotiveControls.State.normal))
         {
             foreach (FuelSource fuelSource in fuelSourceList)

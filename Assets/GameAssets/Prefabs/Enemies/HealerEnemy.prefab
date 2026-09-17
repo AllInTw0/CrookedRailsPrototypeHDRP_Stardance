@@ -137,7 +137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &6773624189879582403
 Transform:
   m_ObjectHideFlags: 0
@@ -188,7 +188,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d717c5d8b6493a43bb0ed6a08bd55ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDamageCollider
-  enemyBehaviour: {fileID: 2535033255997809392}
+  enemyBehaviour: {fileID: 0}
   coolDown: 1.3
   freezeTime: 0.8
   attackDelay: 0.225
@@ -385,10 +385,10 @@ GameObject:
   - component: {fileID: 4171352187836740491}
   - component: {fileID: 5124467602069354198}
   - component: {fileID: 7106498880292165457}
-  - component: {fileID: 2535033255997809392}
   - component: {fileID: 4093623089762549372}
+  - component: {fileID: 4555415201889654931}
   m_Layer: 11
-  m_Name: Enemy
+  m_Name: HealerEnemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -459,7 +459,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 0
   m_IsKinematic: 0
-  m_Interpolate: 0
+  m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &5124467602069354198
@@ -474,7 +474,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3242837286
+  GlobalObjectIdHash: 373810867
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -507,33 +507,14 @@ MonoBehaviour:
   audioOnDamageTaken: 
   origin: {fileID: 172228222760864834}
   invulnerable: 0
+  clientSideDamage: 0
   onTakeDamage:
     m_PersistentCalls:
       m_Calls: []
-  behaviour: {fileID: 2535033255997809392}
+  behaviour: {fileID: 4555415201889654931}
   destroyDelay: 0.25
   collision: {fileID: 7477618007067767545}
-  ragdollPrefab: {fileID: 7121921133450163601, guid: 8623c2374eec9e44ab062496cf630770, type: 3}
---- !u!114 &2535033255997809392
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6631932380828592750}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 913c63a61ff2c014aae2c50b1adec2fd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GroundEnemy
-  ShowTopMostFoldoutHeaderGroup: 1
-  enemyInfo: {fileID: 11400000, guid: fb00dc0c533df4d4a9b006ca29b43a84, type: 2}
-  centerTransform: {fileID: 172228222760864834}
-  health: {fileID: 7106498880292165457}
-  animator: {fileID: 8239933683754249275}
-  walkCycleSpeedMult: 0.5
-  rotationSpeed: 5
-  spawnFreezeTime: 3.5
+  ragdollPrefab: {fileID: 7121921133450163601, guid: 2444d38c2e7afc7b1a90a2429ba0ed0e, type: 3}
 --- !u!114 &4093623089762549372
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -567,6 +548,33 @@ MonoBehaviour:
   velocity: 0
   currentNavigationType: 0
   currentTargetType: 0
+--- !u!114 &4555415201889654931
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6631932380828592750}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e3ca9f28f2254f1ea75f11d88ab080a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HealerEnemy
+  ShowTopMostFoldoutHeaderGroup: 1
+  enemyInfo: {fileID: 11400000, guid: 27d6ce29bae0f75ad93ad8a23500aece, type: 2}
+  centerTransform: {fileID: 172228222760864834}
+  health: {fileID: 7106498880292165457}
+  animator: {fileID: 8239933683754249275}
+  spawnFreezeTime: 3.5
+  walkCycleSpeedMult: 0.5
+  rotationSpeed: 5
+  maxHealDistance: 5
+  sightDistance: 15
+  maxLinkedCount: 3
+  healLinkPrefab: {fileID: 5777703601207664243, guid: 055d8a901ca6d38b1bac2948a46da677, type: 3}
+  healInterval: 2
+  healAmount: 5
+  healParticlePrefab: {fileID: 8803059365575256208, guid: e7ff44bddae551f81b7caa0e84cd16fb, type: 3}
 --- !u!1 &6770462441480761055
 GameObject:
   m_ObjectHideFlags: 0
@@ -727,6 +735,18 @@ PrefabInstance:
     m_TransformParent: {fileID: 1560277106313700146}
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 66eb9fc67c900f34eae8dc550f06db75, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 66eb9fc67c900f34eae8dc550f06db75, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 66eb9fc67c900f34eae8dc550f06db75, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 1.25
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 66eb9fc67c900f34eae8dc550f06db75, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -766,10 +786,18 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 66eb9fc67c900f34eae8dc550f06db75, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 66eb9fc67c900f34eae8dc550f06db75, type: 3}
       propertyPath: m_Name
       value: SwampEnemyRiged
       objectReference: {fileID: 0}
+    - target: {fileID: 2887072235533569873, guid: 66eb9fc67c900f34eae8dc550f06db75, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 030e11f81633d96dfb0678d82e720467, type: 2}
     - target: {fileID: 7045121621019334615, guid: 66eb9fc67c900f34eae8dc550f06db75, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

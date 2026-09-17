@@ -1155,7 +1155,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fbe897a0eeabf94f9ae603067c15c2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
-  baseSpeed: 2.5
+  baseSpeed: 3.5
   acceleration: 10
   deceleration: 10
   maxAngle: 45
@@ -1176,7 +1176,7 @@ MonoBehaviour:
   velocity: 0
   canNoclip: 1
   orientation: {fileID: 5018052482369340482}
-  sprintingSpeed: 4.25
+  sprintingSpeed: 5
   crouchingSpeed: 1
   noclipSpeed: 20
   climbingSpeed: 2
@@ -1189,7 +1189,7 @@ MonoBehaviour:
   maxStamina: 100
   staminaGainDelay: 0.9
   staminaGain: 10
-  staminaLoss: 8.5
+  staminaLoss: 8
   jumpForce: 500
   jumpCoolDown: 0.2
   variableJumpTime: {x: 0, y: 1}

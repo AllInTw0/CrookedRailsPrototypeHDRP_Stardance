@@ -55,8 +55,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: 0.010303497
-      value: 296.38654
+      time: -0.017288208
+      value: 298.78796
       inSlope: 65.7847
       outSlope: 65.7847
       tangentMode: 0
@@ -121,7 +121,7 @@ MonoBehaviour:
     distanceTillStructure: 0
     spawningDisabled: 0
   distanceBufferBetweenStructures: 20
-  trainStartLocation: 2
+  trainStartLocation: 0
   disableNavMeshGen: 0
 --- !u!1 &738210242235767204
 GameObject:
@@ -357,6 +357,7 @@ MonoBehaviour:
     minMaxRot: {x: -45, y: 45}
     minMaxWaveCooldown: {x: 20, y: 30}
     minMaxTravelDistanceCooldown: {x: 10, y: 20}
+    travelDistanceDecay: 0
     minDistanceTravelled: 0
     probability: 1
     canRepeat: 1
@@ -371,6 +372,7 @@ MonoBehaviour:
     minMaxRot: {x: -45, y: 45}
     minMaxWaveCooldown: {x: 10, y: 20}
     minMaxTravelDistanceCooldown: {x: 10, y: 20}
+    travelDistanceDecay: 0
     minDistanceTravelled: 200
     probability: 0.3
     canRepeat: 0
@@ -724,7 +726,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 229873088
+  GlobalObjectIdHash: 1708868192
   InScenePlacedSourceGlobalObjectIdHash: 229873088
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1524,8 +1526,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 71c61feec5dc81608947fd10dea06fd5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MultiplayerManager
-  hostLocally: 1
-  hostLocalTargetScene: Testing
+  hostLocally: 0
+  hostLocalTargetScene: Game
   editorIsClient: 0
   manuallySetRegion: 0
   region: europe-north1

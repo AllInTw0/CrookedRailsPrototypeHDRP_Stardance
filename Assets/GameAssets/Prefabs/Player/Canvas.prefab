@@ -3604,7 +3604,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &6638551375551932865
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4348,6 +4348,10 @@ MonoBehaviour:
   toolImage: {fileID: 3054303934485020562}
   selector: {fileID: 7005881234569947249}
   selectorSpeed: 20
+  defaultColor: {r: 1, g: 1, b: 1, a: 1}
+  selectedColor: {r: 0.6808473, g: 0.8931694, b: 0.9433962, a: 1}
+  targetIconSizes: {x: 0.8, y: 1.1}
+  sizeChangeSpeed: 20
   itemIconTempSprite: {fileID: 21300000, guid: dde90c0131b30c84fba246c0dc15ef82, type: 3}
 --- !u!114 &6415471797845120329
 MonoBehaviour:
@@ -4546,7 +4550,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &7425400679587887096
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5862,7 +5866,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &8467560190988774530
 RectTransform:
   m_ObjectHideFlags: 0

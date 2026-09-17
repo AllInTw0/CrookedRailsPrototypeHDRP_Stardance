@@ -84,6 +84,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 916756930656439565}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &4054948006582819070
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7912572756355062989}
+  m_Layer: 0
+  m_Name: db1
+  m_TagString: Untagged
+  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7912572756355062989
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4054948006582819070}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 1.26, y: 1.2, z: 1.3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1915608864126786201}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &4591550788232894288
 GameObject:
   m_ObjectHideFlags: 0
@@ -180,7 +211,10 @@ MonoBehaviour:
   swaySpring: 0.2
   swayDrag: 0.025
   swayMaxAngle: 5
-  derailed: 0
+  displayBoardPrefab: {fileID: 8520575624907356462, guid: d007001dd44f59d65bb32662aebf4963, type: 3}
+  displayBoardPositionList:
+  - {fileID: 7912572756355062989}
+  - {fileID: 8594225970688930989}
 --- !u!208 &4685049854705146984
 NavMeshObstacle:
   m_ObjectHideFlags: 0
@@ -286,6 +320,7 @@ Transform:
   - {fileID: 6380731290305345154}
   - {fileID: 7095321765889716053}
   - {fileID: 6100675023245559099}
+  - {fileID: 1915608864126786201}
   m_Father: {fileID: 3395232592247058226}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &6379016932758960117
@@ -345,6 +380,70 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &5870267124170260331
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1915608864126786201}
+  m_Layer: 0
+  m_Name: DisplayBoards
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1915608864126786201
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5870267124170260331}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7912572756355062989}
+  - {fileID: 8594225970688930989}
+  m_Father: {fileID: 916756930656439565}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &6429183729402983608
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8594225970688930989}
+  m_Layer: 0
+  m_Name: db2
+  m_TagString: Untagged
+  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8594225970688930989
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6429183729402983608}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -1.26, y: 1.2, z: 1.3}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1915608864126786201}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &6517662383260991156
 GameObject:
   m_ObjectHideFlags: 0
@@ -398,7 +497,13 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventEveryone:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventServer:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &7157022227962442728
@@ -565,7 +670,13 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventEveryone:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventServer:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &2233507580864993926

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -36,6 +37,7 @@ public class Section : NetworkBehaviour
     {
         //Initialize()
     }
+    
     public void Initialize(StructureMaster structureMaster)
     {
         this.structureMaster = structureMaster;
@@ -62,8 +64,6 @@ public class Section : NetworkBehaviour
 
     public bool SyncToClient()
     {
-        structureID.Value = structureMaster.GetStructureID();
-
         if (TryGetComponent(out NetworkObject networkObject))
         {
             transform.SetParent(null);
@@ -76,16 +76,34 @@ public class Section : NetworkBehaviour
         }
     }
 
+    public void DestroySection()
+    {
+        if (IsServer && TryGetComponent(out NetworkObject networkObject) && networkObject.IsSpawned)
+            networkObject.Despawn(true);
+        else
+            Destroy(gameObject);
+    }
     public override void OnNetworkSpawn()
     {
-        if (IsServer == false)
+        if(IsServer)
+            structureID.Value = structureMaster.GetStructureID();
+        else
+            AwaitStructureID();
+    }
+
+    private async void AwaitStructureID()
+    {
+        while (structureID.Value == 0)
         {
-            structureMaster = StructureMaster.GetStructureById(structureID.Value);
-            Initialize(structureMaster);
-            
-            structureMaster.structureSectionList.Add(this);
-            structureMaster.structureConnectionList.AddRange(GetAllConnectionList());
+            Debug.Log("Waiting for structureID");
+            await Task.Delay(10);
         }
+        
+        structureMaster = StructureMaster.GetStructureById(structureID.Value);
+        Initialize(structureMaster);
+            
+        structureMaster.structureSectionList.Add(this);
+        structureMaster.structureConnectionList.AddRange(GetAllConnectionList());
     }
 
     public List<Connection> GetConnectingConnectionList()

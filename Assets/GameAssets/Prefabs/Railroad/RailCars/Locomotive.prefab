@@ -364,8 +364,11 @@ MonoBehaviour:
   leverType: 0
   startAxis: {x: 15, y: 0, z: 0}
   endAxis: {x: -15, y: 0, z: 0}
-  notches: 1
   speed: 170
+  animator: {fileID: 0}
+  animatorBoolStr: 
+  targetObject: {fileID: 0}
+  notches: 1
   displayNotches: 1
 --- !u!1 &1354287302548652920
 GameObject:
@@ -623,7 +626,13 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventEveryone:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventServer:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &5131026380059012358
@@ -1074,8 +1083,40 @@ Transform:
   - {fileID: 708413865698638439}
   - {fileID: 2812511259732320148}
   - {fileID: 3658155126479182970}
+  - {fileID: 5454081351267173624}
   m_Father: {fileID: 8692011977264388937}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &2935580036282826267
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 654735877015826868}
+  m_Layer: 0
+  m_Name: db2
+  m_TagString: Untagged
+  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &654735877015826868
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2935580036282826267}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -1.21, y: 1.95, z: -2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5454081351267173624}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &2982800475359559310
 GameObject:
   m_ObjectHideFlags: 0
@@ -6545,8 +6586,11 @@ MonoBehaviour:
   leverType: 0
   startAxis: {x: 0, y: 90, z: 0}
   endAxis: {x: 0, y: 0, z: 0}
-  notches: 1
   speed: 250
+  animator: {fileID: 0}
+  animatorBoolStr: 
+  targetObject: {fileID: 0}
+  notches: 1
   displayNotches: 0
 --- !u!1 &4235341213232856734
 GameObject:
@@ -7711,6 +7755,39 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!1 &6068255628192875812
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5454081351267173624}
+  m_Layer: 0
+  m_Name: DisplayBoards
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5454081351267173624
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6068255628192875812}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 8778933932373997856}
+  - {fileID: 654735877015826868}
+  m_Father: {fileID: 4847168072240329759}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6105222561057076662
 GameObject:
   m_ObjectHideFlags: 0
@@ -8029,7 +8106,10 @@ MonoBehaviour:
   swaySpring: 0.2
   swayDrag: 0.025
   swayMaxAngle: 5
-  derailed: 0
+  displayBoardPrefab: {fileID: 8520575624907356462, guid: d007001dd44f59d65bb32662aebf4963, type: 3}
+  displayBoardPositionList:
+  - {fileID: 8778933932373997856}
+  - {fileID: 654735877015826868}
 --- !u!114 &2347285896684240729
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8270,21 +8350,15 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4377480842177338080}
-        m_TargetAssemblyTypeName: UnityEngine.Light, UnityEngine
-        m_MethodName: set_enabled
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
+      m_Calls: []
+  interactEventEveryone:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventServer:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &7219500418905901899
 GameObject:
   m_ObjectHideFlags: 0
@@ -8643,6 +8717,37 @@ MonoBehaviour:
   m_AreaLightEmissiveMeshShadowCastingMode: 0
   m_AreaLightEmissiveMeshMotionVectorGenerationMode: 0
   m_AreaLightEmissiveMeshLayer: -1
+--- !u!1 &7798738233985633564
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 8778933932373997856}
+  m_Layer: 0
+  m_Name: db1
+  m_TagString: Untagged
+  m_Icon: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000, type: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &8778933932373997856
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7798738233985633564}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 1.21, y: 1.95, z: -2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5454081351267173624}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!1 &7938186978373944457
 GameObject:
   m_ObjectHideFlags: 0
@@ -8696,7 +8801,13 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventEveryone:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventServer:
     m_PersistentCalls:
       m_Calls: []
 --- !u!65 &1266966713272547391
@@ -9111,8 +9222,11 @@ MonoBehaviour:
   leverType: 0
   startAxis: {x: 0, y: 0, z: 0}
   endAxis: {x: 0, y: 25, z: 0}
-  notches: 4
   speed: 170
+  animator: {fileID: 0}
+  animatorBoolStr: 
+  targetObject: {fileID: 0}
+  notches: 4
   displayNotches: 1
 --- !u!65 &395529979990357735
 BoxCollider:
@@ -9400,21 +9514,15 @@ MonoBehaviour:
   interactSound: Click
   objectNameOverride: 
   actionNameOverride: 
-  interactEvent:
+  interactEventLocal:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2018632478298941917}
-        m_TargetAssemblyTypeName: UnityEngine.Light, UnityEngine
-        m_MethodName: set_enabled
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
+      m_Calls: []
+  interactEventEveryone:
+    m_PersistentCalls:
+      m_Calls: []
+  interactEventServer:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1001 &175676818568809662
 PrefabInstance:
   m_ObjectHideFlags: 0

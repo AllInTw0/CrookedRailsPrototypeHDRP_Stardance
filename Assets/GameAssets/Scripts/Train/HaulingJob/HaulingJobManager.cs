@@ -63,6 +63,8 @@ public class HaulingJobManager : NetworkBehaviour
     }
     public static CargoSO GetCargoSOByID(int ID)
     {
+        if (ID < 0 || ID >= active.haulingCargoInfoList.Count)
+            return null;
         return active.haulingCargoInfoList[ID];
     }
     [Header("Railcar List")]

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.Netcode;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -60,7 +61,7 @@ public class GenerationEntry
 }
 public class StructureMaster : NetworkBehaviour
 {
-    public static int nextStructureID = 0;
+    public static int nextStructureID = 1;
     public static List<StructureMaster> structureMasterList = new List<StructureMaster>();
     private NetworkVariable<int> structureID = new(writePerm: NetworkVariableWritePermission.Server);
     public int GetStructureID(){return structureID.Value;}
@@ -84,8 +85,8 @@ public class StructureMaster : NetworkBehaviour
     public int maxRetryCount;
     private int retryCount = 0;
 
-    public static int generatingStructures;
-    public static int finnishedStructures;
+    public static List<StructureMaster> generatingStructures = new List<StructureMaster>();
+    public static List<StructureMaster> finnishedStructures = new List<StructureMaster>();
 
     [HideInInspector]
     public List<Connection> structureConnectionList;
@@ -108,7 +109,7 @@ public class StructureMaster : NetworkBehaviour
         this.section = section;
         this.structureSO = structureSO;
         
-        generatingStructures++;
+        generatingStructures.Add(this);
         
         //Multiplayer
         if (TryGetComponent(out NetworkObject networkObject))
@@ -131,15 +132,7 @@ public class StructureMaster : NetworkBehaviour
         {
             structureID.Value = nextStructureID;
             nextStructureID++;
-            
-            GeneratingStructureRpc();
         }
-    }
-
-    [Rpc(SendTo.NotServer)]
-    private void GeneratingStructureRpc()
-    {
-        generatingStructures++;
     }
     private void GenerateStructure()
     {
@@ -180,7 +173,7 @@ public class StructureMaster : NetworkBehaviour
     private void FinishedGenerating()
     {
         //Finished generating!
-        finnishedStructures++;
+        finnishedStructures.Add(this);
         if (section != null && structureSO != null)
         {
             if (structureSO.addAutoStop)
@@ -214,6 +207,7 @@ public class StructureMaster : NetworkBehaviour
 
     private async void FinishedGeneratingClient(int sectionCount)
     {
+        generatingStructures.Add(this);
         //Wait for all sections to sync
         Debug.Log("FinishedGeneratingClient");
         while (sectionCount != structureSectionList.Count)
@@ -227,10 +221,14 @@ public class StructureMaster : NetworkBehaviour
             ConnectNearbyConnections(sectionScript);
         }
         SpawnEndPrefabs();
-        finnishedStructures++;
+        finnishedStructures.Add(this);
     }
     public void OnDestroy()
     {
+        generatingStructures.Remove(this);
+        finnishedStructures.Remove(this);
+        
+        DestroyStructure();
         if (structureType == StructureType.Station)
         {
             //GameStateManager.isStationSpawned = false;
@@ -240,7 +238,7 @@ public class StructureMaster : NetworkBehaviour
     {
         foreach (Section section in structureSectionList)
         {
-            DestroyImmediate(section.gameObject);
+            section.DestroySection();
         }
     }
     public void RestartGeneration()
@@ -255,9 +253,8 @@ public class StructureMaster : NetworkBehaviour
         DestroyStructure();
         if (retryCount > maxRetryCount)
         {
-            Destroy(gameObject);
             Debug.LogWarning("Reached max retries!");
-            finnishedStructures++;
+            NetworkObject.Despawn(true);
             return;
         }
         GenerateStructure();

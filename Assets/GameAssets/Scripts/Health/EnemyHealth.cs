@@ -12,7 +12,11 @@ public class EnemyHealth : Health
     private Collider collision;
     [SerializeField]
     private GameObject ragdollPrefab;
-
+    
+    public Enemy GetBehaviour()
+    {
+        return behaviour;
+    }
     private void Start()
     {
         AddHealthToGlobalList();

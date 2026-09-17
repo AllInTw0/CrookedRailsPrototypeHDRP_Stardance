@@ -86,7 +86,7 @@ public class LeverInteractable : Interactable
             Vector3 targetVector = Vector3.Lerp(startAxis,endAxis, GetCurrentNotch() / (float)notches);
             transform.localRotation = Quaternion.RotateTowards(transform.localRotation, Quaternion.Euler(targetVector), speed * Time.deltaTime);
         }
-        else if (leverType == LeverType.Rotation)
+        else if (leverType == LeverType.Position)
         {
             Vector3 targetVector = Vector3.Lerp(startAxis,endAxis, GetCurrentNotch() / (float)notches);
             transform.localPosition = Vector3.MoveTowards(transform.localPosition, targetVector, speed * Time.deltaTime);

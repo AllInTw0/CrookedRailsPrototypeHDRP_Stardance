@@ -194,8 +194,8 @@ public class LocomotiveControls : NetworkBehaviour
             //Fuel
             if (train.HasEnoughFuel(out string depletedFuelSourceName))
             {
-                throttle.SetActionNameOverride("");
-                throttle.SetLocked(false);
+                //throttle.SetActionNameOverride("");
+                //throttle.SetLocked(false);
                 if(IsServer) currentState.Value = State.normal;
             }
         }
@@ -203,9 +203,9 @@ public class LocomotiveControls : NetworkBehaviour
         {
             if(train.HasEnoughFuel(out string depletedFuelSourceName) == false)
             {
-                throttle.SetActionNameOverride("No " + depletedFuelSourceName + "!");
-                throttle.SetLocked(true);
-                throttle.SetCurrentNotch(0);
+                //throttle.SetActionNameOverride("No " + depletedFuelSourceName + "!");
+                //throttle.SetLocked(true);
+                //throttle.SetCurrentNotch(0);
                 if(IsServer) currentState.Value = State.depletedFuel;
             }
         }

@@ -6,24 +6,33 @@ using Random = UnityEngine.Random;
 [RequireComponent(typeof(PathFindingGroundMovement))]
 public class GroundEnemy : Enemy
 {
-    private PathFindingGroundMovement movement;
-    
+    [NonSerialized]
+    public PathFindingGroundMovement movement;
     
     //Animation
+    [Header("Animation")]
     public float walkCycleSpeedMult;
     public float rotationSpeed;
-    [Header("Spawning")]
-    public float spawnFreezeTime;
+    
+    private float timeStandingStill;
+    private float minMovementVelcoity = 0.1f;
 
-    private void Awake()
+    public float GetTimeStandingStill()
+    {
+        return timeStandingStill;
+    }
+    public void ResetTimeStandingStill()
+    {
+        timeStandingStill = 0f;
+    }
+    public override void Awake()
     {
         movement = GetComponent<PathFindingGroundMovement>();
     }
 
-    private void Start()
+    public override void Start()
     {
-        Freeze();
-        Invoke(nameof(UnFreeze), spawnFreezeTime);
+        base.Start();
     }
 
     public override void FixedUpdateCall()
@@ -35,96 +44,16 @@ public class GroundEnemy : Enemy
         //movement.UpdateNavigationBehaviour();
         movement.UpdateNavMovement();
         Animate();
+
+        if (movement.rb.linearVelocity.magnitude <= minMovementVelcoity)
+            timeStandingStill += Time.deltaTime;
+        else
+            timeStandingStill = 0;
     }
     public override void UpdateBehaviour()
     {
-        bool targetReached = movement.HasReachedTarget();
-        //Debug.Log(targetReached);
-
-        switch (state)
-        {
-            case State.Idle:
-                //Pack handling
-                if(IsInPack() == false)
-                {
-                    foreach (EnemyPack pack in EnemyManager.active.activePackList)
-                    {
-                        float distance = Vector3.Distance(transform.position, pack.centerPos);
-                        if(distance <= pack.affectRadius)
-                        {
-                            movement.SetTarget(pack, GetRandomOffset(pack.sizeRadius), 1f);
-                        }
-                    }
-                }
-
-                //Check for nearby targets
-                if (CheckForTargets(out Health closestHealth))
-                {
-                    if (IsInPack()) movement.targetPack.AngerPack(closestHealth.transform);
-                    else Anger(closestHealth.transform,5f);
-                }
-                else
-                {
-                    //Roam around
-                    if (targetReached)
-                    {
-                        timmer -= EnemyManager.active.behaviourRefreshRate;
-                    }
-                    if (timmer <= 0)
-                    {
-                        if (IsInPack()) movement.SetTarget(movement.targetPack, GetRandomOffset(movement.targetPack.sizeRadius), 1f);
-                        else movement.SetTarget(GetRandomPosition(4f), 1f);
-                        timmer = Random.Range(1.5f, 6f);
-                    }
-                }
-
-                break;
-            case State.Attacking:
-                //Attack player / train
-                if (CheckForTargets(out Health closestHealth1))
-                {
-                    movement.SetTarget(closestHealth1.transform, 1f);
-                    timmer = 5f;
-                }
-                else
-                {
-                    timmer -= EnemyManager.active.behaviourRefreshRate;
-                    if(timmer <= 0)
-                    {
-                        state = State.Idle;
-
-                    }
-                }
-                    break;
-            default:
-                break;
-        }
-
         movement.UpdateNavigationBehaviour();
         base.UpdateBehaviour();
-    }
-    public Vector3 GetRandomPosition(float radius = 4f)
-    {
-        int safety = 5;
-        while (safety > 0)
-        {
-            Vector3 samplePos = transform.position + GetRandomOffset(radius);
-
-            if (NavMesh.SamplePosition(samplePos,out NavMeshHit hit, radius, NavMesh.AllAreas))
-            {
-                return hit.position;
-            }
-
-            safety--;
-        }
-
-        Debug.LogWarning("Exeeded safety while loop limit");
-        return transform.position + GetRandomOffset(radius);
-    }
-    public Vector3 GetRandomOffset(float radius = 4f)
-    {
-        Vector2 randomDir = Random.insideUnitCircle * radius;
-        return new Vector3(randomDir.x, 0, randomDir.y);
     }
     public override void Anger(Transform target, float intrestTime)
     {
@@ -155,7 +84,7 @@ public class GroundEnemy : Enemy
     {
         animator.SetFloat("Velocity", movement.velocity);
         animator.SetFloat("SpeedMult", movement.velocity * walkCycleSpeedMult);
-        if(movement.targetDirVector != Vector3.zero)
-            transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(new Vector3(movement.targetDirVector.x,0, movement.targetDirVector.z)), Time.deltaTime * rotationSpeed);
+        if (movement.targetDirVector != Vector3.zero)
+            movement.rb.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(new Vector3(movement.targetDirVector.x,0, movement.targetDirVector.z)), Time.deltaTime * rotationSpeed);
     }
 }

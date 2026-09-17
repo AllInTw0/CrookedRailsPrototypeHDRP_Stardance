@@ -279,15 +279,10 @@ public class EnemySpawner : MonoBehaviour
         {
             float freeDanger = targetDanger - spawnedDanger;
 
-            EnemySO enemy = null;
+            EnemySO enemy = inGameEnemyArray[Random.Range(0,inGameEnemyArray.Length)];
+            //Debug.Log(inGameEnemyArray.Length + ", " + enemy);
             foreach (EnemySO enemySO in inGameEnemyArray)
             {
-                if(enemy == null)
-                {
-                    enemy = enemySO;
-                    continue;
-                }
-
                 if (enemySO.dangerValue < freeDanger && enemySO.dangerValue > enemy.dangerValue)
                 {
                     enemy = enemySO;

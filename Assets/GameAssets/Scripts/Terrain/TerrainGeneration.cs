@@ -186,7 +186,7 @@ public class TerrainGeneration : NetworkBehaviour
         {
             if (chunk.threading)
                 return false;
-            if (chunk.meshData != null)
+            if (chunk.meshData != null && chunk.meshData.meshObject != null && chunk.meshData.meshObject.GetComponent<MeshCollider>() != null)
                 return true;
             return false;
         }

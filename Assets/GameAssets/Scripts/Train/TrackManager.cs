@@ -370,7 +370,10 @@ public class TrackManager : NetworkBehaviour
 
         foreach (var obj in section.associatedObjects)
         {
-            Destroy(obj);
+            if(obj.TryGetComponent(out NetworkObject networkObject) && IsServer)
+                networkObject.Despawn(true);
+            else
+                Destroy(obj);
         }
         if (section.pooledAssociatedObjects != null)
         {

@@ -194,7 +194,7 @@ public class EnemyManager : MonoBehaviour
     }
     public void SpawnEnemy(GameObject prefab, Vector3 position, Quaternion rotation)
     {
-        GameObject enemy = Instantiate(enemyPrefab, position, rotation);
+        GameObject enemy = Instantiate(prefab, position, rotation);
         enemy.GetComponent<NetworkObject>().Spawn(true);
     }
 
