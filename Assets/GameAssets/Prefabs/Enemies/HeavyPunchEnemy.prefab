@@ -188,7 +188,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1d717c5d8b6493a43bb0ed6a08bd55ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyDamageCollider
-  enemyBehaviour: {fileID: 0}
+  enemyBehaviour: {fileID: 529016918824322778}
   coolDown: 1.3
   freezeTime: 0.8
   attackDelay: 0.225
@@ -196,7 +196,7 @@ MonoBehaviour:
   attackForce: 2.5
   attackSoundName: Small Enemy Attack
   attackImpactSoundName: Enemy Attack Impact
-  healthTypeFilterList: 01000000020000000400000005000000
+  healthTypeFilterList: 0100000002000000040000000500000006000000
 --- !u!1 &2874978076699277342
 GameObject:
   m_ObjectHideFlags: 0

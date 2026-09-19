@@ -19,7 +19,7 @@ public class DebugHelperEditor : Editor
 
         if (GUILayout.Button("Add Railcar"))
         {
-            RailCar railCar = Train.playerTrain.AddRailCar(debugHelper.railCar, 2); // 2 because 0-locomotive, 1-tender
+            RailCar railCar = PlayerTrain.active.AddRailCar(debugHelper.railCar, 2); // 2 because 0-locomotive, 1-tender
             railCar.SetCargo(debugHelper.cargo, 1, 1);
         }
         if (GUILayout.Button("Spawn Enemy Near Player"))

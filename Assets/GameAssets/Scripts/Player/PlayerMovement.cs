@@ -313,7 +313,7 @@ public class PlayerMovement : GroundMovement
             if (player == Player.localPlayer)
             {
                 //Max Distance 
-                if (maxDistanceLimitEnabled && Train.playerTrain != null && GameStateManager.gameStarted.Value)
+                if (maxDistanceLimitEnabled && PlayerTrain.active != null && GameStateManager.gameStarted.Value)
                 {
                     DistanceWaypoint closestWaypoint = null;
                     float distanceToWaypoint = float.MaxValue;
@@ -327,7 +327,7 @@ public class PlayerMovement : GroundMovement
                         }
                     }
 
-                    float trainDist = Train.playerTrain.GetClosestDistanceToPos(transform.position);
+                    float trainDist = PlayerTrain.active.GetClosestDistanceToPos(transform.position);
 
                     if (closestWaypoint != null && trainDist > distanceToWaypoint)
                     {
@@ -361,7 +361,7 @@ public class PlayerMovement : GroundMovement
                     else
                     {
                         if (trainDist >= maxDistanceFromTrain &&
-                            Train.playerTrain.GetClosestDistanceToPos(transform.position + projectedVector) > trainDist)
+                            PlayerTrain.active.GetClosestDistanceToPos(transform.position + projectedVector) > trainDist)
                         {
                             Debug.Log("Walking away from the train!");
                             if (sentATooFarFromTrainWarning == false)
@@ -468,8 +468,8 @@ public class PlayerMovement : GroundMovement
         }
 
         float trainDist = 0f;
-        if(Train.playerTrain != null)
-            trainDist = Train.playerTrain.GetClosestDistanceToPos(worldPos);
+        if(PlayerTrain.active != null)
+            trainDist = PlayerTrain.active.GetClosestDistanceToPos(worldPos);
 
         return trainDist < maxDistanceFromTrain || (closestWaypoint != null && distanceToWaypoint < closestWaypoint.maxDistance);
     }

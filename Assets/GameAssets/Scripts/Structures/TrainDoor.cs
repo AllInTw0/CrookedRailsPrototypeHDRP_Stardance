@@ -16,14 +16,14 @@ public class TrainDoor : Door
     {
         float timeToOpen = 1f / minOpenSpeed;
 
-        RailCar frontRailCar = Train.playerTrain.GetRailCarAtIndex(0);
+        RailCar frontRailCar = PlayerTrain.active.GetRailCarAtIndex(0);
         Vector3 trainPos = frontRailCar.transform.position + frontRailCar.transform.forward * (frontRailCar.frontLength + 1f);
 
         float distanceToTrain = Vector3.Distance(transform.position,trainPos);
 
         //Debug.DrawRay(trainPos, Vector3.up, Color.blueViolet);
 
-        float trainSpeed = Train.playerTrain.GetSpeed();
+        float trainSpeed = PlayerTrain.active.GetSpeed();
         float trainTime = distanceToTrain / trainSpeed;
 
         //Debug.Log(trainTime + ", " + timeToOpen);

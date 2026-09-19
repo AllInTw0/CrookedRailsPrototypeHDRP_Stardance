@@ -104,7 +104,7 @@ public class Player : NetworkBehaviour
         while (true)//Safety net
         {
             //Teleport to starting location
-            if (TeleportOnStart.active != null && Train.playerTrain.IsInitialized())
+            if (TeleportOnStart.active != null && PlayerTrain.active.IsInitialized())
             {
                 TeleportOnStart.active.Teleport();
                 return;
@@ -144,7 +144,7 @@ public class Player : NetworkBehaviour
             Vector3 position = transform.position;
             if (movement.IsOnRailCar(out RailCar railCar))
             {
-                List<RailCar> railCarList = Train.playerTrain.GetConsist();
+                List<RailCar> railCarList = PlayerTrain.active.GetConsist();
                 for (int i = 0; i < railCarList.Count; i++)
                 {
                     if (railCarList[i] == railCar)
@@ -192,7 +192,7 @@ public class Player : NetworkBehaviour
         if (current.movingPlatformID != 0)
         {
             int index = current.movingPlatformID - 1;
-            Transform platform = Train.playerTrain.GetConsist()[index].transform;
+            Transform platform = PlayerTrain.active.GetConsist()[index].transform;
             MovingPlatformManager.active.AddEntry(rb,transform,platform,true,rbStartInterpolation);
             targetWorldPos = platform.TransformPoint(targetWorldPos);
         }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
 public class PayloadGenerator : StructureGenerator
@@ -17,6 +18,8 @@ public class PayloadGenerator : StructureGenerator
     private float handleLength = 4f;
     [SerializeField] 
     private int payloadTrackMeshIndex = 4;
+    [SerializeField] 
+    private GameObject payloadPrefab;
     public override IEnumerator Generate(StructureMaster structureMaster)
     {
         Debug.Log("Generating Payload Structure");
@@ -127,12 +130,18 @@ public class PayloadGenerator : StructureGenerator
                         {
                             TrackSection track = TrackManager.active.CreateTrackSection(lastPoint, newPoint,
                                 Spline.active.splineMeshList[payloadTrackMeshIndex]);
+                            trackList.Add(track);
                             modifyTerrain = false;
                         }
                         lastPoint = newPoint;
                     }
                 }
             }
+        }
+
+        for (int i = 0; i < trackList.Count-1; i++)
+        {
+            trackList[i].SetNextSection(trackList[i+1]);
         }
         
         terrainModifyPathListList.Add(terrainModifyPathList);
@@ -142,6 +151,10 @@ public class PayloadGenerator : StructureGenerator
             if(terrainModifyPathListList[i].Count > 0)
                 TrackGeneration.active.ModifyTerrainToFollowPath(terrainModifyPathListList[i], true);
         }
-        
+
+        GameObject clone = Instantiate(payloadPrefab);
+        Payload payload = clone.GetComponent<Payload>();
+        clone.GetComponent<NetworkObject>().Spawn();
+        payload.Initialize(payload.GetConsistLenght(), trackList[0]);
     }
 }

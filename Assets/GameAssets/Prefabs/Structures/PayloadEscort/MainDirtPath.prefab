@@ -40,6 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5548230130780212575}
+  - component: {fileID: 7088908682370791640}
   m_Layer: 0
   m_Name: pathS_
   m_TagString: Untagged
@@ -62,6 +63,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 7268370302966036959}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7088908682370791640
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4452313495642695704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6132999823c9db34ab7ceda678bba08d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DistanceWaypoint
+  maxDistance: 30
+  spawnFoliage: 1
 --- !u!1 &9061682910642552403
 GameObject:
   m_ObjectHideFlags: 0
@@ -162,6 +177,7 @@ MonoBehaviour:
     ignore: 0
     section: {fileID: 0}
   length: 0
+  randomRotation: {x: 0, y: 0}
   targetSpecialConnection: {fileID: 0}
   connectToTrackInterval: {x: 0, y: 0}
   connectingConnectionList: []

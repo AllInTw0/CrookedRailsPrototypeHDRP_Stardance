@@ -20,7 +20,7 @@ public class GenerationManager : NetworkBehaviour
     [SerializeField]
     private TrackGeneration trackGeneration;
     [Header("Player Train")]
-    public Train playerTrain;
+    public PlayerTrain playerTrain;
     [Header("Starting Location")]
     [SerializeField]
     private StructureSO startingLocationSO;
@@ -65,7 +65,7 @@ public class GenerationManager : NetworkBehaviour
                 else if (distanceType == StructureDistanceType.fuelDistance)
                 {
                     float minDistance = float.MaxValue;
-                    foreach (Train.FuelSource fuelSource in Train.playerTrain.GetFuelSourceList())
+                    foreach (PlayerTrain.FuelSource fuelSource in PlayerTrain.active.GetFuelSourceList())
                     {
                         minDistance = Mathf.Min(fuelSource.targetHealth.maxHealth / TrainUpgradeHandler.active.GetStatValue(fuelSource.consumptionRate), minDistance);
                     }
@@ -437,7 +437,7 @@ public class GenerationManager : NetworkBehaviour
                 await Task.Delay(50);
             }
             
-            TrackSection section = Train.playerTrain.frontTrackSection;
+            TrackSection section = PlayerTrain.active.frontTrackSection;
             List<PathPoint> generatedPath = new List<PathPoint>();
 
             while (section.nextSection != null)

@@ -5,7 +5,7 @@ public class AutoStopUpgrade : TrainUpgrade
 {
     [Header("Train")]
     [SerializeField]
-    private Train targetTrain;
+    private PlayerTrain targetTrain;
     [Header("Controlls")]
     [SerializeField]
     private LeverInteractable leverInteractable;

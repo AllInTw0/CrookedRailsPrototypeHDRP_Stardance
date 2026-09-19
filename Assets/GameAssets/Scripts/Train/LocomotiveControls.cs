@@ -5,7 +5,7 @@ using UnityEngine;
 public class LocomotiveControls : NetworkBehaviour
 {
     [SerializeField] 
-    private Train train;
+    private PlayerTrain train;
     
     [Header("Controls")]
     [SerializeField] 
@@ -255,7 +255,7 @@ public class LocomotiveControls : NetworkBehaviour
         }
         else
         {
-            Player.localPlayer.movement.Freeze(Train.playerTrain.GetRailCarAtIndex(0));
+            Player.localPlayer.movement.Freeze(PlayerTrain.active.GetRailCarAtIndex(0));
         }
     }
     [Rpc(SendTo.Everyone)]

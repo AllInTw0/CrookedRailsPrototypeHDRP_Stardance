@@ -83,7 +83,7 @@ public class DebugHelper : MonoBehaviour
 
         if (debugTrain)
         {
-            foreach (RailCar railCar in Train.playerTrain.GetConsist())
+            foreach (RailCar railCar in PlayerTrain.active.GetConsist())
             {
                 Label(railCar.transform.position + Vector3.up, "i: " +railCar.networkData.Value.consistIndex +", t: " + railCar.networkData.Value.train);
             }

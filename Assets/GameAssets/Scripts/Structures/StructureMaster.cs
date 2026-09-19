@@ -262,13 +262,13 @@ public class StructureMaster : NetworkBehaviour
     public float GetLength(LengthType lengthType)
     {
         if (lengthType == LengthType.PlayerTrainLength)
-            return Train.playerTrain != null ? Train.playerTrain.GetConsistLenght() : 50f;
+            return PlayerTrain.active != null ? PlayerTrain.active.GetConsistLenght() : 50f;
         else if(lengthType == LengthType.MaxChosenTrainLength)
         {
             float maxLength = 0f;
             for (int i = 0; i < HaulingJobManager.generatedHaulingJobList.Count; i++)
             {
-                float l = HaulingJobManager.generatedHaulingJobList[i].GetConsistLength() + Train.playerTrain.CalculateConsistLength(true);
+                float l = HaulingJobManager.generatedHaulingJobList[i].GetConsistLength() + PlayerTrain.active.CalculateConsistLength(true);
                 if (l > maxLength) maxLength = l;
             }
             return maxLength;

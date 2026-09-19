@@ -12,7 +12,8 @@ public enum HealthType
     Train,
     Enemy,
     Sentry,
-    Robot
+    Robot,
+    Payload
 }
 
 public class Health : NetworkBehaviour

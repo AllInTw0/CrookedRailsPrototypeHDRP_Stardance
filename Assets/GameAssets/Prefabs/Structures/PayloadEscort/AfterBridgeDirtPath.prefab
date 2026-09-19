@@ -162,6 +162,7 @@ MonoBehaviour:
     ignore: 0
     section: {fileID: 0}
   length: 0
+  randomRotation: {x: 0, y: 0}
   targetSpecialConnection: {fileID: 0}
   connectToTrackInterval: {x: 0, y: 0}
   connectingConnectionList: []
@@ -236,7 +237,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   noiseFrequency: 1
   minMaxTargetOffset: {x: 0, y: 0}
-  minMaxDistanceForward: {x: 25, y: 30}
+  minMaxDistanceForward: {x: 40, y: 45}
   minMaxDistanceRight: {x: -10, y: 10}
   minMaxRotOffset: {x: -60, y: 60}
   sphereCheckRadius: -1

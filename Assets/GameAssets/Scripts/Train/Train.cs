@@ -4,47 +4,19 @@ using System.Threading.Tasks;
 using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
-
 public class Train : NetworkBehaviour
 {
-    public static Train playerTrain;
     public static List<Train> activeTrainList = new List<Train>();
-    
-    [System.Serializable]
-    public class FuelSource
-    {
-        public TrainStatType consumptionRate;
-        public Health targetHealth;
-        public string fuelName;
-
-        public float depletion;
-        public void Deplete(float value)
-        {
-            depletion += value;
-            int intDepletion = Mathf.FloorToInt(depletion);
-            if (intDepletion > 0)
-            {
-                depletion -= intDepletion;
-                targetHealth.TakeDamage(intDepletion);
-            }
-
-        }
-    }
 
     //Variables
     [SerializeField]
     private bool isPlayerTrain;
     [Header("Consist")]
     [SerializeField]
-    private List<RailCar> consist = new List<RailCar>();
+    public List<RailCar> consist = new List<RailCar>();
     [SerializeField] 
     public float couplerLength;
-    [Header("Fuel")]
-    [SerializeField]
-    private List<FuelSource> fuelSourceList;
     [Header("Speed")]
-    [SerializeField]
-    public LocomotiveControls controlls;
     [SerializeField]
     private float drag = 0.25f;
     [SerializeField]
@@ -53,16 +25,6 @@ public class Train : NetworkBehaviour
     private float brokenDownWeightSpeedPenalty = 0.01f;
     [SerializeField]
     private float minSpeed = 1f;
-    [Header("Player")]
-    [SerializeField]
-    private float autoStopPlayerDist = 30f;
-    [Header("Debri Detection")]
-    [SerializeField]
-    private BoxCollider debriBoxCollider;
-    [SerializeField]
-    private TrainStatType debriDerailChance;
-    [SerializeField]
-    private LayerMask debriLayerMask;
 
     //Run Time
     [HideInInspector]
@@ -80,10 +42,6 @@ public class Train : NetworkBehaviour
     [HideInInspector]
     public float sectionProgress;
     private float consistLength;
-
-    private float playerDistFromTrain;
-    
-    private bool consumeFuel;
     
     //Multiplayer
     private NetworkVariable<TrainNetworkData> trainNetworkData = new(writePerm: NetworkVariableWritePermission.Server);
@@ -102,8 +60,6 @@ public class Train : NetworkBehaviour
     }
     private void Awake()
     {
-        if (isPlayerTrain)
-            playerTrain = this;
         activeTrainList.Add(this);
     }
 
@@ -133,9 +89,10 @@ public class Train : NetworkBehaviour
         sectionProgress = current.sectionProgress;
         speed = current.speed;
     }
-    private void Update()
+    [HideInInspector]
+    public float distanceTravelled;
+    public virtual void Update()
     {
-        //Debug.Log(deceleration);
         if(IsInitialized() == false)
         {
             Debug.LogWarning("No track section assigned!");
@@ -146,43 +103,8 @@ public class Train : NetworkBehaviour
             return;
         }
         
-        //Player dist
-        if (GameStateManager.gameStarted.Value)
-        {
-            playerDistFromTrain = GetClosestDistanceToPos(Player.localPlayer.transform.position);
-            if (autoStopPlayerDist > 0 && playerDistFromTrain >= autoStopPlayerDist && deceleration == 0)
-            {
-                Debug.Log("Player Is To Far! Engaging breaks!");
-                Override title = new Override("Title", OverrideType.Text, "WARNING");
-                Override message = new Override("Message", OverrideType.Text, "You're to far from the train! Engaging breaks!");
-                Override subText = new Override("SubText", OverrideType.Text, Mathf.Round(playerDistFromTrain) + "m");
-                MiniPrinter.active.AddNotification(PaperRenderer.active.RenderPaper("Message", new List<Override>() { title, message, subText }));
-
-                controlls.Break();
-            }
-        }
-
-        //Check if derailed
-        bool derailed = false;
-        foreach (RailCar railCar in consist)
-        {
-            if(railCar.IsDerailed())
-            {
-                derailed = true;
-                break;
-            }
-        }
-        if(controlls.currentState.Value == LocomotiveControls.State.derailed)
-        {
-            if (derailed == false)
-                controlls.SetState(LocomotiveControls.State.normal);
-        }
-        else if(controlls.currentState.Value == LocomotiveControls.State.normal)
-        {
-            if (derailed)
-                controlls.SetState(LocomotiveControls.State.derailed);
-        }
-
+        bool derailed = IsDerailed();
+        
         //Update Speed    
         float modifiedMaxSpeed = Mathf.Clamp(maxSpeed - GetBrokenCarWeight() * brokenDownWeightSpeedPenalty, minSpeed, float.MaxValue);
         if (Mathf.Abs(speed) < Mathf.Abs(modifiedMaxSpeed) || (speed > 0 && acceleration < 0) || (speed < 0 && acceleration > 0))
@@ -212,46 +134,12 @@ public class Train : NetworkBehaviour
             }
         }
 
-        float distanceTravelled = speed * Time.deltaTime;
+        distanceTravelled = speed * Time.deltaTime;
         sectionProgress += distanceTravelled;
-
-        if(isPlayerTrain) 
-            GameStateManager.distanceTravelled += distanceTravelled;
-
+        
         UpdatePosition(distanceTravelled);
         
- 
-        //Fuel
-        //Debug.Log("Consume fuel: " + consumeFuel);
-        if(IsServer && consumeFuel && acceleration > 0f && (controlls == null || controlls.currentState.Value == LocomotiveControls.State.normal))
-        {
-            foreach (FuelSource fuelSource in fuelSourceList)
-            {
-                fuelSource.Deplete(Mathf.Abs(distanceTravelled) * TrainUpgradeHandler.active.GetStatValue(fuelSource.consumptionRate));
-                //Not having enough fuel handles LocomotiveControls.cs
-            }
-        }
-        //Debri
-        if(IsServer && debriBoxCollider != null && derailed == false && speed > 0.4f)
-        {
-            Collider[] debriColliders = Util.PhysicsBoxColliderOverlap(debriBoxCollider, debriLayerMask);
-            for (int i = 0; i < debriColliders.Length; i++)
-            {
-                if (debriColliders[i].TryGetComponent(out Item item) && item.IsPhysicsEnabled() == false)
-                {
-                    if (Random.Range(0f, 1f) >= 0.5f)
-                        item.EnablePhysicsRpc(consist[0].transform.forward * (speed * 1.5f) + consist[0].transform.right * Random.Range(2f, 4f) + consist[0].transform.up * Random.Range(5f, 6f));
-                    else
-                        item.EnablePhysicsRpc(consist[0].transform.forward * (speed * 1.5f) - consist[0].transform.right * Random.Range(2f, 4f) + consist[0].transform.up * Random.Range(5f, 6f));
-
-                    if (Random.Range(0f, 1f) <= TrainUpgradeHandler.active.GetStatValue(debriDerailChance))
-                    {
-                        consist[0].SetDerailed(true);
-                        break;
-                    }
-                }
-            }
-        }
+        
         
         if (IsServer)
         {
@@ -263,6 +151,18 @@ public class Train : NetworkBehaviour
                 speed = speed
             };
         }
+    }
+
+    public bool IsDerailed()
+    {
+        foreach (RailCar railCar in consist)
+        {
+            if(railCar.IsDerailed())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void UpdatePosition(float distanceTravelled = 0f)
@@ -301,10 +201,6 @@ public class Train : NetworkBehaviour
 
             railCarProgress -= railCar.backLength + couplerLength;
         }
-    }
-    public void SetFuelConsumption(bool value)
-    {
-        consumeFuel = value;
     }
     public void SetAcceleration(float value)
     {
@@ -371,24 +267,11 @@ public class Train : NetworkBehaviour
 
         return consistLength;
     }
-    public void Initialize(float sectionProgress, TrackSection trackSection, bool fullSpeed)
+    public virtual void Initialize(float sectionProgress, TrackSection trackSection, bool fullSpeed = false)
     {
         this.frontTrackSection = trackSection;
         this.sectionProgress = sectionProgress;
-
-        if (fullSpeed)
-        {
-            controlls.SetFullThrottle();
-            speed = maxSpeed;
-        }
-
         UpdatePosition();
-        
-        //GetComponentInChildren<TeleportOnStart>().Teleport();
-    }
-    public List<FuelSource> GetFuelSourceList()
-    {
-        return fuelSourceList;
     }
     public TrackSection GetFrontTrackSection()
     {
@@ -470,21 +353,6 @@ public class Train : NetworkBehaviour
         return railCarCopy;
     }
 
-    public bool HasEnoughFuel(out string depletedFuelSourceName)
-    {
-        depletedFuelSourceName = "";
-        foreach (FuelSource fuelSource in fuelSourceList)
-        {
-            if (fuelSource.targetHealth.GetHealth() <= 0)
-            {
-                depletedFuelSourceName = fuelSource.fuelName;
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     public void RemoveNonPlayerRailCars()
     {
         for (int i = 0; i < consist.Count; i++)
@@ -538,9 +406,5 @@ public class Train : NetworkBehaviour
         }
 
         return playersOnTrain;
-    }
-    public float GetPlayerDist()
-    {
-        return playerDistFromTrain;
     }
 }

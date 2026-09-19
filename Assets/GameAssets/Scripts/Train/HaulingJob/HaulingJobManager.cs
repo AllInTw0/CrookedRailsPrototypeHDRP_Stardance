@@ -17,7 +17,7 @@ public class HaulingJob
             RailCar prefabScript = haulingJobEntryList[i].railCar.prefab.GetComponent<RailCar>();
             sum += prefabScript.frontLength + prefabScript.backLength;
             if (i != haulingJobEntryList.Count - 1)
-                sum += Train.playerTrain.couplerLength;
+                sum += PlayerTrain.active.couplerLength;
         }
         return sum;
     }

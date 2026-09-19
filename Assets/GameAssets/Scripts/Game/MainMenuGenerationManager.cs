@@ -5,7 +5,7 @@ using static Util;
 
 public class MainMenuGenerationManager : MonoBehaviour
 {
-    public Train train;
+    public PlayerTrain train;
     [SerializeField]
     private int generatedSectionsAheadOfTrain = 2;
     [SerializeField]

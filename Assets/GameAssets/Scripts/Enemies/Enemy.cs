@@ -137,7 +137,7 @@ public class Enemy : NetworkBehaviour
         {
             foreach (Health health in EnemyManager.active.healthTypeArray[(int)healthWeight.healthType])
             {
-                bool canAttackTrain = Train.playerTrain == null || Train.playerTrain.GetPlayerDist() <= enemyInfo.playerDistanceFromTrainToAttack;
+                bool canAttackTrain = PlayerTrain.active == null || PlayerTrain.active.GetPlayerDist() <= enemyInfo.playerDistanceFromTrainToAttack;
                 
                 if (health == this.health || health.GetHealth() <= 0f || (healthWeight.healthType == HealthType.Train && canAttackTrain == false))
                     continue;

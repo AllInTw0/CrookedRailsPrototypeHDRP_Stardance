@@ -135,13 +135,13 @@ public class EnemySpawner : MonoBehaviour
         if (enemiesSpawnAlways)
             return true;
 
-        if (Train.playerTrain)
+        if (PlayerTrain.active)
         {
-            if (Train.playerTrain.controlls.currentState.Value == LocomotiveControls.State.supersonic)
+            if (PlayerTrain.active.controlls.currentState.Value == LocomotiveControls.State.supersonic)
                 return false;
 
             int sectionsForward = 0;
-            TrackSection section = Train.playerTrain.frontTrackSection;
+            TrackSection section = PlayerTrain.active.frontTrackSection;
             while (section != null)
             {
                 sectionsForward++;
@@ -152,7 +152,7 @@ public class EnemySpawner : MonoBehaviour
                 return false;
 
             int sectionsBackwards = 0;
-            section = Train.playerTrain.frontTrackSection;
+            section = PlayerTrain.active.frontTrackSection;
             while (section != null)
             {
                 sectionsBackwards++;
@@ -235,7 +235,7 @@ public class EnemySpawner : MonoBehaviour
             List<WaveEntry> waveEntryListCopy = new List<WaveEntry>(waveEntryList);
             for (int i = 0; i < waveEntryListCopy.Count; i++)
             {
-                if (waveEntryListCopy[i].minDistanceTravelled > waveEntryListCopy[i].distanceTravelled && Train.playerTrain)
+                if (waveEntryListCopy[i].minDistanceTravelled > waveEntryListCopy[i].distanceTravelled && PlayerTrain.active)
                 {
                     waveEntryListCopy.RemoveAt(i);
                     i--;

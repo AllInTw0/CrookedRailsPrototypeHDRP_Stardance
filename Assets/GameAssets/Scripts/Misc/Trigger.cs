@@ -63,4 +63,9 @@ public class Trigger : MonoBehaviour
 
         return false;
     }
+
+    public int GetColliderCount()
+    {
+        return colliderList.Count;
+    }
 }

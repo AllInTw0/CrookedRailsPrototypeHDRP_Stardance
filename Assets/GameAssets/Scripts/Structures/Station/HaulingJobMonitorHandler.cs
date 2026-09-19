@@ -56,7 +56,7 @@ public class HaulingJobMonitorHandler : NetworkBehaviour
             {
                 Debug.Log("Reciept");
                 float sum = 0f;
-                List<CargoInfo> cargoList = Train.playerTrain.GetConsistCargoInfo();
+                List<CargoInfo> cargoList = PlayerTrain.active.GetConsistCargoInfo();
                 for (int i = 0; i < cargoList.Count; i++)
                 {
                     if(cargoList[i].GetValueSum() != 0)
@@ -65,8 +65,8 @@ public class HaulingJobMonitorHandler : NetworkBehaviour
 
                 Money.AddMoney(Mathf.RoundToInt(sum));
 
-                Train.playerTrain.RemoveNonPlayerRailCars();
-                Train.playerTrain.HeallAllRailCars();
+                PlayerTrain.active.RemoveNonPlayerRailCars();
+                PlayerTrain.active.HeallAllRailCars();
             }
 
             if (current.state == State.HaulingJobChosen)
@@ -232,7 +232,7 @@ public class HaulingJobMonitorHandler : NetworkBehaviour
                 mainMonitorArm.EnableMonitor();
 
                 Override newOverride = new Override("HaulReceipt", OverrideType.HaulReceipt);
-                newOverride.cargoListOverride = Train.playerTrain.GetConsistCargoInfo();
+                newOverride.cargoListOverride = PlayerTrain.active.GetConsistCargoInfo();
 
                 mainMonitorArm.printer.AddNotification(PaperRenderer.active.RenderPaper("HaulReceipt", new List<Override>() { newOverride }), float.MaxValue);
                 mainMonitorArm.onInteract.AddListener(() => {
@@ -296,7 +296,7 @@ public class HaulingJobMonitorHandler : NetworkBehaviour
         haulingJobPicked.Value = true;
         foreach (HaulingJobEntry haulingJobEntry in haulingJob.haulingJobEntryList)
         {
-            RailCar railCar = Train.playerTrain.AddRailCar(haulingJobEntry.railCar, 2); // 2 because 0-locomotive, 1-tender
+            RailCar railCar = PlayerTrain.active.AddRailCar(haulingJobEntry.railCar, 2); // 2 because 0-locomotive, 1-tender
 
             railCar.SetCargo(haulingJobEntry.cargo, Mathf.RoundToInt(haulingJobEntry.pay * 0.6f), Mathf.RoundToInt(haulingJobEntry.pay * 0.4f));
         }

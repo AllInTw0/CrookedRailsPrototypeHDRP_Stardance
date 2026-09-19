@@ -26,6 +26,9 @@ MonoBehaviour:
   - healthType: 5
     sightDistance: 15
     importanceWeight: 1.2
-  sightDistance: 35
+  - healthType: 6
+    sightDistance: 45
+    importanceWeight: 2.1
+  sightDistance: 45
   playerDistanceFromTrainToAttack: 500
   dangerValue: 1

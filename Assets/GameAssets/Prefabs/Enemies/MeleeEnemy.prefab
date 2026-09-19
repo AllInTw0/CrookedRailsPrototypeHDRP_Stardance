@@ -196,7 +196,7 @@ MonoBehaviour:
   attackForce: 2.5
   attackSoundName: Small Enemy Attack
   attackImpactSoundName: Enemy Attack Impact
-  healthTypeFilterList: 01000000020000000400000005000000
+  healthTypeFilterList: 0100000002000000040000000500000006000000
 --- !u!1 &2874978076699277342
 GameObject:
   m_ObjectHideFlags: 0

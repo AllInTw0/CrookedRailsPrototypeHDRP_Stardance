@@ -208,7 +208,7 @@ public class RailCar : NetworkBehaviour
         //Sync linked train and consist index
         //Will be called when the consist changes (Server spawns in railcars)
 
-        if (current.train.TryGet(out Train train))
+        if (current.train.TryGet(out PlayerTrain train))
         {
             Debug.Log("Found Train");
             linkedTrain = train;
