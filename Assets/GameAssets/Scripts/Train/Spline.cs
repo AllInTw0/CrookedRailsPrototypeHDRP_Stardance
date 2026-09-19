@@ -136,7 +136,7 @@ public class Spline : MonoBehaviour
                 
                 Vector3 pos = CalculateSplinePosition(pointA, pointB, startTime + increment * zTime);
                 Vector3 dirZ = CalculateSplineDirectionVector(pointA, pointB, startTime + increment * zTime);
-                Vector3 dirX = new Vector3(-dirZ.z, 0, dirZ.x);
+                Vector3 dirX = new Vector3(-dirZ.z, 0, dirZ.x).normalized;
                 float xTime = vert.x * splineMesh.scale.x;
 
                 pos += xTime * dirX;
@@ -259,7 +259,7 @@ public class Spline : MonoBehaviour
 
                 Vector3 pos = TrackManager.GetPathPosition(path, startProgress + increment * zTime);
                 Vector3 dirZ = TrackManager.GetPathDirectionVector(section, startProgress + increment * zTime);
-                Vector3 dirX = new Vector3(-dirZ.z, 0, dirZ.x);
+                Vector3 dirX = new Vector3(-dirZ.z, 0, dirZ.x).normalized;
                 float xTime = vert.x * splineMesh.scale.x;
 
                 pos += xTime * dirX;
@@ -380,7 +380,7 @@ public class Spline : MonoBehaviour
 
                 Vector3 pos = TrackManager.GetPathPosition(path, startProgress + increment * zTime);
                 Vector3 dirZ = TrackManager.GetPathDirectionVector(path, startProgress + increment * zTime);
-                Vector3 dirX = new Vector3(-dirZ.z, 0, dirZ.x);
+                Vector3 dirX = new Vector3(-dirZ.z, 0, dirZ.x).normalized;
                 float xTime = vert.x * splineMesh.scale.x;
 
                 pos += xTime * dirX;

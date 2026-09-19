@@ -104,7 +104,7 @@ public class HealerEnemy : GroundEnemy
             for (int i = 0; i < healthList.Count; i++)
             {
                 Debug.Log(((EnemyHealth)healthList[i]).GetBehaviour().GetType() + ", " + ((((EnemyHealth)healthList[i]).GetBehaviour() as HealerEnemy) != null));
-                if (healthList[i].GetHealth() <= 0f || (((EnemyHealth)healthList[i]).GetBehaviour() as HealerEnemy) != null)
+                if (healthList[i].CanBeSeenBy(typeof(HealerEnemy)) == false || healthList[i].GetHealth() <= 0f || (((EnemyHealth)healthList[i]).GetBehaviour() as HealerEnemy) != null)
                 {
                     healthList.RemoveAt(i);
                     sorted = false;

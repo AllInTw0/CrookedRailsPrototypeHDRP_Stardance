@@ -22,7 +22,14 @@ public class Section : NetworkBehaviour
     }
     [SerializeField]
     private float length;
-
+    [SerializeField]
+    public Vector2 randomRotation;
+    [Header("Special Connections")] 
+    [SerializeField]
+    public Transform targetSpecialConnection;
+    [SerializeField]
+    public Vector2 connectToTrackInterval;
+    
     //Run-time
     [HideInInspector]
     public List<Connection> connectingConnectionList;

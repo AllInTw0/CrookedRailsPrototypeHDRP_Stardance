@@ -443,7 +443,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6631932380828592750}
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 2.5
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -508,7 +508,6 @@ MonoBehaviour:
   origin: {fileID: 172228222760864834}
   invulnerable: 0
   clientSideDamage: 0
-  visible: 1
   onTakeDamage:
     m_PersistentCalls:
       m_Calls: []
@@ -529,7 +528,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PathFindingGroundMovement
   baseSpeed: 4.5
-  acceleration: 10
+  acceleration: 20
   deceleration: 20
   maxAngle: 45
   capsuleCollider: {fileID: 7477618007067767545}

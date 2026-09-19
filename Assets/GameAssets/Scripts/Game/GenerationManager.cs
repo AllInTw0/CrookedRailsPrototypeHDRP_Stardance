@@ -47,6 +47,7 @@ public class GenerationManager : NetworkBehaviour
     public class StructureSpawnParams
     {
         public List<StructureSO> structureInfoList;
+        public bool ignore;
         public StructureDistanceType distanceType;
         public Vector2 distanceTypeValue; // setDistance = distance; fuelDistance = fuelDistance * value
         public bool repeating;
@@ -73,9 +74,9 @@ public class GenerationManager : NetworkBehaviour
             }
         }
         //Run time
-        //[HideInInspector]
+        [HideInInspector]
         public float distanceTillStructure;
-        //[HideInInspector]
+        [HideInInspector]
         public bool spawningDisabled;
     }
     [Header("Structures")]
@@ -479,7 +480,7 @@ public class GenerationManager : NetworkBehaviour
 
         foreach (StructureSpawnParams structureSpawnParams in strutureSpawnParamList)
         {
-            if (structureSpawnParams.spawningDisabled) continue;
+            if (structureSpawnParams.spawningDisabled || structureSpawnParams.ignore) continue;
 
             structureSpawnParams.distanceTillStructure -= generatedSection.length;
             

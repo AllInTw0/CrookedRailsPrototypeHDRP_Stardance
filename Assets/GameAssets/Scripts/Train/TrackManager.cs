@@ -194,7 +194,7 @@ public class TrackManager : NetworkBehaviour
         }
     }
     //Track Section Functions
-    public TrackSection CreateTrackSection(Point pointA,Point pointB)
+    public TrackSection CreateTrackSection(Point pointA,Point pointB, SplineMeshInfo? _splineMesh = null)
     {
         //Dose not automaticlly find next/previous sections
 
@@ -209,7 +209,7 @@ public class TrackManager : NetworkBehaviour
         
         TrackSection section = new TrackSection(pointA, pointB, newPath);
         
-        section.AddObject(Spline.active.GenerateMeshAlongTrackSection(section)); //Track mesh
+        section.AddObject(Spline.active.GenerateMeshAlongTrackSection(section,_splineMesh)); //Track mesh
         
         trackSectionList.Add(section);
         
@@ -597,7 +597,9 @@ public class TrackManager : NetworkBehaviour
     public float GetDistanceFromTrack(Vector3 pos)
     {
         GetClosestTrackSection(pos, out TrackSection section, out float estimatedDist);
-        return GetDistanceFromPath(section.path, pos);
+        if(section  != null)
+            return GetDistanceFromPath(section.path, pos);
+        return Mathf.Infinity;
     }
     public bool IsLeftOfPath(List<PathPoint> path, Vector3 pos)
     {

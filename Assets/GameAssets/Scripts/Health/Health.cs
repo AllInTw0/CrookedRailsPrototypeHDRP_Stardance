@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
@@ -46,7 +48,34 @@ public class Health : NetworkBehaviour
     private int damageSum;
     public int clientSideDamage;
     
-    public bool visible = true;
+    private bool isVisibleGlobally = true;
+    private Dictionary<Type, float> visibilityDict  = new Dictionary<Type, float>();
+    public bool CanBeSeenBy(Type type)
+    {
+        if(isVisibleGlobally == false)
+            return false;
+        if (visibilityDict.TryGetValue(type, out float time))
+        {
+            if (time > 0)
+                return false;
+            visibilityDict.Remove(type);
+            return true;
+        }
+
+        return true;
+    }
+    public void SetGlobalVisibility(bool visible)
+    {
+        isVisibleGlobally = visible;
+    }
+
+    public void UpdateVisibilityCooldown(Type type, float timeInvisible)
+    {
+        if (visibilityDict.ContainsKey(type))
+            visibilityDict[type] = timeInvisible;
+        else
+            visibilityDict.Add(type, timeInvisible);
+    }
     
     public UnityEvent<float,Vector3> onTakeDamage;
     private void Awake()
@@ -114,6 +143,11 @@ public class Health : NetworkBehaviour
             TakeDamageServerRpc(damageSum, forceSum);
             damageSum = 0;
             forceSum = Vector3.zero;
+        }
+
+        foreach (Type type in visibilityDict.Keys)
+        {
+            visibilityDict[type] -= Time.deltaTime;
         }
     }
     public int TakeDamage(float damage, Vector3 force = default)

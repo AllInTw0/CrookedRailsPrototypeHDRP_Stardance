@@ -32,7 +32,7 @@ public class Connection
     public bool useGlobalEnds;
     public bool dontConnect;
     public bool ignoreConnections; // Able to connect to connections that are already connected
-
+    public bool ignore;
     //Nonserializeable
     [HideInInspector]
     public Connection connectedConnection;
@@ -320,7 +320,7 @@ public class StructureMaster : NetworkBehaviour
             List<Connection> connectionList = GetValidConnectionsForConnection(connection);
             //Debug.Log("c: " + connectionList.Count);
 
-            if (connectionList.Count > 0) 
+            if (connectionList.Count > 0 && connection.ignore == false) 
             {
                 sectionConnectionList.Add(connection);
                 validConnectionList.Add(connectionList);
@@ -328,11 +328,61 @@ public class StructureMaster : NetworkBehaviour
         }
 
         //Chose connection
-        if(validConnectionList.Count == 0)
+        if(validConnectionList.Count == 0 && !sectionScript.targetSpecialConnection)
         {
             Debug.LogWarning("Cant find valid connection: validConnectionList.Count == 0, " + sectionObject.name +", sectionCount: " + structureSectionList.Count + ", connectionCount: " + structureConnectionList.Count);
             DestroyImmediate(sectionObject);
             yield break;
+        }
+        if (sectionScript.targetSpecialConnection)
+        {
+            int tries = 5;
+            while (tries >= 0)
+            {
+                if (tries == 0)
+                {
+                    Debug.Log("Couldnt spawn " + sectionObject.name);
+                    DestroyImmediate(sectionObject);
+                    yield break; //return;
+                }
+
+                if (sectionScript.connectToTrackInterval != Vector2.zero)
+                {
+                    Vector3 pos;
+                    Vector3 dir;
+                    if (section != null)
+                    {
+                        TrackManager.active.GetTrackPositionAndDirVectorFromProgress(
+                            sectionProgress + Random.Range(sectionScript.connectToTrackInterval.x,
+                                sectionScript.connectToTrackInterval.y), section, out pos, out dir);
+                    }
+                    else
+                    {
+                        pos = transform.position + transform.forward *
+                            Random.Range(sectionScript.connectToTrackInterval.x,
+                                sectionScript.connectToTrackInterval.y);
+                        dir = transform.forward;
+                    }
+
+                    sectionTransform.position = pos;
+                    sectionTransform.LookAt(pos + new Vector3(dir.x, 0, dir.z).normalized);
+                }
+
+                if (DoesSectionOverlap(sectionScript))
+                {
+                    tries--;
+                    continue;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            foreach (StructureGenerator structureGenerator in sectionScript.GetComponentsInChildren<StructureGenerator>())
+            {
+                yield return structureGenerator.Generate(this);
+            }
         }
         while (sectionConnectionList.Count > 0 && validConnectionList.Count > 0)
         {
@@ -340,8 +390,6 @@ public class StructureMaster : NetworkBehaviour
             int connectionIndex = Random.Range(0, validConnectionList[connectionListIndex].Count);
             Connection sectionConnection = sectionConnectionList[connectionListIndex];
             Connection otherSectionConnection = validConnectionList[connectionListIndex][connectionIndex];
-
-
             //Set position
             //sectionTransform.SetParent(otherSectionConnection.connectionTransform);
             //sectionTransform.localRotation = Quaternion.identity;
@@ -349,9 +397,14 @@ public class StructureMaster : NetworkBehaviour
             //sectionTransform.RotateAround(sectionConnection.connectionTransform.position, Vector3.up, otherSectionConnection.connectionTransform.eulerAngles.y - sectionConnection.connectionTransform.eulerAngles.y + 180f);
             //sectionTransform.SetParent(transform);
             sectionTransform.rotation = otherSectionConnection.connectionTransform.rotation;
-            sectionTransform.position = otherSectionConnection.connectionTransform.TransformPoint(-sectionConnection.connectionTransform.localPosition);
-            sectionTransform.RotateAround(sectionConnection.connectionTransform.position, Vector3.up, otherSectionConnection.connectionTransform.eulerAngles.y - sectionConnection.connectionTransform.eulerAngles.y + 180f);
-            
+            sectionTransform.position =
+                otherSectionConnection.connectionTransform.TransformPoint(-sectionConnection.connectionTransform
+                    .localPosition);
+            sectionTransform.RotateAround(sectionConnection.connectionTransform.position, Vector3.up,
+                otherSectionConnection.connectionTransform.eulerAngles.y -
+                sectionConnection.connectionTransform.eulerAngles.y + 180f);
+
+
             //Reset overlapping bool
             sectionScript.isOverlapping = false;
 
@@ -398,15 +451,20 @@ public class StructureMaster : NetworkBehaviour
             //Connect other section
             if (sectionConnection.dontConnect == false)
                 otherSectionConnection.connectedConnection = sectionConnection;
-
+            
             foreach (StructureGenerator structureGenerator in sectionScript.GetComponentsInChildren<TerrainModifier>())
             {
                 //if (structureGenerator is not TerrainModifier)
                 yield return structureGenerator.Generate(this);
             }
-
             break;
         }
+
+        if (sectionScript.randomRotation != Vector2.one)
+        {
+            sectionScript.transform.rotation *= Quaternion.Euler(0, Random.Range(sectionScript.randomRotation.x, sectionScript.randomRotation.y), 0);
+        }
+        
         //Debug.DrawLine(sectionConnection.connectionTransform.position, otherSectionConnection.connectionTransform.position, Color.purple, 60f);
         //Debug.DrawRay(sectionConnection.connectionTransform.position, Vector3.up, Color.purple, 60f);
 

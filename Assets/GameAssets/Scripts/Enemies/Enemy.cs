@@ -95,7 +95,7 @@ public class Enemy : NetworkBehaviour
     
     public virtual void UpdateCall() // Update()
     {
-        
+
     }
     
     public virtual void UpdateBehaviour() // Called in intervals

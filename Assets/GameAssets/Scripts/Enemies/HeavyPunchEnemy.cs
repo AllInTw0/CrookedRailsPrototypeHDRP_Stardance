@@ -17,22 +17,7 @@ public class HeavyPunchEnemy : GroundEnemy
     
     private Health targetHealth;
 
-    private Health _targetPunchHealth;
-    private Health targetPunchHealth
-    {
-        get
-        {
-            return _targetPunchHealth;
-        }
-        set
-        {
-            if (_targetPunchHealth != null)
-                _targetPunchHealth.visible = true;
-            
-            _targetPunchHealth = value;
-            _targetPunchHealth.visible = false;
-        }
-    }
+    private Health targetPunchHealth;
 
     public override void UpdateBehaviour()
     {
@@ -107,7 +92,7 @@ public class HeavyPunchEnemy : GroundEnemy
                     List<Health> healthList = GetHealthInRadius(sightDistance, HealthType.Enemy);
                     for (int i = 0; i < healthList.Count; i++)
                     {
-                        if (healthList[i].visible == false || (((EnemyHealth)healthList[i]).GetBehaviour() as MeleeEnemy) == null)
+                        if (healthList[i].CanBeSeenBy(typeof(HeavyPunchEnemy)) == false || (((EnemyHealth)healthList[i]).GetBehaviour() as MeleeEnemy) == null)
                         {
                             healthList.RemoveAt(i);
                             i--;
@@ -137,6 +122,7 @@ public class HeavyPunchEnemy : GroundEnemy
                     movement.SetTarget(targetPunchHealth.transform, 0.35f, -dir);
                     if (movement.HasReachedTarget())
                     {
+                        targetPunchHealth.UpdateVisibilityCooldown(typeof(HeavyPunchEnemy),4f);
                         GroundEnemy groundEnemy = (GroundEnemy)((EnemyHealth)targetPunchHealth).GetBehaviour();
                         groundEnemy.movement.Freeze();
                         Freeze();
@@ -147,6 +133,10 @@ public class HeavyPunchEnemy : GroundEnemy
                         
                         animator.SetTrigger("HeavyPunch");
                         StartCoroutine(PunchDelayed(groundEnemy, punchDelay));
+                    }
+                    else
+                    {
+                        targetPunchHealth.UpdateVisibilityCooldown(typeof(HeavyPunchEnemy),1f);
                     }
                 }
                 else
@@ -170,6 +160,11 @@ public class HeavyPunchEnemy : GroundEnemy
         }
         
         base.UpdateBehaviour();
+    }
+
+    public override void Anger(Transform target, float intrestTime)
+    {
+        targetHealth = target.GetComponent<Health>();
     }
 
     public IEnumerator PunchDelayed(GroundEnemy punchEnemy, float delay)

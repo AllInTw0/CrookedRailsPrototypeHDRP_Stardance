@@ -41,6 +41,8 @@ public class SplineGenerator : StructureGenerator
     [SerializeField]
     private bool followTerrain;
     [SerializeField]
+    private Vector2 clampFollowTerrainHeight;
+    [SerializeField]
     private bool checkForTerrainHeight;
     [SerializeField]
     private Vector2 chunkAverageHeigthMinMax;
@@ -50,6 +52,8 @@ public class SplineGenerator : StructureGenerator
     private bool modifyGround;
     [SerializeField]
     private Vector2 allowedHeightInterval;
+    [SerializeField] 
+    private float maxGrade;
     [Header("Track")]
     [SerializeField]
     private bool checkDistanceToTrack;
@@ -58,7 +62,8 @@ public class SplineGenerator : StructureGenerator
     [Header("Min Length")]
     [SerializeField]
     private float minLength = -1f;
-    
+
+    private List<PathPoint> pathEndResult;
     //Multiplayer
     private NetworkVariable<SplineNetworkData> networkData = new NetworkVariable<SplineNetworkData>();
     private struct SplineNetworkData : INetworkSerializable
@@ -66,19 +71,23 @@ public class SplineGenerator : StructureGenerator
         public Vector3 startConnectionPosition;
         public Vector3 startConnectionRotation;
         public Vector3 startConnectionPointHandle;
+        public bool forceStartConnectionPosition;
         
         public Vector3 endConnectionPosition;
         public Vector3 endConnectionRotation;
         public Vector3 endConnectionPointHandle;
+        public bool forceEndConnectionPosition;
         
         public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
         {
             serializer.SerializeValue(ref startConnectionPosition);
             serializer.SerializeValue(ref startConnectionRotation);
             serializer.SerializeValue(ref startConnectionPointHandle);
+            serializer.SerializeValue(ref forceStartConnectionPosition);
             serializer.SerializeValue(ref endConnectionPosition);
             serializer.SerializeValue(ref endConnectionRotation);
             serializer.SerializeValue(ref endConnectionPointHandle);
+            serializer.SerializeValue(ref forceEndConnectionPosition);
         }
     }
     public Connection GetStartConnection()
@@ -96,7 +105,8 @@ public class SplineGenerator : StructureGenerator
 
         List<Connection> validConnections = structureMaster.GetValidConnectionsForConnection(endConnection);
         validConnections.Remove(startConnection.connectedConnection);
-
+        
+        Debug.Log("[SplineGen] count: " +  validConnections.Count);
         if (validConnections.Count > 0)
         {
             //Connect
@@ -171,10 +181,13 @@ public class SplineGenerator : StructureGenerator
             startConnectionPosition = startTransform.position,
             startConnectionRotation = startTransform.eulerAngles,
             startConnectionPointHandle = startTransform.position - startTransform.forward * (dist * Random.Range(minMaxHandleLenghtMult.x,minMaxHandleLenghtMult.y)),
+            forceStartConnectionPosition = maxGrade != 0,
             
             endConnectionPosition = endTransform.position,
             endConnectionRotation = endTransform.eulerAngles,
-            endConnectionPointHandle = endTransform.position + endTransform.forward * (dist * Random.Range(minMaxHandleLenghtMult.x, minMaxHandleLenghtMult.y))
+            endConnectionPointHandle = endTransform.position + endTransform.forward * (dist * Random.Range(minMaxHandleLenghtMult.x, minMaxHandleLenghtMult.y)),
+            forceEndConnectionPosition = maxGrade != 0 && validConnections.Count > 0
+            
         };
         
         CreatePath(networkData.Value);
@@ -184,6 +197,8 @@ public class SplineGenerator : StructureGenerator
     {
         if(IsClient)
             CreatePath(networkData.Value);
+        if(IsServer)
+            PostGenerationProcess();
     }
 
     private void CreatePath(SplineNetworkData splineNetworkData)
@@ -227,7 +242,7 @@ public class SplineGenerator : StructureGenerator
         {
             //Vector3 dir = (path[i].position - path[i - 1].position + path[i + 1].position - path[i].position) * 0.5f;//Average
             Vector3 dir = path[i + 1].position - path[i].position;
-            Vector3 perpendicularDir = new Vector3(-dir.z, dir.y, dir.x);
+            Vector3 perpendicularDir = new Vector3(-dir.z, 0, dir.x);
 
             path[i].position += perpendicularDir.normalized * (offsetValues[i] < 0f ? Mathf.Max(-limitOffsetAlongPathLength.Evaluate(i / (float)path.Count), offsetValues[i] * offsetMult) : Mathf.Min(limitOffsetAlongPathLength.Evaluate(i / (float)path.Count), offsetValues[i] * offsetMult));
         }
@@ -244,9 +259,53 @@ public class SplineGenerator : StructureGenerator
                 //else
                 //{
                 //    Debug.Log("Terrai Nope!");
-                path[i].position = new Vector3(path[i].position.x, TerrainGeneration.active.GetHeight(path[i].position), path[i].position.z);
+                float height = TerrainGeneration.active.GetHeight(path[i].position);
+                if(clampFollowTerrainHeight != Vector2.zero)
+                    height = Mathf.Clamp(height,clampFollowTerrainHeight.x,clampFollowTerrainHeight.y);
+                path[i].position = new Vector3(path[i].position.x, height, path[i].position.z);
                 //}
             }
+
+            for (int i = 1; i < path.Count-1; i+=2)
+            {
+                path[i].position = new Vector3(path[i].position.x, (path[i-1].position.y + path[i+1].position.y) * 0.5f, path[i].position.z);
+            }
+            for (int i = 2; i < path.Count-1; i+=2)
+            {
+                path[i].position = new Vector3(path[i].position.x, (path[i-1].position.y + path[i+1].position.y) * 0.5f, path[i].position.z);
+            }
+            
+            
+            if (networkData.Value.forceEndConnectionPosition)
+                path[^1].position = endPoint.position;
+            if (networkData.Value.forceStartConnectionPosition)
+                path[0].position = startPoint.position;
+            //Max grade
+            if (maxGrade != 0)
+            {
+                float ClampY(Vector3 a, Vector3 b)
+                {
+                    float dist = Vector2.Distance(new Vector2(a.x,a.z), new Vector2(b.x,b.z));
+                    float yDiff = b.y - a.y;
+                    float grade = yDiff / dist;
+                    
+                    if (Mathf.Abs(grade) > maxGrade)
+                    {
+                        grade = Mathf.Clamp(grade,-maxGrade,maxGrade);
+                        float maxYDiff = grade * dist;
+                        return a.y + maxYDiff;
+                    }
+                    return b.y;
+                }
+
+                for (int i = 0; i < path.Count * 0.5f ; i++)
+                {
+                    path[path.Count - 1 - i - 1].position.y = ClampY(path[path.Count - 1 - i].position, path[path.Count - 1 - i - 1].position);
+                    path[i + 1].position.y = ClampY(path[i].position, path[i + 1].position);
+                }
+
+            }
+
             end.connectionTransform.position = path[^1].position;
         }
 
@@ -259,8 +318,8 @@ public class SplineGenerator : StructureGenerator
             Debug.DrawLine(splinePath[i].position, splinePath[i + 1].position, Color.red, 30f);
         }
 
-        TrackManager.CalculatePath(path, out List<PathPoint> meshPath, 1f, followTerrain);
-
+        TrackManager.CalculatePath(path, out List<PathPoint> meshPath, 1f, true);
+        pathEndResult = meshPath;
         if (DoesPathOverlap(meshPath))
         {
             linkedSection.isOverlapping = true;
@@ -271,14 +330,27 @@ public class SplineGenerator : StructureGenerator
         {
             splineVisualizer.Visualize(meshPath);
         }
-        if (modifyGround)
-        {
-            TrackGeneration.active.ModifyTerrainToFollowPath(meshPath, false, allowedHeightInterval, false);
-        }
+
         //for (float i = 0; i < 1f; i+= 0.05f)
         //{
         //    Debug.DrawLine(Spline.CalculateSplinePosition(startPoint, endPoint, i), Spline.CalculateSplinePosition(startPoint, endPoint, i+ 0.05f), Color.purple,30f);
         //}
+
+        if (IsClient)
+            PostGenerationProcess();
+    }
+
+    public void PostGenerationProcess()
+    {
+        if (modifyGround)
+        {
+            TrackGeneration.active.ModifyTerrainToFollowPath(pathEndResult, false, allowedHeightInterval, false);
+        }
+    }
+
+    public List<PathPoint> GetPath()
+    {
+        return pathEndResult;
     }
     public bool DoesPathOverlap(List<PathPoint> path)
     {
