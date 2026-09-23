@@ -67,7 +67,7 @@ public class GenerationManager : NetworkBehaviour
                     float minDistance = float.MaxValue;
                     foreach (PlayerTrain.FuelSource fuelSource in PlayerTrain.active.GetFuelSourceList())
                     {
-                        minDistance = Mathf.Min(fuelSource.targetHealth.maxHealth / TrainUpgradeHandler.active.GetStatValue(fuelSource.consumptionRate), minDistance);
+                        minDistance = Mathf.Min(fuelSource.targetHealth.GetMaxHealth() / TrainUpgradeHandler.active.GetStatValue(fuelSource.consumptionRate), minDistance);
                     }
                     distanceTillStructure = minDistance * Random.Range(distanceTypeValue.x, distanceTypeValue.y);
                 }

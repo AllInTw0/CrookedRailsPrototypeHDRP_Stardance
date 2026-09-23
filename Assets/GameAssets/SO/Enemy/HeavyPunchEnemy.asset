@@ -15,7 +15,7 @@ MonoBehaviour:
   prefab: {fileID: 6631932380828592750, guid: 695ff09749b14217880771c5b7981bb5, type: 3}
   HealthWeightParamsList:
   - healthType: 1
-    sightDistance: 15
+    sightDistance: 40
     importanceWeight: 2
   - healthType: 2
     sightDistance: 20
@@ -28,7 +28,7 @@ MonoBehaviour:
     importanceWeight: 1.2
   - healthType: 6
     sightDistance: 45
-    importanceWeight: 2.1
+    importanceWeight: 1.6
   sightDistance: 45
   playerDistanceFromTrainToAttack: 500
   dangerValue: 1

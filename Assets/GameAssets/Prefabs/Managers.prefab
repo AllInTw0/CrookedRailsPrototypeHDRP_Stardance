@@ -81,6 +81,7 @@ MonoBehaviour:
   strutureSpawnParamList:
   - structureInfoList:
     - {fileID: 11400000, guid: 53277ed3d6046724b9d3dfdd3113b6c8, type: 2}
+    ignore: 0
     distanceType: 1
     distanceTypeValue: {x: 0.75, y: 0.85}
     repeating: 1
@@ -89,39 +90,52 @@ MonoBehaviour:
     spawningDisabled: 0
   - structureInfoList:
     - {fileID: 11400000, guid: 4f66dd1664a026242b42ee7bc9acd39d, type: 2}
+    ignore: 1
     distanceType: 0
     distanceTypeValue: {x: 50, y: 300}
     repeating: 1
     minStationDistance: 50
     distanceTillStructure: 0
-    spawningDisabled: 0
+    spawningDisabled: 1
   - structureInfoList:
     - {fileID: 11400000, guid: 74d7eb2e4728b69489619a067d303b48, type: 2}
     - {fileID: 11400000, guid: 9ab9ed1f338d07c42867dc0e38021465, type: 2}
+    ignore: 1
     distanceType: 0
     distanceTypeValue: {x: 250, y: 350}
     repeating: 1
     minStationDistance: 100
     distanceTillStructure: 0
-    spawningDisabled: 0
+    spawningDisabled: 1
   - structureInfoList:
     - {fileID: 11400000, guid: 9ab9ed1f338d07c42867dc0e38021465, type: 2}
+    ignore: 1
     distanceType: 0
     distanceTypeValue: {x: 80, y: 100}
     repeating: 0
     minStationDistance: 100
     distanceTillStructure: 0
-    spawningDisabled: 0
+    spawningDisabled: 1
   - structureInfoList:
     - {fileID: 11400000, guid: 74d7eb2e4728b69489619a067d303b48, type: 2}
+    ignore: 1
     distanceType: 0
     distanceTypeValue: {x: 150, y: 200}
     repeating: 0
     minStationDistance: 100
     distanceTillStructure: 0
+    spawningDisabled: 1
+  - structureInfoList:
+    - {fileID: 11400000, guid: 6d0b1c5c2c560ddf88d880c419b12096, type: 2}
+    ignore: 0
+    distanceType: 0
+    distanceTypeValue: {x: 80, y: 130}
+    repeating: 0
+    minStationDistance: 50
+    distanceTillStructure: 0
     spawningDisabled: 0
   distanceBufferBetweenStructures: 20
-  trainStartLocation: 0
+  trainStartLocation: 1
   disableNavMeshGen: 0
 --- !u!1 &738210242235767204
 GameObject:
@@ -326,6 +340,8 @@ MonoBehaviour:
   targetEnemyCount_Debug: 0
   inGameEnemyList:
   - {fileID: 11400000, guid: fb00dc0c533df4d4a9b006ca29b43a84, type: 2}
+  - {fileID: 11400000, guid: 27d6ce29bae0f75ad93ad8a23500aece, type: 2}
+  - {fileID: 11400000, guid: 65e040ecf23a8466c8cf539ca6042da0, type: 2}
   behaviourRefreshRate: 0.5
   groundLayer:
     serializedVersion: 2
@@ -348,10 +364,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f57a07f593f3bd41aaf024ff57bb119, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemySpawner
+  enemySpawnProbabilityList:
+  - element: {fileID: 11400000, guid: fb00dc0c533df4d4a9b006ca29b43a84, type: 2}
+    probability: 1
+    maxCount: -1
+    pickCount: 0
+    enabled: 0
+  - element: {fileID: 11400000, guid: 65e040ecf23a8466c8cf539ca6042da0, type: 2}
+    probability: 0.3
+    maxCount: -1
+    pickCount: 0
+    enabled: 0
+  - element: {fileID: 11400000, guid: 27d6ce29bae0f75ad93ad8a23500aece, type: 2}
+    probability: 0.3
+    maxCount: -1
+    pickCount: 0
+    enabled: 0
   waveEntryList:
   - name: small
     minMaxTargetDangerPrecent: {x: 0.225, y: 0.225}
-    minMaxSpawnDangerAtOnce: {x: 2, y: 3}
+    minMaxSpawnDangerAtOnce: {x: 4, y: 6}
     minMaxSpawnCooldown: {x: 8, y: 15}
     minMaxDistance: {x: 35, y: 45}
     minMaxRot: {x: -45, y: 45}
@@ -494,6 +526,14 @@ MonoBehaviour:
     repeatingMeshMinDistanceFromTrack: 0
     material: {fileID: 2100000, guid: bd5721ba136306649a6b1b7e9dd05ca2, type: 2}
     layer: 22
+    scale: {x: 1, y: 1, z: 1}
+  - mainMesh: {fileID: -2432090755550338912, guid: e6ede75f7477cc91d8e47e022ccbd61c, type: 3}
+    repeatingMeshList:
+    - {fileID: -2432090755550338912, guid: 7f31540dafbac5510b58e8781a427708, type: 3}
+    repeatingMeshInterval: 1
+    repeatingMeshMinDistanceFromTrack: 0
+    material: {fileID: 2100000, guid: c26c7cc40b6393a4d9708386f93ec79a, type: 2}
+    layer: 14
     scale: {x: 1, y: 1, z: 1}
 --- !u!114 &7622247812153111010
 MonoBehaviour:
@@ -839,8 +879,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TerrainGeneration
   ShowTopMostFoldoutHeaderGroup: 1
-  chunkSize: 40
-  chunkVertBorderCount: 16
+  chunkSize: 30
+  chunkVertBorderCount: 20
   terrainMaterial: {fileID: 2100000, guid: 07cc79a3a92c415498623409fdcde5ea, type: 2}
   noiseSettingsList:
   - ignore: 0

@@ -12,7 +12,8 @@ public class CargoSO : ScriptableObject
     [Header("Params")]
     public float weight;
 
-    [Header("HaulingJobParams")]
+    [Header("HaulingJobParams")] 
+    public bool ignoreInHaulingJobGen;
     public List<CargoSO> fittingCargo = new List<CargoSO>();
     public float dangerLevel;
     public List<RailCarSO> fittingRailCars = new List<RailCarSO>();

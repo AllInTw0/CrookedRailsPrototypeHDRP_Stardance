@@ -14,7 +14,8 @@ public class PropSpawner : StructureGenerator
     private int maxPropCount;
     [SerializeField]
     private int maxSpawnTries;
-
+    [SerializeField]
+    private float terrainSpawnOffset = -0.25f;
     public override IEnumerator Generate(StructureMaster structureMaster)
     {
         int spawnedPropCount = 0;
@@ -119,6 +120,10 @@ public class PropSpawner : StructureGenerator
                     SetPos(propBoundingBox.size.x <= propBoundingBox.size.z,false);
                 }
 
+                if (targetBoundingBoxScript.spawnOnTerrain)
+                {
+                    propCopy.transform.position = new Vector3(propCopy.transform.position.x, TerrainGeneration.active.GetHeight(propCopy.transform.position) + terrainSpawnOffset, propCopy.transform.position.z);
+                }
 
                 if (DoesPropOverlap(propCopy.GetComponent<BoxCollider>()))
                 {

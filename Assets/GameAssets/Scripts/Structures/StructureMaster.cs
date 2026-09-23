@@ -18,7 +18,8 @@ public enum LengthType
 public enum StructureType
 {
     None,
-    Station
+    Station,
+    Payload
 }
 [System.Serializable]
 public class Connection 
@@ -96,7 +97,9 @@ public class StructureMaster : NetworkBehaviour
 
     [HideInInspector]
     public UnityEvent<Section> onSectionAdded;
-
+    [HideInInspector]
+    public UnityEvent onFinishedGenerating;
+    
     private StructureSO structureSO;
     private float sectionProgress;
     private TrackSection section;
@@ -155,10 +158,10 @@ public class StructureMaster : NetworkBehaviour
     {
         //Debug.Log("Running!");
         bool added = false;
-        foreach (StructureGenerator structure in structureGeneratorList)
+        for (int i = 0; i < structureGeneratorList.Count; i++)
         {
-            yield return StartCoroutine(structure.Generate(this));
-            if (structure is BasicStructureGenerator && added == false)
+            yield return StartCoroutine(structureGeneratorList[i].Generate(this));
+            if (added == false && ((structureGeneratorList[i] is PayloadGenerator && structureType == StructureType.Payload) || (structureGeneratorList[i] is BasicStructureGenerator && structureType != StructureType.Payload)))
             {
                 FinishedGenerating();
                 added = true;
@@ -198,6 +201,7 @@ public class StructureMaster : NetworkBehaviour
         {
             Debug.LogWarning("Not Syncing Structure To Clients: " + gameObject.name);
         }
+        onFinishedGenerating.Invoke();
     }
     [Rpc(SendTo.NotServer)]
     private void FinishedGeneratingClientRpc(int sectionCount)
@@ -222,6 +226,8 @@ public class StructureMaster : NetworkBehaviour
         }
         SpawnEndPrefabs();
         finnishedStructures.Add(this);
+        
+        onFinishedGenerating.Invoke();
     }
     public void OnDestroy()
     {

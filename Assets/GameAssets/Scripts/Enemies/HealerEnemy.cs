@@ -80,7 +80,7 @@ public class HealerEnemy : GroundEnemy
 
             foreach (HealLink link in linkList)
             {
-                if (link.targetHealth.GetHealth() < link.targetHealth.maxHealth)
+                if (link.targetHealth.GetHealth() < link.targetHealth.GetMaxHealth())
                 {
                     link.targetHealth.TakeDamage(-healAmount);
                     GameObject effect = Instantiate(healParticlePrefab, link.targetHealth.transform);

@@ -35,6 +35,7 @@ public class PauseMenu : MonoBehaviour
         });
         quitButton.onClick.AddListener(() =>
         {
+            if (pauseMenuFade.GetAlphaChangeSpeed() < 0f) return;
             Debug.Log("Quit");
             SoundManager.active.Play(clickSoundString);
             StartCoroutine(MainMenu());
@@ -45,7 +46,8 @@ public class PauseMenu : MonoBehaviour
             pauseMenuFade.FadeTo(1f, 0.5f);
         });
 
-        pauseMenuFade.SetAlpha(0f);
+        pauseMenuFade.SetAlpha(0.1f);
+        pauseMenuFade.FadeTo(0f,0.1f);
     }
     private IEnumerator MainMenu()
     {

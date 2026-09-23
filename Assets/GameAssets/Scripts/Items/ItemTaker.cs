@@ -24,7 +24,7 @@ public class ItemTaker : Interactable
         int removeCount = targetCount;
         if (linkedHealth != null)
         {
-            float dammage = linkedHealth.maxHealth - linkedHealth.GetHealth();
+            float dammage = linkedHealth.GetMaxHealth() - linkedHealth.GetHealth();
 
             removeCount = Mathf.Clamp(Mathf.FloorToInt(dammage / healthPerItem), 0, targetCount);
 

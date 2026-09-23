@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8384d97f787c074d8a097d559f112266, type: 3}
+  m_Name: PayloadJob
+  m_EditorClassIdentifier: Assembly-CSharp::SpecialRailCarJobSO
+  title: Payload Escort
+  description: Escort a payload to the crane rail car
+  underText: 'Fee: 100$ Pay: 0$-300$'
+  railCar: {fileID: 11400000, guid: a60e7e6c91e6b482fbcbb6177b6e654f, type: 2}
+  fee: 100

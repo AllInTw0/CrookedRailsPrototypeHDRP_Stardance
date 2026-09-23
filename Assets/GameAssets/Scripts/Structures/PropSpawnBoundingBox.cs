@@ -3,8 +3,11 @@ using UnityEngine;
 public class PropSpawnBoundingBox : MonoBehaviour
 {
     public BoxCollider boundingBox;
-
+    public bool spawnOnTerrain;
+    public int maxPropCount = -1;
+    
     private float areaLeft;
+    private int propCount;
     private bool calculated;
     private void Awake()
     {
@@ -15,9 +18,12 @@ public class PropSpawnBoundingBox : MonoBehaviour
     {
         if (calculated == false) CalculateArea();
         areaLeft -= boxCollider.size.x * boxCollider.size.z;
+        propCount++;
     }
     public bool DoseBoundingBoxFit(BoxCollider boxCollider)
     {
+        if(maxPropCount >= 0 && propCount >= maxPropCount) 
+            return false;
         if (calculated == false) CalculateArea();
         return areaLeft >= boxCollider.size.x * boxCollider.size.z;
     }

@@ -9,7 +9,7 @@ public class TerrainModifier : StructureGenerator
     public BoxCollider boxCollider;
     public AnimationCurve shapeBasedOnDistance;
     public float influenceDistance;
-    
+    public bool modifyOnStructureGenEnd;
     private void Awake()
     {
         if(boxCollider) boxCollider.enabled = false;
@@ -17,7 +17,15 @@ public class TerrainModifier : StructureGenerator
     
     public override IEnumerator Generate(StructureMaster structureMaster)
     {
-        ModifyGround(transform.position, influenceDistance, shapeBasedOnDistance, boxCollider);
+        if (modifyOnStructureGenEnd)
+        {
+            structureMaster.onFinishedGenerating.AddListener(() =>
+            {
+                ModifyGround(transform.position, influenceDistance, shapeBasedOnDistance, boxCollider);
+            });
+        }
+        else
+            ModifyGround(transform.position, influenceDistance, shapeBasedOnDistance, boxCollider);
         yield break;
     }
 

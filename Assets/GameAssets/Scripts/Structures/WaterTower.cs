@@ -103,7 +103,7 @@ public class WaterTower : MonoBehaviour
         }
 
         //Handle Water mesh and filling
-        if (fillWater && Tender.active.waterLevel.GetHealth() < Tender.active.waterLevel.maxHealth && waterLevel.GetHealth() > 0f)
+        if (fillWater && Tender.active.waterLevel.GetHealth() < Tender.active.waterLevel.GetMaxHealth() && waterLevel.GetHealth() > 0f)
         {
             waterSize += waterSpeed * Time.deltaTime;
             waterSize = Mathf.Clamp(waterSize, 0f, 1f);
@@ -118,7 +118,7 @@ public class WaterTower : MonoBehaviour
             if(waterSize > 0.5f && NetworkManager.Singleton.IsServer)
             {
                 float change = fillSpeed * Time.deltaTime;
-                change = Mathf.Clamp(change, 0f, Mathf.Min(Tender.active.waterLevel.maxHealth - Tender.active.waterLevel.GetHealth(), waterLevel.GetHealth()));
+                change = Mathf.Clamp(change, 0f, Mathf.Min(Tender.active.waterLevel.GetMaxHealth() - Tender.active.waterLevel.GetHealth(), waterLevel.GetHealth()));
                 
                 Tender.active.waterLevel.TakeDamage(-change);
                 waterLevel.TakeDamage(change);

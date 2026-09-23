@@ -125,6 +125,18 @@ public class GroundMovement : MonoBehaviour
         //Gravity
         rb.AddForce(grounded ? -groundNormal * (gravityForce * 0.5f) : Vector3.down * gravityForce);
 
+        //Velocity relative to direction
+        float lookAngle = Mathf.Atan2(movementVector.x, movementVector.y) * Mathf.Rad2Deg;
+        float moveAngle = Mathf.Atan2(rb.linearVelocity.x, rb.linearVelocity.z) * Mathf.Rad2Deg;
+
+        float u = Mathf.DeltaAngle(lookAngle, moveAngle);
+        float v = 90 - u;
+
+        float magnitude = rb.linearVelocity.magnitude;
+        float yMag = magnitude * Mathf.Cos(u * Mathf.Deg2Rad);
+        float xMag = magnitude * Mathf.Cos(v * Mathf.Deg2Rad);
+        
+        
         //Movement
         Vector3 targetVector = new Vector3(movementVector.x,0,movementVector.y).normalized;
         projectedVector = Vector3.ProjectOnPlane(targetVector, groundNormal).normalized;

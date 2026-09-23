@@ -119,7 +119,7 @@ public class HeavyPunchEnemy : GroundEnemy
                 {
                     Vector3 dir = (targetHealth.transform.position - targetPunchHealth.transform.position).normalized;
 
-                    movement.SetTarget(targetPunchHealth.transform, 0.35f, -dir);
+                    movement.SetTarget(targetPunchHealth.transform, 0.5f, -dir);
                     if (movement.HasReachedTarget())
                     {
                         targetPunchHealth.UpdateVisibilityCooldown(typeof(HeavyPunchEnemy),4f);
@@ -176,12 +176,13 @@ public class HeavyPunchEnemy : GroundEnemy
             Vector3 dir3D = (targetHealth.transform.position - punchEnemy.transform.position).normalized;
             Vector2 dir2D = new Vector2(dir3D.x, dir3D.z).normalized;
             
-            Util.SolveTrajectory(punchVelocity, punchEnemy.transform.position, targetHealth.transform.position, false,
-                out float angle);
+            //Util.SolveTrajectory(punchVelocity, punchEnemy.transform.position, targetHealth.transform.position, false,out float angle);
+            float angle = 45f;
+            float velocity = Util.SolveVelocityForAngle(angle, punchEnemy.transform.position, targetHealth.transform.position);
             //Debug.Log("PUNCH! " + angle);
-            Vector3 punchDir =  new Vector3(dir2D.x, Mathf.Tan(-angle * Mathf.Deg2Rad), dir2D.y).normalized;
+            Vector3 punchDir =  new Vector3(dir2D.x, Mathf.Tan(angle * Mathf.Deg2Rad), dir2D.y).normalized;
             punchEnemy.UnFreeze();
-            punchEnemy.movement.rb.linearVelocity = punchDir * punchVelocity;
+            punchEnemy.movement.rb.linearVelocity = punchDir * velocity;
             punchEnemy.Anger(targetHealth.transform,1f);
         }
     }

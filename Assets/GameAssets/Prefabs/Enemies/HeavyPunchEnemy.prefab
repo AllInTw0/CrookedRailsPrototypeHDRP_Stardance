@@ -425,7 +425,7 @@ CapsuleCollider:
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 2048
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
@@ -443,7 +443,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6631932380828592750}
   serializedVersion: 5
-  m_Mass: 2.5
+  m_Mass: 0.5
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -527,8 +527,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66fedfc2b0079ae0b9db6912f2440f56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PathFindingGroundMovement
-  baseSpeed: 4.5
-  acceleration: 20
+  baseSpeed: 3.5
+  acceleration: 15
   deceleration: 20
   maxAngle: 45
   capsuleCollider: {fileID: 7477618007067767545}

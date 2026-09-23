@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 public enum HealthType
 {
@@ -18,6 +20,7 @@ public enum HealthType
 
 public class Health : NetworkBehaviour
 {
+    private NetworkVariable<int> networkMaxHealth = new(writePerm: NetworkVariableWritePermission.Server);
     private NetworkVariable<HealthNetworkData> healthNetworkData = new(writePerm: NetworkVariableWritePermission.Server);
     public struct HealthNetworkData : INetworkSerializable
     {
@@ -30,15 +33,32 @@ public class Health : NetworkBehaviour
             serializer.SerializeValue(ref force);
         }
     }
+
+    public void SetHealth(int value)
+    {
+        healthNetworkData.Value = new HealthNetworkData() { health = value };
+    }
     public int GetHealth()
     {
         return healthNetworkData.Value.health - clientSideDamage;
     }
+
+    public void SetMaxHealth(int value)
+    {
+        networkMaxHealth.Value = value;
+    }
+    public int GetMaxHealth()
+    {
+        return networkMaxHealth.Value;
+    }
     
     [Header("Health")]
     public HealthType healthType;
-    public int startingHealth = 100;
-    public int maxHealth = 100;
+    [SerializeField]
+    private int startingHealth = 100;
+    [SerializeField]
+    [FormerlySerializedAs("maxHealth")] 
+    private int startingMaxHealth = 100;
     public string audioOnDamageTaken;
     [Header("Origin")]
     public Transform origin;
@@ -121,6 +141,7 @@ public class Health : NetworkBehaviour
             {
                 health = startingHealth
             };
+            networkMaxHealth.Value = startingMaxHealth;
         }
         else
         {
@@ -146,9 +167,9 @@ public class Health : NetworkBehaviour
             forceSum = Vector3.zero;
         }
 
-        foreach (Type type in visibilityDict.Keys)
+        foreach (Type key in visibilityDict.Keys.ToList())
         {
-            visibilityDict[type] -= Time.deltaTime;
+            visibilityDict[key] -= Time.deltaTime;
         }
     }
     public int TakeDamage(float damage, Vector3 force = default)
@@ -161,7 +182,7 @@ public class Health : NetworkBehaviour
         int damageRounded = Mathf.RoundToInt(damage);
         int damageDone = ClampDamage(damageRounded);
         
-        Debug.Log(damageRounded+","+damageDone + "," + GetHealth());
+        //Debug.Log(damageRounded+","+damageDone + "," + GetHealth());
         
         damageSum += damageDone;
         if(IsServer == false)
@@ -186,7 +207,7 @@ public class Health : NetworkBehaviour
     
     private int ClampDamage(int damage)
     {
-        Vector2Int minMax = new Vector2Int(0, maxHealth);
+        Vector2Int minMax = new Vector2Int(0, GetMaxHealth());
         if (invulnerable)
             minMax.x = 1;
 
@@ -251,6 +272,10 @@ public class Health : NetworkBehaviour
 
     public int GetHealthPercent()
     {
-        return Mathf.RoundToInt(((float)GetHealth() / (float)maxHealth) * 100f);
+        return Mathf.RoundToInt(((float)GetHealth() / (float)GetMaxHealth()) * 100f);
+    }
+    public float GetHealthTime()
+    {
+        return (float)GetHealth() / (float)GetMaxHealth();
     }
 }

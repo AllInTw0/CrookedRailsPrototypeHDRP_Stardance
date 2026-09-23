@@ -20,6 +20,8 @@ public class PayloadGenerator : StructureGenerator
     private int payloadTrackMeshIndex = 4;
     [SerializeField] 
     private GameObject payloadPrefab;
+    [SerializeField] 
+    private bool debugSpawnAtEnd = false;
     public override IEnumerator Generate(StructureMaster structureMaster)
     {
         Debug.Log("Generating Payload Structure");
@@ -145,16 +147,17 @@ public class PayloadGenerator : StructureGenerator
         }
         
         terrainModifyPathListList.Add(terrainModifyPathList);
-        yield return new WaitForSecondsRealtime(3f);
+        yield return new WaitForSecondsRealtime(2f);
         for (int i = 0; i < terrainModifyPathListList.Count; i++)
         {
             if(terrainModifyPathListList[i].Count > 0)
-                TrackGeneration.active.ModifyTerrainToFollowPath(terrainModifyPathListList[i], true);
+                TrackGeneration.active.ModifyTerrainToFollowPath(terrainModifyPathListList[i], true, createBridges: false);
         }
 
         GameObject clone = Instantiate(payloadPrefab);
         Payload payload = clone.GetComponent<Payload>();
         clone.GetComponent<NetworkObject>().Spawn();
-        payload.Initialize(payload.GetConsistLenght(), trackList[0]);
+        payload.Initialize(payload.GetConsistLenght(), trackList[debugSpawnAtEnd ? ^1 : 0]);
+        payload.SetStructure(structureMaster);
     }
 }

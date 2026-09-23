@@ -44,6 +44,7 @@ GameObject:
   - component: {fileID: 6893819316307276848}
   - component: {fileID: 3678465640613875052}
   - component: {fileID: -1634087448851481615}
+  - component: {fileID: 317972694134042417}
   - component: {fileID: 4777892336995982985}
   - component: {fileID: 8549810271426857713}
   m_Layer: 0
@@ -111,9 +112,10 @@ MonoBehaviour:
   structureGeneratorList:
   - {fileID: 3678465640613875052}
   - {fileID: -1634087448851481615}
+  - {fileID: 317972694134042417}
   - {fileID: 4777892336995982985}
   - {fileID: 8549810271426857713}
-  structureType: 0
+  structureType: 2
   startConnection:
     connectionTransform: {fileID: 7337750444291004079}
     validConnectionNameList: []
@@ -126,11 +128,14 @@ MonoBehaviour:
     section: {fileID: 0}
   overlapCheckLayerMask:
     serializedVersion: 2
-    m_Bits: 16384
-  maxRetryCount: 10
+    m_Bits: 1064960
+  maxRetryCount: 20
   structureConnectionList: []
   structureSectionList: []
   onSectionAdded:
+    m_PersistentCalls:
+      m_Calls: []
+  onFinishedGenerating:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &3678465640613875052
@@ -185,7 +190,7 @@ MonoBehaviour:
       m_PreInfinity: 0
       m_PostInfinity: 0
       m_RotationOrder: 0
-    obligatory: 0
+    obligatory: 1
   - sectionPrefabList:
     - {fileID: 9061682910642552403, guid: 27d440d2cc09e1fda81e1d97118476b2, type: 3}
     countType: 0
@@ -198,11 +203,11 @@ MonoBehaviour:
       m_PreInfinity: 0
       m_PostInfinity: 0
       m_RotationOrder: 0
-    obligatory: 0
+    obligatory: 1
   - sectionPrefabList:
     - {fileID: 9061682910642552403, guid: e191a32aa31705953bce30a5dbc0e609, type: 3}
     countType: 0
-    minMaxCount: {x: 0, y: 0}
+    minMaxCount: {x: 3, y: 6}
     lengthType: 0
     lengthAddition: 0
     countCurve:
@@ -212,6 +217,19 @@ MonoBehaviour:
       m_PostInfinity: 0
       m_RotationOrder: 0
     obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 1961505769219332520, guid: 93b09e96280b0cfb68f97d18cc9c5af4, type: 3}
+    countType: 0
+    minMaxCount: {x: 1, y: 1}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    obligatory: 1
 --- !u!114 &-1634087448851481615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -232,6 +250,61 @@ MonoBehaviour:
   handleLength: 2
   payloadTrackMeshIndex: 4
   payloadPrefab: {fileID: 9133909337229533351, guid: 4b360a0902a22e1fdaad3ed1a5c6e73c, type: 3}
+  debugSpawnAtEnd: 0
+--- !u!114 &317972694134042417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7037236421062656352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d08e85745c880934ab2f722c4a57ff8e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BasicStructureGenerator
+  ShowTopMostFoldoutHeaderGroup: 1
+  generationEntryList:
+  - sectionPrefabList:
+    - {fileID: 7932368304356235159, guid: 06a847d798eb6b4c6ab59de8e3c75dcf, type: 3}
+    countType: 0
+    minMaxCount: {x: 4, y: 6}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 9180582522851516105, guid: 78469cb461579782cad01c26c0993e87, type: 3}
+    - {fileID: 9180582522851516105, guid: d7dfb4ac5b49ae8b880431aae5cb6a70, type: 3}
+    countType: 0
+    minMaxCount: {x: 4, y: 8}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    obligatory: 0
+  - sectionPrefabList:
+    - {fileID: 7932368304356235159, guid: fb664669bbdebc64da92098080f2eb3a, type: 3}
+    countType: 0
+    minMaxCount: {x: 4, y: 6}
+    lengthType: 0
+    lengthAddition: 0
+    countCurve:
+      serializedVersion: 2
+      m_Curve: []
+      m_PreInfinity: 0
+      m_PostInfinity: 0
+      m_RotationOrder: 0
+    obligatory: 0
 --- !u!114 &4777892336995982985
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -268,9 +341,10 @@ MonoBehaviour:
     enabled: 0
   overlapCheckLayerMask:
     serializedVersion: 2
-    m_Bits: 2097152
-  maxPropCount: 0
+    m_Bits: 3162112
+  maxPropCount: 25
   maxSpawnTries: 100
+  terrainSpawnOffset: -0.25
 --- !u!114 &8549810271426857713
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -320,4 +394,4 @@ MonoBehaviour:
     maxCount: 1
     pickCount: 5
     enabled: 0
-  minMaxCount: {x: 0, y: 0}
+  minMaxCount: {x: 20, y: 30}

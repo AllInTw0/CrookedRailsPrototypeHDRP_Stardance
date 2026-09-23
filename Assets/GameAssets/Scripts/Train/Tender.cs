@@ -48,9 +48,9 @@ public class Tender : MonoBehaviour
         }
 
         if (waterLevel.GetHealth() != lastWaterLevel)
-            UpdateWarning("Water", waterLevel.GetHealth(), lastWaterLevel, waterLevel.maxHealth);
+            UpdateWarning("Water", waterLevel.GetHealth(), lastWaterLevel, waterLevel.GetMaxHealth());
         if (fuelLevel.GetHealth() != lastFuelLevel)
-            UpdateWarning("Fuel", fuelLevel.GetHealth(), lastFuelLevel, fuelLevel.maxHealth);
+            UpdateWarning("Fuel", fuelLevel.GetHealth(), lastFuelLevel, fuelLevel.GetMaxHealth());
 
         lastWaterLevel = waterLevel.GetHealth();
         lastFuelLevel = fuelLevel.GetHealth();

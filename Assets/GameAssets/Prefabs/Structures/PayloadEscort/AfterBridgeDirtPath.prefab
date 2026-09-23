@@ -237,7 +237,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   noiseFrequency: 1
   minMaxTargetOffset: {x: 0, y: 0}
-  minMaxDistanceForward: {x: 40, y: 45}
+  minMaxDistanceForward: {x: 50, y: 55}
   minMaxDistanceRight: {x: -10, y: 10}
   minMaxRotOffset: {x: -60, y: 60}
   sphereCheckRadius: -1

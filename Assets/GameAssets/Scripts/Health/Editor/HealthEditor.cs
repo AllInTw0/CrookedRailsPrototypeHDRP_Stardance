@@ -17,11 +17,11 @@ public class HealthEditor : Editor
 
         if (GUILayout.Button("Take 10% Damage"))
         {
-            health.TakeDamage(health.maxHealth * 0.1f);
+            health.TakeDamage(health.GetMaxHealth() * 0.1f);
         }
         if (GUILayout.Button("Take 100% Damage"))
         {
-            health.TakeDamage(health.maxHealth);
+            health.TakeDamage(health.GetMaxHealth());
         }
     }
 }

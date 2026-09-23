@@ -148,11 +148,21 @@ public class HaulingJobManager : NetworkBehaviour
         System.Random rng = new System.Random(seed);
         
         //Pick first cargo
+        List<CargoSO> modifiedCargoInfoList = new List<CargoSO>(haulingCargoInfoList);
+        for (int i = 0; i < modifiedCargoInfoList.Count; i++)
+        {
+            if (modifiedCargoInfoList[i].ignoreInHaulingJobGen)
+            {
+                modifiedCargoInfoList.RemoveAt(i);
+                i--;
+            }
+        }
+        
         CargoSO firstCargo;
         int safety = 0;
         do
         {
-            firstCargo = haulingCargoInfoList[rng.Next(0, haulingCargoInfoList.Count-1)];
+            firstCargo = modifiedCargoInfoList[rng.Next(0, modifiedCargoInfoList.Count-1)];
             safety++;
         }
         while (firstCargo.dangerLevel > maxCargoDangerLevel && GetEligibleRailCars(firstCargo,currentLevel).Count == 0 && safety < 20);
@@ -172,7 +182,7 @@ public class HaulingJobManager : NetworkBehaviour
             {
                 if (chooseMixed)
                 {
-                    chosenCargo = haulingCargoInfoList[rng.Next(0, haulingCargoInfoList.Count-1)];
+                    chosenCargo = modifiedCargoInfoList[rng.Next(0, modifiedCargoInfoList.Count-1)];
                 }
                 else
                 {

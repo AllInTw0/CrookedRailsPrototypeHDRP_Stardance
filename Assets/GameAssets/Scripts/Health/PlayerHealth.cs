@@ -52,7 +52,7 @@ public class PlayerHealth : Health
         if(IsOwner == false)
             return;
         
-        StatUI.active.UpdateHealth(GetHealth(), maxHealth);
+        StatUI.active.UpdateHealth(GetHealth(), GetMaxHealth());
         
         if (player.movement.IsSubmergedInWater())
         {

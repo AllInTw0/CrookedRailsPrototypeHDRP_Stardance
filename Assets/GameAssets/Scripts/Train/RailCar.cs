@@ -9,10 +9,10 @@ public struct CargoInfo : INetworkSerializable
     public int cargoSOID;
     public NetworkObjectReference cargoObject;
 
-    public float cargoValue;
+    public int cargoValue;
     public NetworkBehaviourReference cargoHealth;
 
-    public float railCarValue;
+    public int railCarValue;
     public NetworkBehaviourReference railCarHealth;
 
     public NetworkBehaviourReference railCarRefrence;
@@ -61,16 +61,16 @@ public struct CargoInfo : INetworkSerializable
         
         if (cargoInfo != null)
             if (cargoHealth != null)
-                return Mathf.Round((cargoHealth.GetHealth() / cargoHealth.maxHealth) * 100f) + "%";
+                return cargoHealth.GetHealthPercent() + "%";
             else
-                return Mathf.Round((railCarHealth.GetHealth() / railCarHealth.maxHealth) * 100f) + "%*";
+                return cargoHealth.GetHealthPercent() + "%*";
         else
             return "-";
     }
     public string GetRailCarHealthPrecentString()
     {
         Health railCarHealth = GetRailCarHealth();
-        return Mathf.Round((railCarHealth.GetHealth() / railCarHealth.maxHealth) * 100f) + "%";
+        return railCarHealth.GetHealthPercent()+ "%";
     }
     public float GetExpensesSum()
     {
@@ -78,11 +78,11 @@ public struct CargoInfo : INetworkSerializable
         Health railCarHealth = GetRailCarHealth();
         if (cargoHealth != null)
         {
-            return GetValueSum() * (2f - (cargoHealth.GetHealth() / cargoHealth.maxHealth) - (railCarHealth.GetHealth() / railCarHealth.maxHealth));
+            return GetValueSum() * (2f - cargoHealth.GetHealthTime() - railCarHealth.GetHealthTime());
         }
         else
         {
-            return GetValueSum() * (2f - 2f * (railCarHealth.GetHealth() / railCarHealth.maxHealth));
+            return GetValueSum() * (2f - 2f * railCarHealth.GetHealthTime());
         }
     }
     public float GetPaySum()
@@ -264,7 +264,7 @@ public class RailCar : NetworkBehaviour
         AddDisplayBoards();
     }
     
-    private void Update()
+    public virtual void Update()
     {
         derailTime += IsDerailed() ? Time.deltaTime : -Time.deltaTime;
         derailTime = Mathf.Clamp01(derailTime);
@@ -277,8 +277,8 @@ public class RailCar : NetworkBehaviour
             {
                 displayBoard.healthText.text = railCarSO.GetName() + ": " + networkCargo.Value.GetRailCarHealth().GetHealthPercent() + "%";
             
-                Debug.Log(railCarSO.GetName() + ":" +networkCargo.Value.GetCargoSO());
-                if (networkCargo.Value.GetCargoSO() != null)
+                //Debug.Log(railCarSO.GetName() + ":" +networkCargo.Value.GetCargoSO());
+                if (networkCargo.Value.GetCargoSO() && networkCargo.Value.GetCargoHealth())
                 {
                     displayBoard.healthText.text += "\n" + networkCargo.Value.GetCargoSO().GetName() + ": " +
                                                    networkCargo.Value.GetCargoHealth().GetHealthPercent() + "%";
@@ -348,7 +348,7 @@ public class RailCar : NetworkBehaviour
     public void SetCargo(CargoSO cargoSO, int cargoValue, int railCarValue)
     {
         NetworkObject cargoPrefabReference = null;
-        if (cargoSO.cargoPrefab != null)
+        if (cargoSO && cargoSO.cargoPrefab != null)
         {
             cargoPrefabReference = Instantiate(cargoSO.cargoPrefab).GetComponent<NetworkObject>();
             if (cargoPrefabReference != null)

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5398561895084555941}
   m_Layer: 0
-  m_Name: x
+  m_Name: xL
   m_TagString: Untagged
   m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0
@@ -318,8 +318,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 665329558296275796}
-  - component: {fileID: 6302237300712337039}
   - component: {fileID: 2949454471737597161}
+  - component: {fileID: 6302237300712337039}
   - component: {fileID: 2184580996893725834}
   m_Layer: 20
   m_Name: PlatformStairs
@@ -353,6 +353,32 @@ Transform:
   - {fileID: 4192052670270624456}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2949454471737597161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3608849174374438339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 866687241
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  <InScenePlaced>k__BackingField: 0
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &6302237300712337039
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -380,6 +406,7 @@ MonoBehaviour:
     useGlobalEnds: 0
     dontConnect: 0
     ignoreConnections: 0
+    ignore: 0
     section: {fileID: 0}
   - connectionTransform: {fileID: 1511652100270035025}
     validConnectionNameList: []
@@ -388,6 +415,7 @@ MonoBehaviour:
     useGlobalEnds: 0
     dontConnect: 0
     ignoreConnections: 0
+    ignore: 0
     section: {fileID: 0}
   - connectionTransform: {fileID: 2736566917624574698}
     validConnectionNameList: []
@@ -396,6 +424,7 @@ MonoBehaviour:
     useGlobalEnds: 0
     dontConnect: 0
     ignoreConnections: 0
+    ignore: 0
     section: {fileID: 0}
   - connectionTransform: {fileID: 5398561895084555941}
     validConnectionNameList: []
@@ -404,36 +433,15 @@ MonoBehaviour:
     useGlobalEnds: 0
     dontConnect: 0
     ignoreConnections: 0
+    ignore: 0
     section: {fileID: 0}
   length: 0
+  randomRotation: {x: 0, y: 0}
+  targetSpecialConnection: {fileID: 0}
+  connectToTrackInterval: {x: 0, y: 0}
   connectingConnectionList: []
   nonConnectingConnectionList: []
   isOverlapping: 0
---- !u!114 &2949454471737597161
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3608849174374438339}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 866687241
-  InScenePlacedSourceGlobalObjectIdHash: 0
-  DeferredDespawnTick: 0
-  Ownership: 1
-  AlwaysReplicateAsRoot: 0
-  SynchronizeTransform: 1
-  ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
-  SpawnWithObservers: 1
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
-  AllowOwnerToParent: 0
 --- !u!65 &2184580996893725834
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -639,7 +647,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2736566917624574698}
   m_Layer: 0
-  m_Name: x
+  m_Name: xR
   m_TagString: Untagged
   m_Icon: {fileID: 3936346786652291628, guid: 0000000000000000d000000000000000, type: 0}
   m_NavMeshLayer: 0

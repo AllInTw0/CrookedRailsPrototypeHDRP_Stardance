@@ -44,6 +44,8 @@ public class EnemySpawner : MonoBehaviour
 {
     public static EnemySpawner active;
 
+    [SerializeField] 
+    private List<Util.ProbabilityListElement<EnemySO>> enemySpawnProbabilityList;
     [Header("Wave types")]
     [SerializeField]
     private List<WaveEntry> waveEntryList;
@@ -68,6 +70,7 @@ public class EnemySpawner : MonoBehaviour
     private float lastCoolDownLength;
 
     //Wave variables
+    private Util.ProbabilityList<EnemySO> enemyProbabilityList;
     private WaveEntry nextWave;
     private WaveEntry currentWave;
     private List<WaveEntry> lastWaves = new List<WaveEntry>();
@@ -82,7 +85,8 @@ public class EnemySpawner : MonoBehaviour
     {
         active = this;
         inGameEnemyArray = EnemyManager.active.GetInGameEnemies();
-
+        enemyProbabilityList = new Util.ProbabilityList<EnemySO>(enemySpawnProbabilityList);
+        
         //Sort wave entry list by probability
         bool sorted = false;
         while (sorted == false)
@@ -174,7 +178,7 @@ public class EnemySpawner : MonoBehaviour
         int totalHealth = 0;
         foreach (Player player in Player.playerList)
         {
-            totalMaxHealth += player.health.maxHealth;
+            totalMaxHealth += player.health.GetMaxHealth();
             totalHealth += player.health.GetHealth();
         }
         
@@ -270,7 +274,7 @@ public class EnemySpawner : MonoBehaviour
 
         SetUpdateCoolDown(0.5f);
     }
-    private float SpawnDanger(float targetDanger, Vector2 minMaxDistance, Vector2 minMaxRot)
+    public float SpawnDanger(float targetDanger, Vector2 minMaxDistance, Vector2 minMaxRot, EnemySpawnPoint spawnPoint = null)
     {
         float spawnedDanger = 0f;
         float realSpawnedDanger = 0f;
@@ -279,26 +283,38 @@ public class EnemySpawner : MonoBehaviour
         {
             float freeDanger = targetDanger - spawnedDanger;
 
-            EnemySO enemy = inGameEnemyArray[Random.Range(0,inGameEnemyArray.Length)];
-            //Debug.Log(inGameEnemyArray.Length + ", " + enemy);
-            foreach (EnemySO enemySO in inGameEnemyArray)
+            for (int i = 0; i < enemyProbabilityList.probabilityList.Count; i++)
             {
-                if (enemySO.dangerValue < freeDanger && enemySO.dangerValue > enemy.dangerValue)
+                if (enemyProbabilityList.probabilityList[i].element.dangerValue > freeDanger)
                 {
-                    enemy = enemySO;
+                    enemyProbabilityList.probabilityList[i].enabled = false;
+                }
+                else
+                {
+                    enemyProbabilityList.probabilityList[i].enabled = true;
                 }
             }
 
+            EnemySO enemy = enemyProbabilityList.PickNext();
+            
             if (enemy == null)
                 return spawnedDanger;
 
-            Vector3 startPos = Player.playerList[playerIndex].transform.position;
-            Vector3 travelDir = Player.playerList[playerIndex].GetTravelDir();
-                
-            Vector3 spawnDir = Quaternion.AngleAxis(Random.Range(minMaxRot.x, minMaxRot.y), Vector3.up) * new Vector3(travelDir.x, 0f, travelDir.y);
-            Vector3 spawnPos = startPos + spawnDir.normalized * Random.Range(minMaxDistance.x, minMaxDistance.y);
+            Vector3 spawnPos;
+            if (spawnPoint == null)
+            {
+                Vector3 startPos = Player.playerList[playerIndex].transform.position;
+                Vector3 travelDir = Player.playerList[playerIndex].GetTravelDir();
+                Vector3 spawnDir = Quaternion.AngleAxis(Random.Range(minMaxRot.x, minMaxRot.y), Vector3.up) *
+                                   new Vector3(travelDir.x, 0f, travelDir.y);
+                spawnPos = startPos + spawnDir.normalized * Random.Range(minMaxDistance.x, minMaxDistance.y);
+            }
+            else
+            {
+                spawnPos = spawnPoint.transform.position + Random.insideUnitSphere * spawnPoint.radius;
+            }
 
-            if (NavMesh.SamplePosition(spawnPos, out NavMeshHit hit, 10f, 1 << NavMesh.GetAreaFromName("Walkable"))) {
+            if (NavMesh.SamplePosition(spawnPos, out NavMeshHit hit, 20f, 1 << NavMesh.GetAreaFromName("Walkable"))) {
 
                 EnemyManager.active.SpawnEnemy(enemy.prefab, hit.position, Quaternion.identity);
                 realSpawnedDanger += enemy.dangerValue;

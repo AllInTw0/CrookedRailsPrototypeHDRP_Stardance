@@ -13,7 +13,7 @@ public class RailCarHealth : Health
     [SerializeField]
     private List<EventInteractable> rerailInteractableList;
     [SerializeField]
-    private List<GameObject> brokenDownParticles;
+    private List<GameObject> brokenDownParticles = new List<GameObject>();
     [System.Serializable]
     public class HealthState
     {
@@ -120,10 +120,10 @@ public class RailCarHealth : Health
         int currentState = -1;
         for (int i = 0; i < healthStateList.Count; i++)
         {
-            float startHealth = healthStateList[i].startHealthPercent * maxHealth;
+            float startHealth = healthStateList[i].startHealthPercent * GetMaxHealth();
             float endHealth = -1;
             if(i+1 < healthStateList.Count)
-                endHealth =  healthStateList[i+1].startHealthPercent * maxHealth;
+                endHealth =  healthStateList[i+1].startHealthPercent * GetMaxHealth();
             
             if (GetHealth() <= startHealth && (GetHealth() > endHealth || (endHealth == -1 && GetHealth() >= 0f)))
             {

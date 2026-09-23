@@ -62,7 +62,7 @@ public class DebugHelper : MonoBehaviour
             {
                 foreach (Health health in healthList)
                 {
-                    Label(health.transform.position, "h:" +health.GetHealth() + "/" + health.maxHealth +"\n cd:" + health.clientSideDamage);
+                    Label(health.transform.position, "h:" +health.GetHealth() + "/" + health.GetMaxHealth() +"\n cd:" + health.clientSideDamage);
                 }
             }
         }
