@@ -298,6 +298,11 @@ public class RailCar : NetworkBehaviour
         cargoObject.transform.position = cargoOrigin.position;
         cargoObject.transform.rotation = cargoOrigin.rotation;
     }
+
+    public Vector3 GetCargoPos()
+    {
+        return cargoOrigin.position;
+    }
     private void FixedUpdate()
     {
         UpdateSwaySpring();

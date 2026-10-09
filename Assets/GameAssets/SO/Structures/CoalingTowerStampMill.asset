@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: CoalingTowerStampMill
   m_EditorClassIdentifier: Assembly-CSharp::StructureSO
   structurePrefab: {fileID: 3791161114667938621, guid: 512d05ceb3062524c9c3d9ff1b83f83a, type: 3}
-  addAutoStop: 1
-  stopType: 4
-  stopOffset: 0
+  distanceType: 0
+  distanceTypeValue: {x: 100, y: 100}
+  maxCount: 1
+  minDistanceFromStation: 50

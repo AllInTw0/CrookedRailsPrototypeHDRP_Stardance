@@ -15,5 +15,7 @@ MonoBehaviour:
   title: Payload Escort
   description: Escort a payload to the crane rail car
   underText: 'Fee: 100$ Pay: 0$-300$'
-  railCar: {fileID: 11400000, guid: a60e7e6c91e6b482fbcbb6177b6e654f, type: 2}
+  railCarList:
+  - {fileID: 11400000, guid: a60e7e6c91e6b482fbcbb6177b6e654f, type: 2}
+  - {fileID: 11400000, guid: e1b57eeabcc8afe4482d17364ce7a8b7, type: 2}
   fee: 100

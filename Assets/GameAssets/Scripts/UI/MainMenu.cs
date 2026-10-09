@@ -1,5 +1,10 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using TMPro;
+using Unity.Services.Lobbies;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -10,7 +15,7 @@ public class MainMenu : MonoBehaviour
     private Fade mainMenuFade;
 
     [SerializeField]
-    private Button playButton;
+    private Button singleplayerButton;
     [SerializeField]
     private Button settingsButton;
     [SerializeField]
@@ -20,30 +25,43 @@ public class MainMenu : MonoBehaviour
     [SerializeField]
     private AudioSource musicAudioSource;
 
+    [Header("Parents")]
+    [SerializeField] 
+    private GameObject mainMenuParent;
+    [SerializeField] 
+    private GameObject lobbyListParent;
+    [SerializeField] 
+    private GameObject lobbyParent;
+    [Header("LobbyList")]
+    [SerializeField] 
+    private GameObject lobbyListVerticalGroupParent;
+    [SerializeField] 
+    private GameObject lobbyPrefab;
+    [Header("Lobby")]
+    [SerializeField] 
+    private GameObject lobbyPlayerVerticalGroupParent;
+    [SerializeField] 
+    private GameObject playerPrefab;
+    [SerializeField] 
+    private Button createGameButton;
+
+    private enum OpenMenu
+    {
+        Main,
+        LobbyList,
+        Lobby
+    }
+    private OpenMenu currentOpenMenu = OpenMenu.Main;
+    
     private bool gameStarting = false;
     private float musicStartVolume;
     private float fadeTime;
     private float timer;
-
+    
     private void Start()
     {
         musicStartVolume = musicAudioSource.volume;
-
-        playButton.onClick.AddListener(() =>
-        {  
-            MultiplayerManager.active.CreateOrJoinLobby();
-            return;
-            
-            
-            if (gameStarting || mainMenuFade.GetAlphaChangeSpeed() < 0f) return;
-            SoundManager.active.Play(clickSoundString);
-            Debug.Log("Play");
-            fadeTime = 1.3f;
-            musicStartVolume = musicAudioSource.volume;
-            gameStarting = true;
-            Fade.screenFade.FadeTo(1f, fadeTime-0.1f);
-            timer = 0f;
-        });
+        
         settingsButton.onClick.AddListener(() =>
         {
             if (gameStarting || mainMenuFade.GetAlphaChangeSpeed() < 0f) return;
@@ -59,12 +77,177 @@ public class MainMenu : MonoBehaviour
             Application.Quit();
         });
 
+        createGameButton.onClick.AddListener(() =>
+        {
+            PopUp.active.LoadingNotification("Starting Game...");
+            MultiplayerManager.active.StartGame();
+        });
+        
         Settings.active.onClose.AddListener(() =>
         {
             mainMenuFade.FadeTo(1f, 0.5f);
         });
         mainMenuFade.SetAlpha(0f);
         mainMenuFade.FadeTo(1f, 1f, 2f);
+
+        UpdateCoroutine();
+        MultiplayerManager.onLobbyUpdate.AddListener(OnLobbyUpdate);
+
+    }
+    private async Task UpdateCoroutine()
+    {
+        while (true)
+        {
+
+            if (currentOpenMenu == OpenMenu.LobbyList)
+            {
+                UpdateLobbyList();
+                await Task.Delay(2000);
+            }
+            await Task.Delay(100);
+        }
+    }
+
+    private async void OnLobbyUpdate(ILobbyChanges changes)
+    {
+        Debug.Log("Updating Lobby");
+        if (currentOpenMenu == OpenMenu.Lobby)
+        {
+            if (changes.Data.Changed)
+            {
+                if (changes.Data.Value["joinCode"].Value.Value != "")
+                {
+                    await MultiplayerManager.active.JoinHostGame(changes.Data.Value["joinCode"].Value.Value,changes.Data.Value["scene"].Value.Value);
+                }
+            }
+
+            if (changes.PlayerData.Changed || changes.PlayerLeft.Changed || changes.PlayerJoined.Changed)
+            {
+                UpdateLobby();
+            }
+        }
+    }
+
+    public void SinglePlayer()
+    {
+        gameStarting = true;
+        timer = 0f;
+    }
+    public void OpenMain()
+    {
+        SetOpenMenu(OpenMenu.Main);
+    }
+    public void OpenLobbyList()
+    {
+        SetOpenMenu(OpenMenu.LobbyList);
+    }
+    private void OpenLobby()
+    {
+        SetOpenMenu(OpenMenu.Lobby);
+    }
+    public async void CreateLobby()
+    {
+        string lobbyName = await PopUp.active.TextInput("Enter Lobby Name");
+        PopUp.active.LoadingNotification("Creating Lobby...");
+        await MultiplayerManager.active.CreateLobby(lobbyName);
+        await SetOpenMenu(OpenMenu.Lobby);
+        PopUp.active.DestroyCurrentPopUp();
+        createGameButton.gameObject.SetActive(true);
+    }
+
+    private async void UpdateLobbyList()
+    {
+        List<Lobby> lobbyList = await MultiplayerManager.active.GetLobbyList();
+
+        foreach (Transform child in lobbyListVerticalGroupParent.GetComponentsInChildren<Transform>())
+        {
+            if(child.gameObject != lobbyListVerticalGroupParent)
+                Destroy(child.gameObject);
+        }
+
+        foreach (Lobby lobby in lobbyList)
+        {
+            GameObject clone = Instantiate(lobbyPrefab, lobbyListVerticalGroupParent.transform);
+            clone.transform.Find("Name").GetComponent<TMP_Text>().text = lobby.Name;
+            clone.transform.Find("PlayerCount").GetComponent<TMP_Text>().text = lobby.Players.Count +"/" + lobby.MaxPlayers;
+            Lobby l = lobby;
+            clone.transform.Find("JoinButton").GetComponent<Button>().onClick.AddListener(() =>
+            {
+                JoinLobby(l);
+            });
+        }
+        
+    }
+
+    private async void JoinLobby(Lobby lobby)
+    {
+        createGameButton.gameObject.SetActive(false);
+        Lobby joinedLobby = await MultiplayerManager.active.JoinLobbyByID(lobby.Id);
+        if (joinedLobby != null)
+        {
+            OpenLobby();
+        }
+        else
+        {
+            PopUp.active.Notification("Could not Join Lobby");
+        }
+    }
+    private async void UpdateLobby()
+    {
+        Lobby connectedLobby = await MultiplayerManager.active.GetConnectedLobby();
+        if (connectedLobby == null)
+        {
+            OpenLobbyList();
+            PopUp.active.Notification("Lobby closed");
+            return;
+        }
+
+        lobbyParent.transform.Find("Title").GetComponent<TMP_Text>().text = connectedLobby.Name + " " + connectedLobby.Players.Count + "/" + connectedLobby.MaxPlayers;
+        UpdateLobbyPlayers(connectedLobby.Players);
+    }
+
+    private void UpdateLobbyPlayers(List<Unity.Services.Lobbies.Models.Player> playerList)
+    {
+        foreach (Transform child in lobbyPlayerVerticalGroupParent.GetComponentsInChildren<Transform>())
+        {
+            if(child.gameObject != lobbyPlayerVerticalGroupParent)
+                Destroy(child.gameObject);
+        }
+
+        foreach (var player in playerList)
+        {
+            GameObject clone = Instantiate(playerPrefab, lobbyPlayerVerticalGroupParent.transform);
+            clone.transform.Find("Name").GetComponent<TMP_Text>().text = player.Data["username"].Value;
+        }
+    }
+
+    private async Task SetOpenMenu(OpenMenu openMenu)
+    {
+        if (currentOpenMenu == OpenMenu.Lobby && openMenu != OpenMenu.Lobby)
+        {
+            await MultiplayerManager.active.LeaveLobby();
+        }
+        
+        mainMenuParent.SetActive(openMenu == OpenMenu.Main);
+        lobbyListParent.SetActive(openMenu == OpenMenu.LobbyList);
+        lobbyParent.SetActive(openMenu == OpenMenu.Lobby);
+        
+        if (openMenu == OpenMenu.LobbyList)
+        {
+            if (MultiplayerManager.username == "")
+            {
+                MultiplayerManager.username = await PopUp.active.TextInput("Enter Username");
+                PopUp.active.LoadingNotification("Authenticating...");
+                await MultiplayerManager.active.Authenticate();
+                PopUp.active.DestroyCurrentPopUp();
+            }
+            UpdateLobbyList();
+        }
+        if (openMenu == OpenMenu.Lobby)
+        {
+            UpdateLobby();
+        }
+        currentOpenMenu = openMenu;
     }
     private void Update()
     {
@@ -76,7 +259,9 @@ public class MainMenu : MonoBehaviour
 
             if (timer >= fadeTime)
             {
-                SceneManager.LoadScene("Game");
+                gameStarting = false;
+                timer = 0f;
+                MultiplayerManager.active.StartSinglePlayer();
             }
         }
         else

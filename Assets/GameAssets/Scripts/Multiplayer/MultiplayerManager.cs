@@ -11,11 +11,14 @@ using Unity.Services.Lobbies.Models;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 public class MultiplayerManager : MonoBehaviour
 {
     public static MultiplayerManager active = null;
+    public static string username = "";
+    public static UnityEvent<ILobbyChanges> onLobbyUpdate = new UnityEvent<ILobbyChanges>();
     private void Awake()
     {
         if(active != null)
@@ -30,8 +33,10 @@ public class MultiplayerManager : MonoBehaviour
     }
     private void OnDestroy()
     {
-        active = null;
+        if(active == this)
+            active = null;
     }
+    LobbyEventCallbacks lobbyCallbacks = new LobbyEventCallbacks();
     
     [Header("Local Testing")]
     [SerializeField] private bool hostLocally = true;
@@ -59,17 +64,23 @@ public class MultiplayerManager : MonoBehaviour
             return;
         }
         
-        string sceneName = SceneManager.GetActiveScene().name;
-        if (sceneName != "MainMenu")
-        {
-            await Authenticate();
-            CreateLobby();
-        }
+        lobbyCallbacks.LobbyChanged += OnLobbyChanged;
+        
+    }
+
+    public async void StartSinglePlayer()
+    {
+        await SceneManager.LoadSceneAsync("Game");
+        NetworkManager.Singleton.StartHost();
+    }
+    private void OnLobbyChanged(ILobbyChanges changes)
+    {
+        onLobbyUpdate.Invoke(changes);
     }
     
     private string playerID;
     
-    private async Task Authenticate()
+    public async Task Authenticate()
     {
         InitializationOptions options = new InitializationOptions();
 
@@ -84,12 +95,36 @@ public class MultiplayerManager : MonoBehaviour
     }
     
     //Lobby
-    private Lobby connectedLobby;
+    private string joinedLobbyID;
+    private bool isHost;
+    public async Task<Lobby> GetConnectedLobby()
+    {
+        if (string.IsNullOrEmpty(joinedLobbyID))
+            return null;
+
+        int tries = 5;
+        while (tries > 0)
+        {
+            try
+            {
+                return await LobbyService.Instance.GetLobbyAsync(joinedLobbyID);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Couldnt get lobby: " + e);
+            }
+
+            Task.Delay(1000);
+            tries--;
+        }
+
+        return null;
+    }
     public async void CreateOrJoinLobby()
     {
         await Authenticate();
         
-        connectedLobby = await QuickJoinLobby() ?? await CreateLobby();
+        Lobby lobby = await QuickJoinLobby() ?? await CreateLobby();
     }
 
     private async Task<Lobby> QuickJoinLobby()
@@ -111,6 +146,7 @@ public class MultiplayerManager : MonoBehaviour
                 joinAllocation.ConnectionData, joinAllocation.HostConnectionData);
 
             NetworkManager.Singleton.StartClient();
+            joinedLobbyID = lobby.Id;
             return lobby;
         }
         catch (Exception e)
@@ -120,41 +156,100 @@ public class MultiplayerManager : MonoBehaviour
         }
     }
 
-    [Header("Lobby Creation")] 
-    [SerializeField] private bool manuallySetRegion = true;
-    [SerializeField] private string region = "europe-north1";//Finland https://docs.unity.com/en-us/relay/locations-and-regions
-    private async Task<Lobby> CreateLobby()
+    public async Task<List<Lobby>> GetLobbyList()
+    {
+        QueryResponse response = await LobbyService.Instance.QueryLobbiesAsync();
+        return response.Results;
+    }
+
+    public async Task<Lobby> JoinLobbyByID(string lobbyID)
     {
         try
         {
-            const int maxPlayers = 10;
-            
-            if (SceneManager.GetActiveScene().name == "MainMenu")
+            //Try to join lobby
+            JoinLobbyByIdOptions options = new JoinLobbyByIdOptions();
+            options.Player = new Unity.Services.Lobbies.Models.Player
             {
-                await SceneManager.LoadSceneAsync("Game");
-            }
+                Data = new Dictionary<string, PlayerDataObject>
+                {
+                    {
+                        "username", new PlayerDataObject(visibility: PlayerDataObject.VisibilityOptions.Member, value: username)
+                    }
+                }
+            };
 
-            Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayers, manuallySetRegion ? region : null);
-            string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            Lobby lobby = await LobbyService.Instance.JoinLobbyByIdAsync(lobbyID,options);
+            joinedLobbyID = lobby.Id;
+            isHost = false;
+            
+            Task.Delay(1000);
+            
+            ILobbyEvents lobbyEvents = await LobbyService.Instance.SubscribeToLobbyEventsAsync(lobbyID,lobbyCallbacks);
+            
+            return lobby;
+        }
+        catch (Exception e)
+        {
+            Debug.Log("Failed joining lobby: " + e.Message);
+            return null;
+        }
+    }
+
+    public async Task LeaveLobby()
+    {
+        if (isHost)
+        {
+            await LobbyService.Instance.DeleteLobbyAsync(joinedLobbyID);
+        }
+        else
+        {
+            await LobbyService.Instance.RemovePlayerAsync(joinedLobbyID, AuthenticationService.Instance.PlayerId);
+            ILobbyEvents lobbyEvents = await LobbyService.Instance.SubscribeToLobbyEventsAsync(joinedLobbyID, lobbyCallbacks);
+            await lobbyEvents.UnsubscribeAsync();
+        }
+
+        joinedLobbyID = "";
+        StopCoroutine(nameof(HeartbeatLobbyCoroutine));
+    }
+    [Header("Lobby Creation")] 
+    [SerializeField] private bool manuallySetRegion = true;
+    [SerializeField] private string region = "europe-north1";//Finland https://docs.unity.com/en-us/relay/locations-and-regions
+    const int maxPlayers = 10;
+    public async Task<Lobby> CreateLobby(string lobbyName = "Lobby Name")
+    {
+        try
+        {
+            
+            
+            Unity.Services.Lobbies.Models.Player player = new Unity.Services.Lobbies.Models.Player
+            {
+                Data = new Dictionary<string, PlayerDataObject>
+                {
+                    {"username", new PlayerDataObject(visibility: PlayerDataObject.VisibilityOptions.Member, value: username)}
+                }
+            };
             
             CreateLobbyOptions options = new CreateLobbyOptions
             {
                 Data = new Dictionary<string, DataObject>()
                 {
-                    {"joinCode", new DataObject(DataObject.VisibilityOptions.Public, joinCode)},
+                    {"joinCode", new DataObject(DataObject.VisibilityOptions.Public, "")},
                     {"scene", new DataObject(DataObject.VisibilityOptions.Public, SceneManager.GetActiveScene().name)},
                 },
-                IsPrivate = false
+                IsPrivate = false,
+                Player = player
             };
-            Lobby lobby = await LobbyService.Instance.CreateLobbyAsync("Lobby Name", maxPlayers, options);
+            Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, options);
 
             StartCoroutine(HeartbeatLobbyCoroutine(lobby.Id, 15f));
 
-            FindFirstObjectByType<UnityTransport>().SetHostRelayData(allocation.RelayServer.IpV4,
-                (ushort)allocation.RelayServer.Port, allocation.AllocationIdBytes, allocation.Key,
-                allocation.ConnectionData);
-
-            NetworkManager.Singleton.StartHost();
+            joinedLobbyID = lobby.Id;
+            isHost = true;
+            
+            Task.Delay(1000);
+            
+            ILobbyEvents lobbyEvents = await LobbyService.Instance.SubscribeToLobbyEventsAsync(joinedLobbyID,lobbyCallbacks);
+            
             return lobby;
         }
         catch(Exception e)
@@ -164,6 +259,48 @@ public class MultiplayerManager : MonoBehaviour
         }
     }
 
+    public async Task StartGame()
+    {
+        if (SceneManager.GetActiveScene().name == "MainMenu")
+        {
+            await SceneManager.LoadSceneAsync("Game");
+        }
+
+        Allocation allocation = await RelayService.Instance.CreateAllocationAsync(maxPlayers, manuallySetRegion ? region : null);
+        string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            
+        UpdateLobbyOptions options = new UpdateLobbyOptions
+        {
+            Data = new Dictionary<string, DataObject>()
+            {
+                {"joinCode", new DataObject(DataObject.VisibilityOptions.Public, joinCode)},
+                {"scene", new DataObject(DataObject.VisibilityOptions.Public, SceneManager.GetActiveScene().name)},
+            }
+        };
+        await LobbyService.Instance.UpdateLobbyAsync(joinedLobbyID, options);
+
+        FindFirstObjectByType<UnityTransport>().SetHostRelayData(allocation.RelayServer.IpV4,
+            (ushort)allocation.RelayServer.Port, allocation.AllocationIdBytes, allocation.Key,
+            allocation.ConnectionData);
+
+        NetworkManager.Singleton.StartHost();
+    }
+
+    public async Task JoinHostGame(string joinCode, string scene)
+    {
+        if (SceneManager.GetActiveScene().name != scene)
+        {
+            await SceneManager.LoadSceneAsync(scene);
+        }
+            
+        JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+            
+        FindFirstObjectByType<UnityTransport>().SetClientRelayData(joinAllocation.RelayServer.IpV4,
+            (ushort)joinAllocation.RelayServer.Port, joinAllocation.AllocationIdBytes, joinAllocation.Key,
+            joinAllocation.ConnectionData, joinAllocation.HostConnectionData);
+
+        NetworkManager.Singleton.StartClient();
+    }
     private static IEnumerator HeartbeatLobbyCoroutine(string lobbyID, float delay)
     {
         while (true)

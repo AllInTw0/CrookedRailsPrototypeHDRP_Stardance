@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: RefillStation
   m_EditorClassIdentifier: Assembly-CSharp::StructureSO
   structurePrefab: {fileID: 7858576653668020282, guid: e1bee4c77e889a54f8ce8853802c3a42, type: 3}
-  addAutoStop: 1
-  stopType: 1
-  stopOffset: 0
+  distanceType: 1
+  distanceTypeValue: {x: 0.7, y: 0.8}
+  maxCount: -1
+  minDistanceFromStation: 0

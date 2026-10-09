@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: WaterTower
   m_EditorClassIdentifier: Assembly-CSharp::StructureSO
   structurePrefab: {fileID: 3409113424161998415, guid: 123476f50a86460448258e47b81c9650, type: 3}
-  addAutoStop: 1
-  stopType: 1
-  stopOffset: 0
+  distanceType: 1
+  distanceTypeValue: {x: 0.1, y: 0.2}
+  maxCount: -1
+  minDistanceFromStation: 5

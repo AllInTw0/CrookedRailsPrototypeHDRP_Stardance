@@ -32,6 +32,9 @@ public class Payload : Train
     private Vector2 waveCooldown;
     [SerializeField]
     private float minDanger;
+    [Header("Crane")] 
+    [SerializeField]
+    private Transform hookPos;
     
     private float stunTime;
     //wave stuff
@@ -46,6 +49,10 @@ public class Payload : Train
     public bool CanBePickedUp()
     {
         return linkedCraneRailCar == null && frontTrackSection.GetNextSection() == null;
+    }
+    public Transform GetHookPos()
+    {
+        return hookPos;
     }
     private void Start()
     {
@@ -62,6 +69,10 @@ public class Payload : Train
     }
     public override void Update()
     {
+        if (linkedCraneRailCar != null)
+        {
+            return;
+        }
         base.Update();
 
         if (playerTrigger.GetColliderCount() > 0 && stunTime <= 0)

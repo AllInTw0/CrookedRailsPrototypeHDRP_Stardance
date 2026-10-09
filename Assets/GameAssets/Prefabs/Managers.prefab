@@ -766,7 +766,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1708868192
+  GlobalObjectIdHash: 229873088
   InScenePlacedSourceGlobalObjectIdHash: 229873088
   DeferredDespawnTick: 0
   Ownership: 1

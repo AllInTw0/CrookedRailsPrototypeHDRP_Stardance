@@ -43,45 +43,10 @@ public class GenerationManager : NetworkBehaviour
         setDistance,
         fuelDistance
     }
-    [System.Serializable]
-    public class StructureSpawnParams
-    {
-        public List<StructureSO> structureInfoList;
-        public bool ignore;
-        public StructureDistanceType distanceType;
-        public Vector2 distanceTypeValue; // setDistance = distance; fuelDistance = fuelDistance * value
-        public bool repeating;
-        public float minStationDistance;
-        public void ResetDistance(bool resetSpawningDisabled = false)
-        {
-            if (resetSpawningDisabled || repeating) spawningDisabled = false;
 
-            if (spawningDisabled == false)
-            {
-                if (distanceType == StructureDistanceType.setDistance)
-                {
-                    distanceTillStructure = Random.Range(distanceTypeValue.x, distanceTypeValue.y);
-                }
-                else if (distanceType == StructureDistanceType.fuelDistance)
-                {
-                    float minDistance = float.MaxValue;
-                    foreach (PlayerTrain.FuelSource fuelSource in PlayerTrain.active.GetFuelSourceList())
-                    {
-                        minDistance = Mathf.Min(fuelSource.targetHealth.GetMaxHealth() / TrainUpgradeHandler.active.GetStatValue(fuelSource.consumptionRate), minDistance);
-                    }
-                    distanceTillStructure = minDistance * Random.Range(distanceTypeValue.x, distanceTypeValue.y);
-                }
-            }
-        }
-        //Run time
-        [HideInInspector]
-        public float distanceTillStructure;
-        [HideInInspector]
-        public bool spawningDisabled;
-    }
     [Header("Structures")]
     [SerializeField]
-    private List<StructureSpawnParams> strutureSpawnParamList;
+    private List<StructureSO> structureSpawnList;
     [SerializeField]
     private float distanceBufferBetweenStructures;
     private enum DebugTrainStartLocation
@@ -107,7 +72,6 @@ public class GenerationManager : NetworkBehaviour
     private bool stationGenerated;
     private float distanceLeftTillNextStation;
     //structures
-    private float currentStructureDistanceBuffer;
 
     private List<PathPoint> generatedPath;
     
@@ -240,21 +204,64 @@ public class GenerationManager : NetworkBehaviour
         currentStationPos = lastTrackSectionOut.path[^1].position;
 
         //Structures
-        foreach (StructureSpawnParams structureSpawnParams in strutureSpawnParamList)
-        {
-            structureSpawnParams.ResetDistance(true);
-        }
-        while (lastSection != lastTrackSectionOut)
-        {
-            lastSection = lastSection.nextSection;
-            UpdateStructureDistances(lastSection);
-        }
-
-        //lastSection = lastTrackSectionOut;
+        SpawnStructures(lastSection.nextSection, lastTrackSectionOut);
+        
+        lastSection = lastTrackSectionOut;
         lastPoint = lastSection.pointB;
         generatedPath = path;
         GenerateStation();
         StartCoroutine(WaitForStructuresCoroutine());
+    }
+
+    private void SpawnStructures(TrackSection startSection, TrackSection endSection)
+    {
+        float trackLength = 0f;
+        TrackSection section = startSection;
+        while (section != endSection)
+        {
+            trackLength += section.length;
+            section = section.nextSection;
+        }
+        trackLength += section.length;
+
+        void SpawnAtDist(float dist, StructureSO so)
+        {
+            TrackSection section = startSection;
+            while (section.length < dist)
+            {
+                trackLength -= section.length;
+                section = section.nextSection;
+            }
+
+            SpawnStructureNearTrack(dist, section, so);
+        }
+
+        void SpawnStructure(StructureSO structureSO)
+        {
+            float dist = 0f;
+            int spawnedCount = 0;
+            while (spawnedCount < structureSO.maxCount || structureSO.maxCount == -1)
+            {
+                dist += structureSO.GetDistance();
+                if(dist > trackLength - structureSO.minDistanceFromStation)
+                    break;
+                
+                float sectionProgress = dist;
+                TrackSection spawnSection = startSection;
+                while (spawnSection.length < sectionProgress)
+                {
+                    sectionProgress -=  spawnSection.length;
+                    spawnSection = spawnSection.nextSection;
+                }
+                
+                SpawnStructureNearTrack(sectionProgress, spawnSection, structureSO);
+            }
+        }
+
+        foreach (StructureSO structureSpawnParams in structureSpawnList)
+        {
+            SpawnStructure(structureSpawnParams);
+        }
     }
     public IEnumerator WaitForStructuresCoroutine()
     {
@@ -474,50 +481,21 @@ public class GenerationManager : NetworkBehaviour
     }
 
     //Generation functions end
-    private void UpdateStructureDistances(TrackSection generatedSection)
-    {
-        currentStructureDistanceBuffer -= generatedSection.length;
-
-        foreach (StructureSpawnParams structureSpawnParams in strutureSpawnParamList)
-        {
-            if (structureSpawnParams.spawningDisabled || structureSpawnParams.ignore) continue;
-
-            structureSpawnParams.distanceTillStructure -= generatedSection.length;
-            
-            if(currentStructureDistanceBuffer <= 0f && structureSpawnParams.distanceTillStructure <= 0f)
-            {
-                float sectionProgress = Mathf.Clamp01(Mathf.Min(-currentStructureDistanceBuffer, -structureSpawnParams.distanceTillStructure) / generatedSection.length) * generatedSection.length;
-
-                Vector3 pos = TrackManager.GetPathPosition(generatedSection.path,sectionProgress);
-                if (Vector2.Distance(new Vector2(currentStationPos.x, currentStationPos.z),new Vector2(pos.x, pos.z)) >= structureSpawnParams.minStationDistance)
-                {
-                    SpawnStructureNearTrack(sectionProgress, generatedSection, structureSpawnParams.structureInfoList[Random.Range(0, structureSpawnParams.structureInfoList.Count)]);
-                    currentStructureDistanceBuffer = distanceBufferBetweenStructures;
-
-                    structureSpawnParams.spawningDisabled = true;
-                    structureSpawnParams.ResetDistance();
-                }
-                else
-                {
-                    Debug.Log("Did not spawn structure becasue to close to station");
-                }
-            }
-        }
-    }
     private void SpawnStructureNearTrack(float sectionProgress, TrackSection section, StructureSO structureInfo)
     {
         //Ran only on server
         TrackManager.active.GetTrackPositionAndDirVectorFromProgress(sectionProgress, section, out Vector3 position, out Vector3 dir);
 
         GameObject structure = Instantiate(structureInfo.structurePrefab);
+        StructureMaster structureMaster = structure.GetComponent<StructureMaster>();
         
         structure.transform.position = position;
-        structure.transform.LookAt(position + (structureInfo.onlyRotateY ? new Vector3(dir.x, 0, dir.z) : dir));
+        structure.transform.LookAt(position + ((structureMaster == null || structureMaster.onlyRotateY) ? new Vector3(dir.x, 0, dir.z) : dir));
         
         section.AddObject(structure); //Adds it for deletion when track section is deleted
 
         //Initialize structure generation
-        if(structure.TryGetComponent(out StructureMaster structureMaster))
+        if(structureMaster)
         {
             structureMaster.Generate(sectionProgress, section, structureInfo);
         }

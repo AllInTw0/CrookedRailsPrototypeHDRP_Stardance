@@ -82,8 +82,16 @@ public class StructureMaster : NetworkBehaviour
     public StructureType structureType;
     public Connection startConnection;
     public LayerMask overlapCheckLayerMask;
-
+    
+    [Header("Spawn params")]
+    public bool onlyRotateY = true;
     public int maxRetryCount;
+    
+    [Header("AutoStop")]
+    public bool addAutoStop;
+    public AutoStopType stopType;
+    public float stopOffset;
+    
     private int retryCount = 0;
 
     public static List<StructureMaster> generatingStructures = new List<StructureMaster>();
@@ -179,9 +187,9 @@ public class StructureMaster : NetworkBehaviour
         finnishedStructures.Add(this);
         if (section != null && structureSO != null)
         {
-            if (structureSO.addAutoStop)
+            if (addAutoStop)
             {
-                section.SetAutoStop(sectionProgress, structureSO.stopType);
+                section.SetAutoStop(sectionProgress, stopType);
             }
         }
         

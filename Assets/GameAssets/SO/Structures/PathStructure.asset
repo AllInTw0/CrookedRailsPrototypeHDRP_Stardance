@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: PathStructure
   m_EditorClassIdentifier: Assembly-CSharp::StructureSO
   structurePrefab: {fileID: 7037236421062656352, guid: 28cea8e99614be04ba8fe596332e7028, type: 3}
-  addAutoStop: 1
-  stopType: 4
-  stopOffset: 0
+  distanceType: 0
+  distanceTypeValue: {x: 80, y: 120}
+  maxCount: 2
+  minDistanceFromStation: 50
