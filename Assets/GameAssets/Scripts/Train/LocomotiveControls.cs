@@ -41,6 +41,12 @@ public class LocomotiveControls : NetworkBehaviour
     }
     [HideInInspector]
     public NetworkVariable<bool> onSetOffTriggerGenerationReset = new(writePerm:NetworkVariableWritePermission.Server);
+
+    public override void OnNetworkSpawn()
+    {
+        onSetOffTriggerGenerationReset.Value = false;
+    }
+
     private void Start()
     {
         throttle.interactEvent.AddListener(() =>

@@ -137,6 +137,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   neededBoughtItems: []
   maxCountBought: -1
+  bonusItems: []
   offset: {x: 0.15, y: 0.2, z: 0.25}
   origin: {x: -0.02, y: 0.08, z: 0.035}
   rotation: {x: 0, y: 0, z: 0}
@@ -150,7 +151,7 @@ MonoBehaviour:
   sell: 16
   randomness: 0.4047619
   slotCount: 1
-  maxCount: 20
+  maxCount: 200
   randomYRot: 1
   dropOffset: {x: 0, y: 0, z: 0}
   isTool: 0

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ItemGun : Item
 {
@@ -20,16 +21,25 @@ public class ItemGun : Item
     private float reloadCoolDown = 0.5f;
     [SerializeField] 
     private float shootCoolDown = 0.5f;
+    [SerializeField]
+    public GameObject bulletPrefab;
+    [SerializeField]
+    public bool spawnBurstEffect = true;
+    [SerializeField]
+    public List<HealthType> healthTypeFilter = new List<HealthType>();
+    [Header("Sound")]
     [SerializeField] 
     public string reloadSound;
+    [SerializeField] 
+    private string shootStartSound;
+    [SerializeField] 
+    private string shootEndSound;
     [SerializeField] 
     private string shootSound;
     [SerializeField] 
     public string failedSound;
-    [SerializeField]
-    public GameObject bulletPrefab;
-    [SerializeField]
-    public List<HealthType> healthTypeFilter = new List<HealthType>();
+    [SerializeField] 
+    public AudioSource shootLoopSound;
     //Run Time
     private int clip;
     private void SetClip(int value)
@@ -37,31 +47,66 @@ public class ItemGun : Item
         clip = value;
     }
     private float coolDown;
+    private NetworkVariable<bool> shootingNetwork = new NetworkVariable<bool>(writePerm: NetworkVariableWritePermission.Owner);
+    public override void Start()
+    {
+        base.Start();
+        shootingNetwork.OnValueChanged += ShootingChanged;
+        if(shootLoopSound)
+            shootLoopSound.transform.SetParent(null);
+    }
     void Update()
     {
         if (coolDown > 0f)
             coolDown -= Time.deltaTime;
         
-       if(Player.localPlayer.inventory.tool == this && coolDown <= 0f && Time.timeScale != 0f)
+       if(Player.localPlayer.inventory.tool == this)
        {
-           if ((InputManager.attackAction.IsPressed() && clip > 0) ||(InputManager.attackAction.triggered && clip == 0))
+           shootingNetwork.Value = InputManager.attackAction.IsPressed() && HasAmmoInClip();
+           if (coolDown <= 0f && Time.timeScale != 0f)
            {
-               Shoot();
-           }
-           else if (InputManager.reloadAction.triggered)
-           {
-               Reload();
-           }
+               if ((InputManager.attackAction.IsPressed() && clip > 0) || (InputManager.attackAction.triggered && clip == 0))
+               {
+                   Shoot();
+               }
+               else if (InputManager.reloadAction.triggered)
+               {
+                   Reload();
+               }
 
-           UpdateText();
+               UpdateText();
+           }
        }
+       if(shootLoopSound)
+           shootLoopSound.transform.position = GetBulletOrigin();
        
        UpdateItem();
     }
 
+    private void ShootingChanged(bool previous, bool current)
+    {
+        Debug.Log("Shooting: "+current);
+        if (current)
+        {
+            if(shootLoopSound)
+                shootLoopSound.Play();
+            SoundManager.active.PlayAtPos(GetBulletOrigin(), shootStartSound);
+        }
+        else
+        {
+            if(shootLoopSound)
+                shootLoopSound.Stop();
+            SoundManager.active.PlayAtPos(GetBulletOrigin(), shootEndSound);
+        }
+    }
+
+    private bool CanShoot()
+    {
+        return !IsOnCooldown() && HasAmmoInClip();
+    }
     public void Shoot()
     {
-        if ((clip > 0) && coolDown <= 0f)
+        if (CanShoot())
         {
             ShootRpc(Player.localPlayer.camera.GetRaycastPos());
         }
@@ -95,7 +140,7 @@ public class ItemGun : Item
         if (bulletPrefab == null)
             BulletManager.active.ShootBullets(bulletOrigin, direction, bulletCount, bulletDamage, spread, healthTypeFilter, shooterType, doDamage);
         else
-            BulletManager.active.ShootPrefab(bulletOrigin, direction, bulletPrefab, bulletCount, spread, shooterType, doDamage);
+            BulletManager.active.ShootPrefab(bulletOrigin, direction, bulletPrefab, bulletCount, spread, shooterType, doDamage, spawnBurstEffect);
         
         SoundManager.active.PlayAtPos(bulletOrigin, shootSound); 
         
@@ -154,11 +199,21 @@ public class ItemGun : Item
 
     private Vector3 GetBulletOrigin()
     {
+        if(!playerWhoHasItem)
+            return transform.position;
+        
         return playerWhoHasItem.avatar.GetAnimationInfo().bulletSpawn.transform.position;
     }
     private void GetBulletDefiningVariables(Vector3 aimPos, out Vector3 bulletOrigin, out Vector3 direction)
     {
         bulletOrigin = GetBulletOrigin();
         direction = (aimPos - bulletOrigin).normalized;
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        if(shootLoopSound)
+            Destroy(shootLoopSound);
     }
 }

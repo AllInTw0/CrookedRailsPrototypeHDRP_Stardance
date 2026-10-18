@@ -185,11 +185,11 @@ public class StructureMaster : NetworkBehaviour
     {
         //Finished generating!
         finnishedStructures.Add(this);
-        if (section != null && structureSO != null)
+        if (section != null)
         {
             if (addAutoStop)
             {
-                section.SetAutoStop(sectionProgress, stopType);
+                section.SetAutoStop(sectionProgress + stopOffset, stopType);
             }
         }
         

@@ -37,6 +37,8 @@ public class Enemy : NetworkBehaviour
     public EnemySO enemyInfo;
     public Transform centerTransform;
     public Health health;
+    public GameObject xRayObject;
+    private float xRayTime;
     //Animation
     [Header("Animation")]
     public Animator animator;
@@ -100,6 +102,9 @@ public class Enemy : NetworkBehaviour
     
     public virtual void UpdateBehaviour() // Called in intervals
     {
+        xRayTime -= EnemyManager.active.behaviourRefreshRate;
+        if(xRayTime < 0 && xRayObject.activeSelf) xRayObject.SetActive(false);
+        
         if (IsServer)
         {
             Transform target = GetComponent<PathFindingGroundMovement>().GetTargetTransform();
@@ -127,7 +132,12 @@ public class Enemy : NetworkBehaviour
             };
         }
     }
-    
+
+    public void EnableXRay(float time)
+    {
+        xRayTime = time;
+        if(!xRayObject.activeSelf) xRayObject.SetActive(true);
+    }
     //Other behaviour calls
     public bool CheckForTargets(List<EnemySO.HealthWeightParams> healthFilterList, out Health closestHealth)
     {

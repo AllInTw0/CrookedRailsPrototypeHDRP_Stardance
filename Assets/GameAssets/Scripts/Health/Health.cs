@@ -17,7 +17,10 @@ public enum HealthType
     Robot,
     Payload
 }
-
+public enum DebuffType
+{
+    Fire
+}
 public class Health : NetworkBehaviour
 {
     private NetworkVariable<int> networkMaxHealth = new(writePerm: NetworkVariableWritePermission.Server);
@@ -71,6 +74,7 @@ public class Health : NetworkBehaviour
     
     private bool isVisibleGlobally = true;
     private Dictionary<Type, float> visibilityDict  = new Dictionary<Type, float>();
+    
     public bool CanBeSeenBy(Type type)
     {
         if(isVisibleGlobally == false)
@@ -98,14 +102,80 @@ public class Health : NetworkBehaviour
             visibilityDict.Add(type, timeInvisible);
     }
     
+    public class Debuff
+    {
+        public DebuffType type;
+        public float duration;
+        public float value;
+        
+        public bool owner;
+
+        public Debuff(DebuffType type, float duration = 0f, float value = 0f, bool owner = true)
+        {
+            this.type = type;
+            this.duration = duration;
+            this.value = value;
+            this.owner = owner;
+        }
+    }
+    [System.Serializable]
+    public class DebuffVisualizer
+    {
+        public DebuffType type;
+        public List<ParticleSystem> ParticleSystemList = new List<ParticleSystem>();
+
+        public void ChangeState(bool enabled)
+        {
+            for (int i = 0; i < ParticleSystemList.Count; i++)
+            {
+                if(enabled)
+                    ParticleSystemList[i].Play();
+                else
+                    ParticleSystemList[i].Stop();
+            }
+        }
+    }
+
+    private List<Debuff> debuffList = new List<Debuff>();
+    [SerializeField]
+    private List<DebuffVisualizer> debuffVisualizerList = new List<DebuffVisualizer>();
+    public void AddDebuff(Debuff debuff)
+    {
+        debuffList.Add(debuff);
+        for (int i = 0; i < debuffVisualizerList.Count; i++)
+        {
+            if (debuffVisualizerList[i].type == debuff.type)
+            {
+                debuffVisualizerList[i].ChangeState(true);
+            }
+        }
+    }
+    public Debuff GetDebuff(DebuffType type)
+    {
+        Debuff debuff = null;
+        for (int i = 0; i < debuffList.Count; i++)
+        {
+            if (debuffList[i].type == type)
+            {
+                if (debuff == null)
+                    debuff = new Debuff(type);
+
+                debuff.duration += debuffList[i].duration;
+                debuff.value += debuffList[i].value;
+            }
+        }
+        return debuff;
+    }
+    
     public UnityEvent<float,Vector3> onTakeDamage;
     private void Awake()
     {
         onTakeDamage = new UnityEvent<float,Vector3>();
     }
-    private void Start()
+    public virtual void Start()
     {
         AddHealthToGlobalList();
+        InvokeRepeating(nameof(DebuffTick),1f,1f);
     }
 
     private void HealthChanged(HealthNetworkData previous, HealthNetworkData current)
@@ -154,9 +224,20 @@ public class Health : NetworkBehaviour
         if(EnemyManager.active != null)
             EnemyManager.active.healthTypeArray[(int)healthType].Add(this);
     }
+    
     private void Update()
     {
         UpdateCall();
+    }
+
+    public void DebuffTick()
+    {
+        Debuff fire = GetDebuff(DebuffType.Fire);
+        if (fire != null && fire.owner)
+        {
+            TakeDamage(fire.value);
+            HitSound.active.HandleHitSound(this, fire.value, transform.localPosition + Vector3.up);
+        }
     }
     public void UpdateCall()
     {
@@ -170,6 +251,24 @@ public class Health : NetworkBehaviour
         foreach (Type key in visibilityDict.Keys.ToList())
         {
             visibilityDict[key] -= Time.deltaTime;
+        }
+
+        for (int i = 0; i < debuffList.Count; i++)
+        {
+            debuffList[i].duration -= Time.deltaTime;
+            if (debuffList[i].duration <= 0f)
+            {
+                for (int j = 0; j < debuffVisualizerList.Count; j++)
+                {
+                    if (debuffVisualizerList[i].type == debuffList[i].type)
+                    {
+                        debuffVisualizerList[i].ChangeState(false);
+                    }
+                }
+                
+                debuffList.RemoveAt(i);
+                i--;
+            }
         }
     }
     public int TakeDamage(float damage, Vector3 force = default)

@@ -32,10 +32,10 @@ public class PlayerHealth : Health
 
     private float timeUnderWater;
     private float timeSinceDammageTick;
-    private void Start()
+    public override void Start()
     {
+        base.Start();
         isAlive = true;
-        AddHealthToGlobalList();
         onTakeDamage.AddListener((float damage, Vector3 force) => {
             if(damage > 0 && player == Player.localPlayer)
             {

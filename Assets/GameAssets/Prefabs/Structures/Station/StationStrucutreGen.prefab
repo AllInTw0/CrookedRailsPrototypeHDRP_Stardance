@@ -121,7 +121,11 @@ MonoBehaviour:
   overlapCheckLayerMask:
     serializedVersion: 2
     m_Bits: 1064960
+  onlyRotateY: 1
   maxRetryCount: 0
+  addAutoStop: 1
+  stopType: 3
+  stopOffset: 0
   structureConnectionList: []
   structureSectionList: []
   onSectionAdded:

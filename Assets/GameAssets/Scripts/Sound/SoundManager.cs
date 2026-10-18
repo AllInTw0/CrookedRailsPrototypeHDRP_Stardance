@@ -42,6 +42,7 @@ public class SoundManager : MonoBehaviour
 
     public void PlayAtPos(Vector3 pos, string soundName, float spatialBlend = 1f, Transform parent = null)
     {
+        if(string.IsNullOrEmpty(soundName)) return;
         SoundInfo soundInfo = GetSoundInfo(soundName);
         if (soundInfo != null)
         {
@@ -70,6 +71,7 @@ public class SoundManager : MonoBehaviour
     }
     public void Play(string soundName)
     {
+        if(string.IsNullOrEmpty(soundName)) return;
         SoundInfo soundInfo = GetSoundInfo(soundName);
         if (soundInfo != null)
         {

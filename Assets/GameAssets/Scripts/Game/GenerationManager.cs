@@ -47,6 +47,11 @@ public class GenerationManager : NetworkBehaviour
     [Header("Structures")]
     [SerializeField]
     private List<StructureSO> structureSpawnList;
+    private List<StructureSO> oneTimeStructureSpawnList = new List<StructureSO>();
+    public void AddOneTimeStructure(StructureSO structure)
+    {
+        oneTimeStructureSpawnList.Add(structure);
+    }
     [SerializeField]
     private float distanceBufferBetweenStructures;
     private enum DebugTrainStartLocation
@@ -255,9 +260,16 @@ public class GenerationManager : NetworkBehaviour
                 }
                 
                 SpawnStructureNearTrack(sectionProgress, spawnSection, structureSO);
+                spawnedCount++;
             }
         }
 
+        foreach (StructureSO structureSpawnParams in oneTimeStructureSpawnList)
+        {
+            SpawnStructure(structureSpawnParams);
+        }
+        oneTimeStructureSpawnList = new List<StructureSO>();
+        
         foreach (StructureSO structureSpawnParams in structureSpawnList)
         {
             SpawnStructure(structureSpawnParams);
@@ -526,7 +538,7 @@ public class GenerationManager : NetworkBehaviour
 
         SpawnStructureNearTrack(section.length, section, startingLocationSO);
         
-        section.SetAutoStop(playerTrain.GetConsistLenght() + 1.2f, AutoStopType.StartingLocation);
+        //section.SetAutoStop(playerTrain.GetConsistLenght() + 1.2f, AutoStopType.StartingLocation);
         
         
         lastPoint = pointB;
@@ -590,7 +602,7 @@ public class GenerationManager : NetworkBehaviour
 
         if (trainStartLocation == DebugTrainStartLocation.Station)
         {
-            playerTrain.Initialize(generatedSection.length - 3f, generatedSection,false);
+            playerTrain.Initialize(generatedSection.length - 5f, generatedSection,false);
         }
         
         //generatedSection.SetAutoStop(generatedSection.length - 5f, AutoStopType.Front);

@@ -63,7 +63,7 @@ public struct CargoInfo : INetworkSerializable
             if (cargoHealth != null)
                 return cargoHealth.GetHealthPercent() + "%";
             else
-                return cargoHealth.GetHealthPercent() + "%*";
+                return railCarHealth.GetHealthPercent() + "%*";
         else
             return "-";
     }

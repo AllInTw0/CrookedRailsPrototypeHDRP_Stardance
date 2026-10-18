@@ -205,6 +205,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   influenceDistance: 32
+  modifyOnStructureGenEnd: 0
 --- !u!1 &1062496842822323050
 GameObject:
   m_ObjectHideFlags: 0
@@ -14790,14 +14791,22 @@ MonoBehaviour:
     useGlobalEnds: 0
     dontConnect: 0
     ignoreConnections: 0
+    ignore: 0
     section: {fileID: 0}
   overlapCheckLayerMask:
     serializedVersion: 2
     m_Bits: 0
+  onlyRotateY: 1
   maxRetryCount: 0
+  addAutoStop: 1
+  stopType: 6
+  stopOffset: -2
   structureConnectionList: []
   structureSectionList: []
   onSectionAdded:
+    m_PersistentCalls:
+      m_Calls: []
+  onFinishedGenerating:
     m_PersistentCalls:
       m_Calls: []
 --- !u!1 &8169949331665250490

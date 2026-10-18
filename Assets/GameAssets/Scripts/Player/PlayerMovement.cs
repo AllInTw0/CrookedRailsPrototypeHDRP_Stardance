@@ -156,7 +156,7 @@ public class PlayerMovement : GroundMovement
 
         moveInput = player == Player.localPlayer ? InputManager.active.moveInput : player.playerNetworkData.Value.moveInput;
         bool sprinting = player == Player.localPlayer ? InputManager.sprintAction.IsPressed() : player.playerNetworkData.Value.sprinting;
-        bool jumping = player == Player.localPlayer ? InputManager.jumpAction.IsPressed() : player.playerNetworkData.Value.jumping;
+        bool jump = player == Player.localPlayer ? InputManager.jumpAction.WasPressedThisFrame() : player.playerNetworkData.Value.jumping;
         bool crouching = player == Player.localPlayer ? InputManager.crouchAction.IsPressed() : player.playerNetworkData.Value.crouching;
         
         if (noclip)
@@ -215,7 +215,7 @@ public class PlayerMovement : GroundMovement
 
             //Jumping
             jumpTimer += Time.deltaTime;
-            if (jumping && grounded && jumpTimer >= jumpCoolDown)
+            if (jump && grounded && jumpTimer >= jumpCoolDown)
             {
                 float force = jumpForce;
                 if (IsInWater())

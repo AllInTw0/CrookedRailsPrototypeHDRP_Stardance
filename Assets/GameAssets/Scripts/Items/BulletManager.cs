@@ -80,10 +80,11 @@ public class BulletManager : MonoBehaviour
         }
         
     }
-    public void ShootPrefab(Vector3 start, Vector3 dir, GameObject prefab, int count, float spread, ShooterType shooterType = ShooterType.Player, bool doDamage = true)
+    public void ShootPrefab(Vector3 start, Vector3 dir, GameObject prefab, int count, float spread, ShooterType shooterType = ShooterType.Player, bool doDamage = true, bool burstEffect = true)
     {
 
-        SpawnBurstEffect(start, dir, 1f, 4f);
+        if(burstEffect)
+            SpawnBurstEffect(start, dir, 1f, 4f);
         for (int i = 0; i < count; i++)
         {
             Vector3 spreadDir = dir + new Vector3(Random.Range(-spread, spread), Random.Range(-spread, spread), Random.Range(-spread, spread));

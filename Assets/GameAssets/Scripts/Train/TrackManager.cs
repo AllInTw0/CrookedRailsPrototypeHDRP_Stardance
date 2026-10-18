@@ -370,6 +370,8 @@ public class TrackManager : NetworkBehaviour
 
         foreach (var obj in section.associatedObjects)
         {
+            if(!obj)
+                continue;
             if(obj.TryGetComponent(out NetworkObject networkObject) && IsServer)
                 networkObject.Despawn(true);
             else

@@ -723,7 +723,7 @@ MonoBehaviour:
   displayBoardPositionList:
   - {fileID: 7912572756355062989}
   - {fileID: 8594225970688930989}
-  maxPickUpDistance: 10
+  maxPickUpDistance: 6
   payloadCargoSO: {fileID: 11400000, guid: c18aac838a46d06fd86a4e256c5ac26d, type: 2}
   partBody: {fileID: 6650107560007984082}
   bodyRotSpeed: 10

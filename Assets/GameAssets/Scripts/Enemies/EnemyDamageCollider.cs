@@ -9,6 +9,8 @@ public class EnemyDamageCollider : MonoBehaviour
 {
     [SerializeField] 
     private Enemy enemyBehaviour;
+    [SerializeField]
+    private float xRayTime = 3f;
     [SerializeField] 
     private float coolDown = 0.2f;
     [SerializeField] 
@@ -63,6 +65,7 @@ public class EnemyDamageCollider : MonoBehaviour
 
     IEnumerator DamageDelayed(Health healthScript, float damage, Vector3 force, float delay)
     {
+        enemyBehaviour.EnableXRay(xRayTime);
         yield return new WaitForSeconds(delay);
         
         if(enemyBehaviour.IsOwner) healthScript.TakeDamage(damage,force);

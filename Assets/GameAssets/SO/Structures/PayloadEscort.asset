@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: PayloadEscort
   m_EditorClassIdentifier: Assembly-CSharp::StructureSO
   structurePrefab: {fileID: 7037236421062656352, guid: 903bfda626dfdb9d6acafd0d55cfc6ec, type: 3}
-  onlyRotateY: 1
-  addAutoStop: 1
-  stopType: 4
-  stopOffset: 0
+  distanceType: 0
+  distanceTypeValue: {x: 100, y: 200}
+  maxCount: 1
+  minDistanceFromStation: 0

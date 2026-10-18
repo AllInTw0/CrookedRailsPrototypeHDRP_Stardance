@@ -15,6 +15,7 @@ public class SpecialRailCarJobSO : SpecialJobSO
     {
         if (Money.CanAfford(fee) == false)
             return false;
+        base.OrderJob();
         for (int i = 0; i < railCarList.Count; i++)
         {
             RailCar spawnedRailCar = PlayerTrain.active.AddRailCar(railCarList[i], 2);

@@ -230,3 +230,27 @@ MonoBehaviour:
     volume: 0.7
     pitch: {x: 0.8, y: 1.2}
     groupType: 0
+  - name: Flame Whoosh
+    AudioClips:
+    - {fileID: 8300000, guid: 9c37aa3df99e99b71952b76d37f6ab6d, type: 3}
+    - {fileID: 8300000, guid: 5eedc9e30b7666435823637ed258a329, type: 3}
+    - {fileID: 8300000, guid: 32fb18d8ce1e4e45482895f03437fa09, type: 3}
+    - {fileID: 8300000, guid: 7844aca23972d9b9b8213427df81799e, type: 3}
+    - {fileID: 8300000, guid: a3b106ea8fdc4e48691e9ab00c7d35b4, type: 3}
+    volume: 0.7
+    pitch: {x: 0.9, y: 1.1}
+    groupType: 0
+  - name: Flamethrower - start
+    AudioClips:
+    - {fileID: 8300000, guid: 5eb4540495c55209a8250db3b6faa451, type: 3}
+    - {fileID: 8300000, guid: 4078187fc42f1230296ed251429b6ddc, type: 3}
+    volume: 0.7
+    pitch: {x: 0.9, y: 1.1}
+    groupType: 0
+  - name: Flamethrower - end
+    AudioClips:
+    - {fileID: 8300000, guid: 46dc887bc3df5ffaab97042cddcb7e66, type: 3}
+    - {fileID: 8300000, guid: cb2ee350a4af3a6918ace8ee9fd45c4e, type: 3}
+    volume: 0.7
+    pitch: {x: 0.9, y: 1.1}
+    groupType: 0

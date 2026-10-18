@@ -55,16 +55,21 @@ public class MainMenu : MonoBehaviour
     
     private bool gameStarting = false;
     private float musicStartVolume;
+    [SerializeField]
     private float fadeTime;
     private float timer;
-    
+
+    private bool CanNotPressButtons()
+    {
+        return gameStarting || mainMenuFade.GetAlphaChangeSpeed() < 0f || PopUp.active.IsAPopUpActive();
+    }
     private void Start()
     {
         musicStartVolume = musicAudioSource.volume;
         
         settingsButton.onClick.AddListener(() =>
         {
-            if (gameStarting || mainMenuFade.GetAlphaChangeSpeed() < 0f) return;
+            if (CanNotPressButtons()) return;
             SoundManager.active.Play(clickSoundString);
             Debug.Log("Settings Open");
             Settings.active.Open();
@@ -79,6 +84,7 @@ public class MainMenu : MonoBehaviour
 
         createGameButton.onClick.AddListener(() =>
         {
+            if (CanNotPressButtons()) return;
             PopUp.active.LoadingNotification("Starting Game...");
             MultiplayerManager.active.StartGame();
         });
@@ -130,19 +136,28 @@ public class MainMenu : MonoBehaviour
 
     public void SinglePlayer()
     {
+        if (CanNotPressButtons()) return;
+        SoundManager.active.Play(clickSoundString);
         gameStarting = true;
         timer = 0f;
+        Fade.screenFade.FadeTo(1f, fadeTime);
     }
     public void OpenMain()
     {
+        if (CanNotPressButtons()) return;
+        SoundManager.active.Play(clickSoundString);
         SetOpenMenu(OpenMenu.Main);
     }
     public void OpenLobbyList()
     {
+        if (CanNotPressButtons()) return;
+        SoundManager.active.Play(clickSoundString);
         SetOpenMenu(OpenMenu.LobbyList);
     }
     private void OpenLobby()
     {
+        if (CanNotPressButtons()) return;
+        SoundManager.active.Play(clickSoundString);
         SetOpenMenu(OpenMenu.Lobby);
     }
     public async void CreateLobby()
@@ -185,7 +200,7 @@ public class MainMenu : MonoBehaviour
         Lobby joinedLobby = await MultiplayerManager.active.JoinLobbyByID(lobby.Id);
         if (joinedLobby != null)
         {
-            OpenLobby();
+            SetOpenMenu(OpenMenu.Lobby);
         }
         else
         {
@@ -197,7 +212,7 @@ public class MainMenu : MonoBehaviour
         Lobby connectedLobby = await MultiplayerManager.active.GetConnectedLobby();
         if (connectedLobby == null)
         {
-            OpenLobbyList();
+            SetOpenMenu(OpenMenu.LobbyList);
             PopUp.active.Notification("Lobby closed");
             return;
         }

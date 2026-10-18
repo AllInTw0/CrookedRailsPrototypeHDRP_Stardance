@@ -17,9 +17,9 @@ public class EnemyHealth : Health
     {
         return behaviour;
     }
-    private void Start()
+    public override void Start()
     {
-        AddHealthToGlobalList();
+        base.Start();
     }
 
     private void Update()

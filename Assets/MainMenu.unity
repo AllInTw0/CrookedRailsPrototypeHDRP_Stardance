@@ -5432,6 +5432,7 @@ MonoBehaviour:
   lobbyPlayerVerticalGroupParent: {fileID: 1377796329}
   playerPrefab: {fileID: 8839062161742830085, guid: 6efa7b21f4771a41cb8bd5bcc3f018a8, type: 3}
   createGameButton: {fileID: 1396829014}
+  fadeTime: 1
 --- !u!114 &1824627965
 MonoBehaviour:
   m_ObjectHideFlags: 0
