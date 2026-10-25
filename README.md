@@ -53,7 +53,10 @@ After Flavortown with this project I participated in an YouShipWeShip called "St
 
 With this project i participated in an YSWS called "Falvortown" organized by HackClub. I won't explain how the event works here but I'll say my thoughts.
 Before I knew about Hackclub this project was a mess. (I started working on it in 2024) I'd work on it sure, but it would usually take me hours to implement something simple. Due to it also becoming a huge clump of different features, that don't go with each other, I decided about half a month before I learned about Flavortown to start from scratch. I implemented some simple features and then I learned about Flavortown from my school's hackclub workshop. From now on Flavortown gave me something to look forward to and it only motivated me to finally make a somewhat playable version of the game.
+
 [Flavortown project](https://flavortown.hackclub.com/projects/10071)
+
+[Flavortown Repo](https://github.com/AllInTw0/CrookedRailsPrototypeHDRP)
 
 Here is me playing the somewhat playable version for over and hour.
 [YouTube Video](https://youtu.be/yDcuscI8zDo)
