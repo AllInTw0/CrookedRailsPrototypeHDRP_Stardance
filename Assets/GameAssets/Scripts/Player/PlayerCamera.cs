@@ -89,6 +89,14 @@ public class PlayerCamera : MonoBehaviour
         }
 
         CameraBob();
+
+        if (Physics.Raycast(GetRay(), out RaycastHit hit))
+        {
+            if (hit.transform.TryGetComponent(out Player hitPlayer))
+            {
+                hitPlayer.SetPlayerNameDuration(0.5f);
+            }
+        }
     }
 
     private void FixedUpdate()

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using TMPro;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -13,6 +15,11 @@ public class Player : NetworkBehaviour
     private static byte nextPlayerID = 0; // byte is a 0-255 int
     
     //Network
+    private NetworkVariable<FixedString32Bytes> playerName = new NetworkVariable<FixedString32Bytes>(writePerm: NetworkVariableWritePermission.Owner);
+    public string GetUserName()
+    {
+        return playerName.Value.ToString();
+    }
     public NetworkVariable<PlayerNetworkData> playerNetworkData = new (writePerm: NetworkVariableWritePermission.Owner);
     private NetworkVariable<byte> playerIDNetworkVariable = new (writePerm: NetworkVariableWritePermission.Server);
     public byte playerID
@@ -39,7 +46,23 @@ public class Player : NetworkBehaviour
     private float rotXVelocity, rotX;
     
     private RigidbodyInterpolation rbStartInterpolation;
-    
+
+    [Header("PlayerName")] 
+    [SerializeField]
+    private Transform playerNamePrefab;
+    [SerializeField]
+    private Transform playerNameFollowTransform;
+    [SerializeField] 
+    private Vector3 playerNameOffset;
+    [SerializeField] 
+    private float playerNameFadeSpeed = 10f;
+    private Transform playerNameTransform;
+    private TMP_Text playerNameText;
+    private float playerNameDuration;
+    public void SetPlayerNameDuration(float duration)
+    {
+        playerNameDuration = duration;
+    }
     //Travel dir (used for enemy spawning)
     private const int maxTravelDirCount = 10;
     private Vector3 lastPos;
@@ -61,6 +84,24 @@ public class Player : NetworkBehaviour
         health.player = this;
         rb = GetComponent<Rigidbody>();
         rbStartInterpolation = rb.interpolation;
+    }
+    
+    protected override void OnNetworkPostSpawn()
+    {
+        if (IsOwner)
+        {
+            if (string.IsNullOrEmpty(MultiplayerManager.username))
+                playerName.Value = Application.isEditor ? "Editor" : "Application";
+            else
+                playerName.Value = MultiplayerManager.username;
+        }
+        else
+        {
+            if (playerNameTransform == null)
+                playerNameTransform = Instantiate(playerNamePrefab);
+            playerNameText = playerNameTransform.GetComponentInChildren<TMP_Text>();
+            playerNameText.text = GetUserName();
+        }
     }
 
     void Start()
@@ -97,6 +138,17 @@ public class Player : NetworkBehaviour
             AwaitTeleport();
         
         InvokeRepeating(nameof(UpdateTravelDir),0.5f,0.5f);
+
+        playerName.OnValueChanged += (value, newValue) =>
+        {
+            if (IsOwner == false)
+            {
+                if(playerNameTransform == null)
+                    playerNameTransform = Instantiate(playerNamePrefab);
+                playerNameText =playerNameTransform.GetComponentInChildren<TMP_Text>();
+                playerNameText.text = GetUserName();
+            }
+        };
     }
 
     private async void AwaitTeleport()
@@ -173,6 +225,15 @@ public class Player : NetworkBehaviour
         {
             orientation.rotation = Quaternion.Euler(0, Mathf.SmoothDampAngle(orientation.rotation.eulerAngles.y, playerNetworkData.Value.yRot, ref rotYVelocity, rotSmoothTime), 0);
             rotX = Mathf.SmoothDampAngle(rotX, playerNetworkData.Value.xRot, ref rotXVelocity, rotSmoothTime);
+
+            if (playerNameTransform)
+            {
+                playerNameTransform.position = playerNameFollowTransform.position + playerNameOffset;
+                playerNameTransform.LookAt(PlayerCamera.active.transform.position);
+                
+                playerNameText.color = Color.Lerp(playerNameText.color,new Color(1f,1f,1f,playerNameDuration > 0 ? 1f : 0f),playerNameFadeSpeed * Time.deltaTime);
+                playerNameDuration -= Time.deltaTime;
+            }
         }
     }
 
@@ -249,6 +310,7 @@ public class Player : NetworkBehaviour
     public override void OnDestroy()
     {
         base.OnDestroy();
+        Destroy(playerNameTransform.gameObject);
         playerList.Remove(this);
     }
 

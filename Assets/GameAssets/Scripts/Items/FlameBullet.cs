@@ -24,7 +24,7 @@ public class FlameBullet : Bullet
     [SerializeField] private string igniteSound;
     private bool canSpawnFlames = false;
     private ShooterType shooterType;
-    private bool doDamage = true;
+    private bool doDamage = false;
     public override void Initialize(ShooterType shooterType, bool doDamage)
     {
         canSpawnFlames = true;
@@ -59,7 +59,7 @@ public class FlameBullet : Bullet
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("[Flame] terrain");
+        //Debug.Log("[Flame] terrain");
         if (canSpawnFlames)
         {
             Instantiate(flamePrefab, collision.contacts[0].point, Quaternion.Euler(0f,Random.Range(0f, 360f),0f));
@@ -83,12 +83,15 @@ public class FlameBullet : Bullet
             }
             else
                 health.AddDebuff(new Health.Debuff(DebuffType.Fire, tickDamageDuration, tickDamage, doDamage));
-            health.TakeDamage(damage);
-            SoundManager.active.PlayAtPos(health.transform.position + Vector3.up, igniteSound);
-            HitSound.active.HandleHitSound(health,damage, health.transform.position + Vector3.up);
+
+            if (doDamage)
+            {
+                HitSound.active.HandleHitSound(health,health.TakeDamage(damage), health.transform.position + Vector3.up);
+                SoundManager.active.PlayAtPos(health.transform.position + Vector3.up, igniteSound);
+            }
             if(canSpawnFlames == false)
                 timer = 0f;
         }
-        Debug.Log($"[Flame] trigger {other.gameObject.name}, {health}");
+        //Debug.Log($"[Flame] trigger {other.gameObject.name}, {health}");
     }
 }

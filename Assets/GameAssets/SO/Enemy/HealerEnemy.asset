@@ -15,5 +15,6 @@ MonoBehaviour:
   prefab: {fileID: 6631932380828592750, guid: b4b8fb99c92a0008daf6032bc9cb5506, type: 3}
   HealthWeightParamsList: []
   sightDistance: 35
-  playerDistanceFromTrainToAttack: 500
+  playerDistanceFromTrainToAttack: 15
   dangerValue: 1
+  minWaveSpawnedDangerValue: 2.5

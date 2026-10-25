@@ -28,7 +28,8 @@ public class EnemySO : ScriptableObject
     
     [Header("Spawning")]
     public float dangerValue;
-
+    public float minWaveSpawnedDangerValue;
+    
 //    [Header("Misc")]
 //    public float gravityForce = 10f;
 

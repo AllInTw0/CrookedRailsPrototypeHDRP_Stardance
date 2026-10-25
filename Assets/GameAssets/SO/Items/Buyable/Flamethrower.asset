@@ -14,7 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemSO
   nameOverride: 
   prefab: {fileID: 5062412172767849501, guid: 1651d75f2f32e2d8da84cc30860077fc, type: 3}
-  description: Flamethrower desc.
+  description: Rapidly spews out flames at a medium distance. The flames can be spewd
+    on the terrain to leave behind a fire.
   probabilityCurve:
     serializedVersion: 2
     m_Curve:
@@ -137,7 +138,8 @@ MonoBehaviour:
     m_RotationOrder: 4
   neededBoughtItems: []
   maxCountBought: -1
-  bonusItems: []
+  bonusItems:
+  - {fileID: 11400000, guid: 541bf2873324b227e826662374bd726e, type: 2}
   offset: {x: -1, y: 0, z: 0}
   origin: {x: 0, y: 0, z: 0.095}
   rotation: {x: -30, y: 0, z: 90}

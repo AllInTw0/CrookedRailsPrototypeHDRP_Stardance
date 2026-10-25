@@ -5,20 +5,14 @@ using static Util;
 
 public class ItemSpawner : StructureGenerator
 {
-    [System.Serializable]
-    public class ItemSpawnEntry
-    {
-        public ItemSO item;
-        public Vector2Int minMaxStackCount;
-    }
     [SerializeField]
-    private List<ProbabilityListElement<ItemSpawnEntry>> itemSpawnEntryList = new List<ProbabilityListElement<ItemSpawnEntry>>();
+    private ItemSpawnerParamsSO spawnParams;
     [SerializeField]
     private Vector2Int minMaxCount;
-
+    
     public override IEnumerator Generate(StructureMaster structureMaster)
     {
-        if (itemSpawnEntryList.Count == 0)
+        if (!spawnParams || spawnParams.GetItemSpawnEntryList().Count == 0)
         {
             Debug.LogWarning("No Items Defined!");
             yield break;
@@ -26,13 +20,35 @@ public class ItemSpawner : StructureGenerator
 
         ItemSpawnBounds[] structureItemSpawnBoundsArray = GetItemSpawnBoundsArray(structureMaster);
 
-        ProbabilityList<ItemSpawnEntry> probabilityList = new ProbabilityList<ItemSpawnEntry>(itemSpawnEntryList);
+        ProbabilityList<ItemSpawnerParamsSO.ItemSpawnEntry> probabilityList = new ProbabilityList<ItemSpawnerParamsSO.ItemSpawnEntry>(spawnParams.GetItemSpawnEntryList());
 
+        for (int i = 0; i < probabilityList.probabilityList.Count; i++)
+        {
+            bool canSpawn = true;
+            for (int j = 0; j < probabilityList.probabilityList[i].element.neededBoughtItemsToSpawn.Count; j++)
+            {
+                if (!GameStateManager.boughtItemList.Contains(probabilityList.probabilityList[i].element.neededBoughtItemsToSpawn[j]))
+                {
+                    canSpawn = false;
+                    break;
+                }
+            }
+            
+            if(canSpawn)
+                probabilityList.probabilityList[i].Enable();
+            else
+                probabilityList.probabilityList[i].Disable();
+        }
+        
         int count = Random.Range(minMaxCount.x, minMaxCount.y);
         for (int a = 0; a < count; a++)
         {
-            ItemSpawnEntry itemSpawnEntry = probabilityList.PickNext();
-
+            ItemSpawnerParamsSO.ItemSpawnEntry itemSpawnEntry = probabilityList.PickNext();
+            if (itemSpawnEntry == null)
+            {
+                Debug.LogWarning($"[ItemSpawner] Couldnt pick next item.");
+                break;
+            }
             //Get valid spawns points
             List<ItemSpawnBounds> itemSpawnBoundsList = new List<ItemSpawnBounds>(structureItemSpawnBoundsArray);
             for (int b = 0; b < itemSpawnBoundsList.Count; b++)

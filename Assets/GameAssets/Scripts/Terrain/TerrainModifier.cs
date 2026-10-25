@@ -35,7 +35,7 @@ public class TerrainModifier : StructureGenerator
             ModifyGround(transform.position, influenceDistance, shapeBasedOnDistance, boxCollider);
     }
 
-    public static void ModifyGround(Vector3 worldPos, float influenceDistance, AnimationCurve shapeBasedOnDistance = null, BoxCollider boxCollider = null)
+    public static void ModifyGround(Vector3 worldPos, float influenceDistance, AnimationCurve shapeBasedOnDistance = null, BoxCollider boxCollider = null, Vector2 minMaxTerrainOffset = default)
     {
         Vector2Int chunkCoord = TerrainGeneration.active.GetChunkCoord(worldPos);
 
@@ -59,10 +59,35 @@ public class TerrainModifier : StructureGenerator
 
                         if (distance < influenceDistance && (boxCollider == null || Util.PointInBox(vertWorldPos, boxCollider)))
                         {
+                            //interesting test
+                            float addition = 0f;
+                            if (minMaxTerrainOffset != default)
+                            {
+                                addition = TerrainGeneration.terrainNoise.SampleNoise(vertWorldPos.x, vertWorldPos.z);
+                                int saftey = 50;
+                                while (addition < minMaxTerrainOffset.x || addition > minMaxTerrainOffset.y)
+                                {
+                                    if (addition < minMaxTerrainOffset.x)
+                                    {
+                                        addition = minMaxTerrainOffset.x +(minMaxTerrainOffset.x - addition) * 0.9f;
+                                    }
+                                    if (addition > minMaxTerrainOffset.y)
+                                    {
+                                        addition = minMaxTerrainOffset.y + (minMaxTerrainOffset.y - addition) * 0.9f;
+                                    }
+
+                                    saftey--;
+                                    if (saftey < 0)
+                                    {
+                                        Debug.LogWarning("EXEDED TERRAIN MODIFIER SAFTEY");
+                                        break;
+                                    }
+                                }
+                            }
                             float time = 1f;
                             if(shapeBasedOnDistance != null)
                                 time = shapeBasedOnDistance.Evaluate(distance);
-                            chunk.heightMap[x, y] = Mathf.Lerp(vertWorldPos.y, worldPos.y, time);
+                            chunk.heightMap[x, y] = Mathf.Lerp(vertWorldPos.y, worldPos.y, time) + addition;
                         }
                         Debug.DrawRay(vertWorldPos, Vector3.up, Color.blue, 20f);
                     }

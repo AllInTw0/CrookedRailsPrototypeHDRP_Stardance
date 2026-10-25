@@ -72,5 +72,6 @@ public class ShopItemSO : ScriptableObject
         
         stock = Mathf.RoundToInt(stockCurve.Evaluate(level) * ((float)rng.NextDouble() * randomness * 1f + 1f));
         if(stock < 1) stock = 1;
+        if(stock > maxCountBought && maxCountBought > 0) stock = maxCountBought;
     }
 }

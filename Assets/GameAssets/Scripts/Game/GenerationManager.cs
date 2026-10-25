@@ -561,7 +561,7 @@ public class GenerationManager : NetworkBehaviour
         else if (trainStartLocation == DebugTrainStartLocation.StartingLocation ||
                  trainStartLocation == DebugTrainStartLocation.Station)
         {
-            playerTrain.Initialize(playerTrain.GetConsistLenght(), section, true);
+            playerTrain.Initialize(8f, section, true);
         }
         
         terrainGeneration.SetUpdateRenderDistance(true);
@@ -650,7 +650,7 @@ public class GenerationManager : NetworkBehaviour
         //Modify Ground
         ModifyGroundRpc(new Vector3(middlePos.x, middlePos.y - 100f, middlePos.z), startionTrackLength * 0.5f + stationSpeedTrackDistance);
         
-        ModifyGroundRpc(new Vector3(middlePos.x, middlePos.y, middlePos.z), startionTrackLength * 0.5f + stationSpeedTrackDistance * 0.5f);
+        ModifyGroundRpc(new Vector3(middlePos.x, middlePos.y, middlePos.z), startionTrackLength * 0.5f + stationSpeedTrackDistance * 0.5f, new Vector2(-3f,2f));
 
         ThreadManager.AddThreadJob(delegate { trackGeneration.ModifyTerrainToFollowPath(ListOfPathPoints, true); }, delegate {  });
 
@@ -663,11 +663,11 @@ public class GenerationManager : NetworkBehaviour
         stationGenerated = true;
     }
     [Rpc(SendTo.Everyone)]
-    private void ModifyGroundRpc(Vector3 worldPos, float influenceDistance)
+    private void ModifyGroundRpc(Vector3 worldPos, float influenceDistance, Vector2 minMaxTerrainOffset = default)
     {
         AnimationCurve newAnimationCurve = new AnimationCurve();
         newAnimationCurve.keys = new Keyframe[] { new Keyframe(0f, 1f), new Keyframe(influenceDistance - 30f, 1f), new Keyframe(influenceDistance, 0f) };
-        TerrainModifier.ModifyGround(worldPos, influenceDistance, newAnimationCurve);
+        TerrainModifier.ModifyGround(worldPos, influenceDistance, newAnimationCurve, minMaxTerrainOffset : minMaxTerrainOffset);
     }
     private TrackSection GenerateStraightSection(float distance, float handleLength = 10f)
     {

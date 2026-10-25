@@ -69,7 +69,7 @@ public class HitSound : MonoBehaviour
 
     public void HandleHitSound(Health targetHealth, float damage, Vector3 position)
     {
-        if(damage == 0)
+        if(damage == 0 || targetHealth.GetHealth() <= 0)
             return;
         
         foreach (var hitInfo in hitInfoList)

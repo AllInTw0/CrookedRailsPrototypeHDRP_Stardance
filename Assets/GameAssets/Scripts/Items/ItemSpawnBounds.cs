@@ -1,12 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class ItemSpawnBounds : MonoBehaviour
 {
     [SerializeField]
     public Vector3 maxRandomOffset;
+    [FormerlySerializedAs("itemFilter")] [SerializeField]
+    private List<ItemSO> itemWhiteList;
     [SerializeField]
-    private List<ItemSO> itemFilter;
+    private List<ItemSO> itemBlackList;
     [SerializeField]
     private int maxItemCount = -1;
 
@@ -21,8 +24,10 @@ public class ItemSpawnBounds : MonoBehaviour
     {
         if (itemCount >= maxItemCount && maxItemCount >= 0) return false;
 
-        if (itemFilter.Count > 0 && itemFilter.Contains(itemSO) == false) return false;
-
+        if (itemWhiteList.Count > 0 && itemWhiteList.Contains(itemSO) == false) return false;
+        if (itemBlackList.Count > 0 && itemBlackList.Contains(itemSO)) return false;
+        
+        
         return true;
     }
     private void OnDrawGizmosSelected()

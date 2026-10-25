@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86b3c9d61f42923496ea0581a5f813a, type: 3}
+  m_Name: EscortSpawnParams
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSpawnerParamsSO
+  copySettingsFrom: {fileID: 11400000, guid: be6899af0639c767d82d520a2d095238, type: 2}
+  itemSpawnEntryList:
+  - element:
+      item: {fileID: 11400000, guid: 02439b0d4cb249a9fa3964ddef96853f, type: 2}
+      minMaxStackCount: {x: 1, y: 1}
+      neededBoughtItemsToSpawn: []
+    probability: 0.25
+    maxCount: 1
+    pickCount: 5
+    enabled: 0

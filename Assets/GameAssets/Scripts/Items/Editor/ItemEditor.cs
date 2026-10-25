@@ -19,6 +19,9 @@ public class ItemEditor : Editor
         {
             item.EnablePhysicsRpc(new Vector3(Random.Range(-3f, 3f), Random.Range(8f, 10f), Random.Range(-3f, 3f)));
         }
-
+        if (GUILayout.Button("Drop Item"))
+        {
+            item.DropFromPos(item.transform.position);
+        }
     }
 }

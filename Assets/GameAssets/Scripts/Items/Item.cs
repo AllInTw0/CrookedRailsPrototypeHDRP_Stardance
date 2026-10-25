@@ -17,7 +17,7 @@ public class Item : NetworkBehaviour
     //Variables
     [Header("Item")]
     public ItemSO itemInfo;
-
+    public bool isFakeItem;
     //[SerializeField] 
     private MeshRenderer[] meshRenderers;
     //[SerializeField] 
@@ -88,13 +88,13 @@ public class Item : NetworkBehaviour
         interactableCollider = GetComponent<BoxCollider>();
         
 
-        rb = gameObject.GetComponent<Rigidbody>();
-        rb.isKinematic = true;
+        if(TryGetComponent(out rb))
+            rb.isKinematic = true;
         
-        networkRigidbody = GetComponent<NetworkRigidbody>();
-        networkRigidbody.enabled = false;
-        networkTransform = GetComponent<NetworkTransform>();
-        networkTransform.enabled = false;
+        if(TryGetComponent(out networkRigidbody))
+            networkRigidbody.enabled = false;
+        if(TryGetComponent(out networkTransform))
+            networkTransform.enabled = false;
         
     }
     
@@ -102,19 +102,21 @@ public class Item : NetworkBehaviour
     {
         DropFromPos(transform.position);
         
-        eventInteractable = GetComponent<EventInteractable>();
-        eventInteractable.interactEventLocal.AddListener(() =>
+        if (TryGetComponent(out eventInteractable))
         {
-            if (TryEquipping())
+            eventInteractable.interactEventLocal.AddListener(() =>
             {
-                Debug.Log("Item Equipped");
-            }
-            else
-            {
-                eventInteractable.InteractionFailed();
-                Debug.Log("Cant Equip Item");
-            }
-        });
+                if (TryEquipping())
+                {
+                    Debug.Log("Item Equipped");
+                }
+                else
+                {
+                    eventInteractable.InteractionFailed();
+                    Debug.Log("Cant Equip Item");
+                }
+            });
+        }
     }
     
     public virtual bool TryEquipping(Player targetPlayer = null, bool sendRpc = true)
@@ -218,38 +220,41 @@ public class Item : NetworkBehaviour
 
     public void UpdateItem()
     {
-        if (itemInfo.maxCount > 1)
-            eventInteractable.SetObjectNameOverride(eventInteractable.objectName + " [" + GetCount() + "]");
-        
-        if (physicsEnabled)
+        if (isFakeItem == false)
         {
-            falling = false;
-            if(IsServer)
+            if (itemInfo.maxCount > 1)
+                eventInteractable.SetObjectNameOverride(eventInteractable.objectName + " [" + GetCount() + "]");
+            if (physicsEnabled)
             {
-                if (rb.linearVelocity.magnitude <= 0.1f)
+                falling = false;
+                if (IsServer)
                 {
-                    DropFromPosRpc(transform.position);
-                }
-                else if (transform.position.y < -10f) // Safety net if item falls out of world
-                {
-                    if (Physics.Raycast(new Vector3(transform.position.x, 100f, transform.position.z), Vector3.down,
-                            out RaycastHit hit, 115f, ItemManager.itemDropLayerMask))
+                    if (rb.linearVelocity.magnitude <= 0.1f)
                     {
-                        Debug.LogWarning("Item fell out of world. Teleporting to surface");
-                        DropFromPosRpc(hit.point + Vector3.up * 0.25f);
+                        DropFromPosRpc(transform.position);
                     }
-                    else
+                    else if (transform.position.y < -10f) // Safety net if item falls out of world
                     {
-                        Debug.LogWarning("Cant get item back. Teleporting to player");
-                        DropFromPosRpc(Player.localPlayer.transform.position + Vector3.up * 0.25f);
+                        if (Physics.Raycast(new Vector3(transform.position.x, 100f, transform.position.z), Vector3.down,
+                                out RaycastHit hit, 115f, ItemManager.itemDropLayerMask))
+                        {
+                            Debug.LogWarning("Item fell out of world. Teleporting to surface");
+                            DropFromPosRpc(hit.point + Vector3.up * 0.25f);
+                        }
+                        else
+                        {
+                            Debug.LogWarning("Cant get item back. Teleporting to player");
+                            DropFromPosRpc(Player.localPlayer.transform.position + Vector3.up * 0.25f);
+                        }
                     }
                 }
             }
+            else
+            {
+                rb.isKinematic = true;
+            }
         }
-        else
-        {
-            rb.isKinematic = true;
-        }
+
         if (falling)
         {
             velocity += 10f * Time.deltaTime;
@@ -363,6 +368,9 @@ public class Item : NetworkBehaviour
     }
     private void DisablePhysics()
     {
+        if(isFakeItem)
+            return;
+        
         rb.isKinematic = true;
         physicsEnabled = false;
         

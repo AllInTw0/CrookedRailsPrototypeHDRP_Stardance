@@ -1,15 +1,55 @@
 using System;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 using Random = UnityEngine.Random;
 
-public class Companion : MonoBehaviour
+public class Companion : NetworkBehaviour
 {
+    public struct CompanionNetworkData : INetworkSerializable
+    {
+        public Vector3 position;
+        public Vector3 velocity;
+
+        public int currentState;
+        public NetworkObjectReference targetObject;
+
+        public float time;
+        
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref position);
+            serializer.SerializeValue(ref velocity);
+            serializer.SerializeValue(ref currentState);
+            serializer.SerializeValue(ref time);
+            serializer.SerializeValue(ref targetObject);
+        }
+    }
+    private NetworkVariable<CompanionNetworkData> networkData = new(writePerm: NetworkVariableWritePermission.Owner);
+    
+    private void NetworkStateChanged(CompanionNetworkData previous, CompanionNetworkData current)
+    {
+        if (IsOwner == false)
+        {
+            float timeDiff = NetworkManager.Singleton.LocalTime.TimeAsFloat - current.time;
+            
+            Rigidbody rb = GetComponent<Rigidbody>();
+            rb.MovePosition(current.position + current.velocity * timeDiff);
+            rb.linearVelocity = current.velocity;
+            
+            state = (CompanionState)current.currentState;
+
+            if (current.targetObject.TryGet(out NetworkObject networkObject))
+                movement.SetTarget(networkObject.transform,2f);
+        }
+    }
+    
     public enum CompanionState
     {
+        turnedOff,
         normal,
         goingToJumpStart,
         ragdolled,
@@ -28,6 +68,23 @@ public class Companion : MonoBehaviour
         }
         set
         {
+            if (_state == CompanionState.turnedOff && value != CompanionState.turnedOff)
+            {
+                health.SetGlobalVisibility(true);
+                faceText.enabled = true;
+                turnOnInteractable.gameObject.SetActive(false);
+                movement.rb.isKinematic = false;
+                animator.SetBool("isOn", true);
+            }
+            if (value == CompanionState.turnedOff)
+            {
+                health.SetGlobalVisibility(false);
+                faceText.enabled = false;
+                turnOnInteractable.gameObject.SetActive(true);
+                movement.rb.isKinematic = true;
+                animator.SetBool("isOn", false);
+            }
+            
             if (_state != CompanionState.TV && value == CompanionState.TV)
             {
                 //Enable TV
@@ -44,17 +101,6 @@ public class Companion : MonoBehaviour
 
             if (value != CompanionState.ragdolled)
             {
-                if (value == CompanionState.shooting)
-                {
-                    animator.SetBool("shooting", true);
-                    ChangeFaceState(2, 50000f);
-                }
-                else if (_state == CompanionState.shooting)
-                {
-                    animator.SetBool("shooting", false);
-                    ChangeFaceState(0, 0f);
-                }
-
                 if (value == CompanionState.flee)
                 {
                     ChangeFaceState(1, 50000f);
@@ -65,6 +111,17 @@ public class Companion : MonoBehaviour
                 }
             }
 
+            if (value == CompanionState.shooting)
+            {
+                animator.SetBool("shooting", true);
+                ChangeFaceState(2, 50000f);
+            }
+            else if (_state == CompanionState.shooting)
+            {
+                animator.SetBool("shooting", false);
+                ChangeFaceState(0, 0f);
+            }
+            
             _state = value;
         }
     }
@@ -104,6 +161,7 @@ public class Companion : MonoBehaviour
     private float faceTimer;
     [Header("Behaviour")] 
     public float behaviourUpdateTime = 0.5f;
+    public float maxDistanceFromPlayer;
     [Header("TV")] 
     public GameObject tvObject;
     public Vector2 randomTimeToActivateTV;
@@ -122,6 +180,10 @@ public class Companion : MonoBehaviour
     public float fleeEndDistance;
     [Header("Health")] 
     public Health health;
+    public ItemSO itemDropOnDeath;
+    [Header("OffState")] 
+    public bool isOnOnStart = false;
+    public EventInteractable turnOnInteractable;
     
     private Vector3 lookVectorOverride;
     private float jumpTimmer;
@@ -130,6 +192,13 @@ public class Companion : MonoBehaviour
     private Transform[] navigationTransformArray;
 
     private float lastScreenRotX;
+    private float lastScreenRotY;
+
+    public override void OnNetworkSpawn()
+    {
+        networkData.OnValueChanged += NetworkStateChanged;
+    }
+
     private void Start()
     {
         movement = GetComponent<PathFindingGroundMovement>();
@@ -147,17 +216,46 @@ public class Companion : MonoBehaviour
             ChangeFaceState(1, 10f);
             Ragdoll(force);
             movement.rb.angularVelocity = new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), Random.Range(-1f, 1f));
+            
+        });
+        health.onHealthReachedZero.AddListener((force)=>
+        {
+            if (IsServer)
+            {
+                Item.SpawnItem(itemDropOnDeath, transform.position + Vector3.up * 0.2f, transform.rotation);
+                NetworkObject.Despawn(true);
+            }
         });
         InvokeRepeating(nameof(UpdateBehaviour), behaviourUpdateTime, behaviourUpdateTime);
-    }
 
+        turnOnInteractable.interactEventEveryone.AddListener(() =>
+        {
+            state = CompanionState.normal; //TurnOn
+        });
+        if (isOnOnStart)
+            state = CompanionState.normal; //TurnOn
+        else
+        {
+            state = CompanionState.normal;
+            state = CompanionState.turnedOff; //TurnOff
+        }
+    }
     private void UpdateBehaviour()
     { 
         Debug.Log("Current state: " + state);
         switch (state)
         {
             case CompanionState.normal:
-                movement.SetTarget(Player.localPlayer.transform, 1f);
+                if (CheckForTargets(out Health closestPlayer, new List<HealthType>() { HealthType.Player }, float.MaxValue))
+                {
+                    if (Vector3.Distance(closestPlayer.transform.position, transform.position) > maxDistanceFromPlayer &&
+                        NavMesh.SamplePosition(closestPlayer.transform.position + Random.insideUnitSphere * Random.Range(3,8f),out NavMeshHit hit, 20f,NavMesh.AllAreas))
+                    {
+                        transform.position = hit.position;
+                    }
+                    movement.SetTarget(closestPlayer.transform, 2f);
+                }
+
                 //Check if should jump
                 bool shouldJump = false;
                 if (IsPointOnMovingPlatform(movement.GetTargetPosition(), out Transform playerPlatform))
@@ -175,7 +273,7 @@ public class Companion : MonoBehaviour
                     }
                 }
                 
-                if (CheckForTargets(out Health h))
+                if (CheckForTargets(out Health h, healthTypeFilterList, maxDistance))
                 {
                     state = CompanionState.shooting;
                 }
@@ -202,23 +300,38 @@ public class Companion : MonoBehaviour
                     }
                     
                     //Find jump start
-                    Vector3 pathDir = (reversedPath.corners[^1] - reversedPath.corners[^2]).normalized;
-                    
-                    Vector3 bias = Vector3.down;
-                    if (reversedPath.corners[^1].y < transform.position.y) bias = -bias;
-                    Vector3 samplePos = reversedPath.corners[^1] + pathDir * 6f + Vector3.up * 2f;
-
-
-                    if (SampleNavPos(samplePos, 6f, out Vector3 hitPos, out Transform movingPlatform))
+                    int safety = 10;
+                    while (true)
                     {
-                        NavMeshPath safetyPath = new NavMeshPath();
-                        NavMesh.CalculatePath(transform.position, hitPos, NavMesh.AllAreas, safetyPath);
-                        //Assign jump start to a transform that will move with a platform if needed
-                        MovingPlatformManager.active.RemoveEntry(navigationTransformArray[0]);
-                        navigationTransformArray[0].position = safetyPath.corners[^1];
-                        if(movingPlatform != null)
-                            MovingPlatformManager.active.AddEntry(navigationTransformArray[0],platform);
+                        Vector3 pathDir = (reversedPath.corners[^1] - reversedPath.corners[^2]).normalized;
+                        pathDir = Quaternion.AngleAxis(Random.Range(-20f, 20f), Vector3.up) * pathDir;
+                        Vector3 samplePos = reversedPath.corners[^1] + pathDir * 6f + Vector3.up * 2f;
+
+
+                        if (SampleNavPos(samplePos, 6f, out Vector3 hitPos, out Transform movingPlatform))
+                        {
+                            NavMeshPath safetyPath = new NavMeshPath();
+                            NavMesh.CalculatePath(transform.position, hitPos, NavMesh.AllAreas, safetyPath);
+                            
+                            if (!Physics.Raycast(safetyPath.corners[^1] + Vector3.up, reversedPath.corners[^1] - safetyPath.corners[^1], Vector3.Distance(reversedPath.corners[^1], safetyPath.corners[^1])))
+                            {
+                                //Assign jump start to a transform that will move with a platform if needed
+                                MovingPlatformManager.active.RemoveEntry(navigationTransformArray[0]);
+                                navigationTransformArray[0].position = safetyPath.corners[^1];
+                                if (movingPlatform != null)
+                                    MovingPlatformManager.active.AddEntry(navigationTransformArray[0], platform);
+                                break;
+                            }
+                        }
+    
+                        safety--;
+                        if (safety < 0)
+                        {
+                            Debug.LogWarning("[Companion] could not find jump");
+                            return;
+                        }
                     }
+
                     
                     
                     movement.SetTarget(navigationTransformArray[0],0.5f);
@@ -268,8 +381,8 @@ public class Companion : MonoBehaviour
                     float angle = Util.SolveTrajectoryMinAngle(transform.position, navigationTransformArray[1].position);
                     float velocity = Util.SolveVelocityForAngle(angle, transform.position, navigationTransformArray[1].position);
                     velocity += minJumpVelocityAddition;
-                    //Debug.Log("Angle: " + angle + ", Velocity: " + velocity);
-                    Debug.Log(Util.SolveTrajectory(velocity, transform.position, navigationTransformArray[1].position, angleMode, out angle));
+                    
+                    Util.SolveTrajectory(velocity, transform.position, navigationTransformArray[1].position, angleMode, out angle);
 
                     helperTransform.position = transform.position;
                     helperTransform.LookAt(navigationTransformArray[1].position);
@@ -280,7 +393,7 @@ public class Companion : MonoBehaviour
                     Debug.DrawRay(transform.position, helperTransform.forward, Color.white, 60f);
                     
                     Ragdoll();
-                    movement.rb.linearVelocity = helperTransform.forward * (velocity + 1.5f);
+                    movement.rb.linearVelocity = helperTransform.forward * (velocity + 3f);
                     
                     //AddFaceChangeImpact(1f);
                     ChangeFaceState(1, 500f);
@@ -311,7 +424,7 @@ public class Companion : MonoBehaviour
                 }
                 break;
             case CompanionState.shooting:
-                if (CheckForTargets(out Health closestHealth))
+                if (CheckForTargets(out Health closestHealth, healthTypeFilterList, maxDistance))
                 {
                     //Stop movement
                     movement.SetTarget(closestHealth.origin,50000000f);
@@ -324,15 +437,23 @@ public class Companion : MonoBehaviour
                     float dist = Vector3.Distance(closestHealth.origin.position, transform.position);
                     if (dist <= fleeStartDistance)
                         state = CompanionState.flee;
-                    else if(Quaternion.Angle(gunRot.rotation,Quaternion.LookRotation(helperTransform.forward)) < 5f)
+                    else
                     {
-                        if (gun.HasAmmoInClip())
+                        //Debug.Log($"[Companion] cooldown {gun.GetCooldown()}, { IsOwner}");
+                        if (gun.IsOnCooldown() == false && IsOwner)
                         {
-                            //gun.Shoot(false, gunEnd, ShooterType.Sentry);
-                        }
-                        else
-                        {
-                            //gun.Reload(gun.clipSize, gunEnd);
+                            //Debug.Log("[Companion] 2");
+                            if (gun.HasAmmoInClip())
+                            {
+                                //Debug.Log("[Companion] 3");
+                                if(Quaternion.Angle(gunRot.rotation,Quaternion.LookRotation(helperTransform.forward)) < 5f)
+                                    ShootRpc();
+                            }
+                            else
+                            {
+                                //Debug.Log("[Companion] 4");
+                                ReloadRpc(gun.clipSize);
+                            }
                         }
                     }
                 }
@@ -342,7 +463,7 @@ public class Companion : MonoBehaviour
                 }
                 break;
             case CompanionState.flee:
-                if (CheckForTargets(out Health closestHealth2))
+                if (CheckForTargets(out Health closestHealth2, healthTypeFilterList, maxDistance))
                 {
                     float dist = Vector3.Distance(closestHealth2.origin.position, transform.position);
                     if (dist <= fleeEndDistance)
@@ -362,8 +483,47 @@ public class Companion : MonoBehaviour
                 break;
         }
         movement.UpdateNavigationBehaviour(preferPath: true);
+        
+        //Multiplayer
+        
+        if (IsServer)
+        {
+            Transform target = movement.GetTargetTransform();
+            if (target && target.TryGetComponent(out Player player) && NetworkObject.OwnerClientId != player.OwnerClientId)
+            {
+                NetworkObject.ChangeOwnership(player.OwnerClientId);
+                Debug.Log("Changed Companion Ownership");
+            }
+        }
+        if (IsOwner)
+        {
+            NetworkObject target = null;
+            if (movement.GetTargetTransform() != null && movement.GetTargetTransform().TryGetComponent(out NetworkBehaviour networkBehaviour))
+            {
+                target = networkBehaviour.NetworkObject;
+            }
+            networkData.Value = new CompanionNetworkData()
+            {
+                position = transform.position,
+                velocity = movement.rb.linearVelocity,
+                currentState = (int)state,
+                time = NetworkManager.Singleton.LocalTime.TimeAsFloat,
+                targetObject = target
+            };
+        }
     }
 
+    [Rpc(SendTo.Everyone)]
+    private void ShootRpc()
+    {
+        bool doDamage = IsOwner;
+        gun.Shoot(gunEnd.position, gunEnd.forward, doDamage, ShooterType.Sentry);
+    }
+    [Rpc(SendTo.Everyone)]
+    private void ReloadRpc(int count)
+    {
+        gun.ReloadClient(count, gunEnd.position);
+    }
     private bool SampleNavPos(Vector3 worldPos, float range, out Vector3 hitPos, out Transform movingPlatform)
     {
         if (NavMesh.SamplePosition(worldPos, out NavMeshHit navHit, range, NavMesh.AllAreas))
@@ -428,6 +588,9 @@ public class Companion : MonoBehaviour
 
     private void Ragdoll(Vector3 additionalVelocity = default)
     {
+        if(state == CompanionState.turnedOff)
+            return;
+        
         movement.rb.constraints = RigidbodyConstraints.None;
         movement.rb.linearVelocity += additionalVelocity;
         state = CompanionState.ragdolled;
@@ -445,8 +608,9 @@ public class Companion : MonoBehaviour
     }
     private void Animate()
     {
-        //Stand back up
-
+        
+        if(state == CompanionState.turnedOff)
+            return;
         
         //Animation
         if(state == CompanionState.ragdolled)
@@ -476,7 +640,6 @@ public class Companion : MonoBehaviour
         //Logic
         Vector3 bodyLook = Vector3.zero;
         Vector3 screenLook = movement.GetTargetTransform() == Player.localPlayer.transform ? PlayerCamera.active.transform.position - screen.position : movement.GetTargetPosition() - screen.position;
-
         if (movement.HasReachedTarget() == false)
         {
             bodyLook = movement.targetDirVector;
@@ -492,33 +655,33 @@ public class Companion : MonoBehaviour
             screenLook = transform.forward;
         
         //Body Rotation
-        if (bodyLook != Vector3.zero && state != CompanionState.ragdolled)
-            transform.rotation = Quaternion.Lerp(transform.rotation,
-                Quaternion.LookRotation(new Vector3(bodyLook.x, 0, bodyLook.z)),
-                Time.deltaTime * rotationSpeed);
-        else if(state != CompanionState.ragdolled)
-            transform.rotation = Quaternion.Lerp(transform.rotation,
-                Quaternion.Euler(0, transform.eulerAngles.y, 0),
-                Time.deltaTime * rotationSpeed);
+        //Debug.Log($"{bodyLook}, {screenLook}");
+        if (state != CompanionState.ragdolled)
+        {
+            if (bodyLook != Vector3.zero)
+                transform.rotation = Quaternion.Lerp(transform.rotation,Quaternion.LookRotation(new Vector3(bodyLook.x, 0, bodyLook.z)), Time.deltaTime * rotationSpeed);
+            else
+                transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.Euler(0, transform.eulerAngles.y, 0), Time.deltaTime * rotationSpeed);
+        }
+
         //Screen Rotation
         if (screenLook != Vector3.zero)
         {
-            screenLook = transform.InverseTransformDirection(screenLook);
-            headRotY.localRotation = Quaternion.Lerp(headRotY.localRotation,
-                Quaternion.LookRotation(new Vector3(screenLook.x, 0, screenLook.z)),
-                Time.deltaTime * rotationSpeed);
-            float angle = Vector3.Angle(new Vector3(screenLook.x, 0, screenLook.z), screenLook);
+            Vector3 inverseScreenLook = transform.InverseTransformDirection(screenLook);
+            headRotY.localRotation = Quaternion.Lerp(Quaternion.Euler(headRotY.localEulerAngles.x,lastScreenRotY,screen.localEulerAngles.z), Quaternion.LookRotation(new Vector3(inverseScreenLook.x, 0, inverseScreenLook.z).normalized), Time.deltaTime * rotationSpeed);
+            lastScreenRotY = headRotY.localEulerAngles.y;
+            float angle = Vector3.Angle(new Vector3(inverseScreenLook.x, 0, inverseScreenLook.z), inverseScreenLook);
             screen.localRotation = Quaternion.Lerp(Quaternion.Euler(lastScreenRotX,screen.localEulerAngles.y,screen.localEulerAngles.z), Quaternion.Euler(-angle,screen.localEulerAngles.y,screen.localEulerAngles.z), Time.deltaTime * rotationSpeed);
             lastScreenRotX = screen.localEulerAngles.x;
         }
     }
-    public bool CheckForTargets(out Health closestHealth)
+    public bool CheckForTargets(out Health closestHealth, List<HealthType> filterList, float maxDistance)
     {
         closestHealth = null;
         float closestDistance = float.PositiveInfinity;
-        for (int i = 0; i < healthTypeFilterList.Count; i++)
+        for (int i = 0; i < filterList.Count; i++)
         {
-            foreach (Health health in EnemyManager.active.healthTypeArray[(int)healthTypeFilterList[i]])
+            foreach (Health health in EnemyManager.active.healthTypeArray[(int)filterList[i]])
             {
                 if (health.GetHealth() <= 0f)
                     continue;
@@ -539,6 +702,9 @@ public class Companion : MonoBehaviour
     }
     private void OnCollisionEnter(Collision collision)
     {
+        if(state == CompanionState.turnedOff)
+            return;
+        
         if ((movement.groundLayer.value & (1 << collision.gameObject.layer)) != 0)
         {
             //Debug.Log("OWawahwa!");
@@ -558,6 +724,9 @@ public class Companion : MonoBehaviour
 
     private void OnCollisionExit(Collision collision)
     {
+        if(state == CompanionState.turnedOff)
+            return;
+        
         if ((movement.groundLayer.value & (1 << collision.gameObject.layer)) != 0)
         {
             //Debug.Log("Im Fine!");

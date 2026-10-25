@@ -86,6 +86,7 @@ MonoBehaviour:
   Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
+  <InScenePlaced>k__BackingField: 0
   ActiveSceneSynchronization: 0
   SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
@@ -119,14 +120,22 @@ MonoBehaviour:
     useGlobalEnds: 0
     dontConnect: 0
     ignoreConnections: 0
+    ignore: 0
     section: {fileID: 0}
   overlapCheckLayerMask:
     serializedVersion: 2
     m_Bits: 5259264
+  onlyRotateY: 1
   maxRetryCount: 10
+  addAutoStop: 0
+  stopType: 0
+  stopOffset: 0
   structureConnectionList: []
   structureSectionList: []
   onSectionAdded:
+    m_PersistentCalls:
+      m_Calls: []
+  onFinishedGenerating:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &3971425371039602981
@@ -363,6 +372,7 @@ MonoBehaviour:
     m_Bits: 2097152
   maxPropCount: 100
   maxSpawnTries: 200
+  terrainSpawnOffset: -0.25
 --- !u!114 &7267936075137670101
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,10 +386,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemSpawner
   ShowTopMostFoldoutHeaderGroup: 1
+  spawnParams: {fileID: 11400000, guid: be6899af0639c767d82d520a2d095238, type: 2}
+  minMaxCount: {x: 35, y: 50}
   itemSpawnEntryList:
   - element:
       item: {fileID: 11400000, guid: fba5de258cb318342bb90a8d0b6bf548, type: 2}
       minMaxStackCount: {x: 1, y: 3}
+      neededBoughtItemsToSpawn: []
     probability: 0.65
     maxCount: 16
     pickCount: 8
@@ -387,6 +400,7 @@ MonoBehaviour:
   - element:
       item: {fileID: 11400000, guid: 37b28eef436127340b96cf8afef5fc0a, type: 2}
       minMaxStackCount: {x: 3, y: 6}
+      neededBoughtItemsToSpawn: []
     probability: 0.3
     maxCount: -1
     pickCount: 7
@@ -394,6 +408,7 @@ MonoBehaviour:
   - element:
       item: {fileID: 11400000, guid: eace34aab063c944ab7933acb4427aa0, type: 2}
       minMaxStackCount: {x: 3, y: 6}
+      neededBoughtItemsToSpawn: []
     probability: 0.25
     maxCount: -1
     pickCount: 5
@@ -401,6 +416,7 @@ MonoBehaviour:
   - element:
       item: {fileID: 11400000, guid: 517ca367be1565a4294aa7684a1e17ae, type: 2}
       minMaxStackCount: {x: 1, y: 1}
+      neededBoughtItemsToSpawn: []
     probability: 0.04
     maxCount: 2
     pickCount: 5
@@ -408,8 +424,8 @@ MonoBehaviour:
   - element:
       item: {fileID: 11400000, guid: 277c7caad7a7f2447a65933adf1a7c17, type: 2}
       minMaxStackCount: {x: 1, y: 1}
+      neededBoughtItemsToSpawn: []
     probability: 0.01
     maxCount: 1
     pickCount: 5
     enabled: 0
-  minMaxCount: {x: 35, y: 50}

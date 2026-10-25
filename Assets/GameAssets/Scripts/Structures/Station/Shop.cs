@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.Events;
 using static Util;
 public class ShopItem : INetworkSerializable
 {
@@ -47,6 +48,8 @@ public class ShopItem : INetworkSerializable
 }
 public class Shop : NetworkBehaviour
 {
+    public UnityEvent onItemBought = new UnityEvent();
+    
     [Header("Refrences")]
     [SerializeField]
     private List<ShopStand> shopStandList;
@@ -58,7 +61,7 @@ public class Shop : NetworkBehaviour
     private Flickerer shopLight;
     [Header("Items")]
     [SerializeField]
-    private List<ShopItemSO> shopItemEntryList;
+    public List<ShopItemSO> shopItemEntryList;
     [SerializeField] 
     private bool forceSingleStock;
     [SerializeField] 
@@ -87,7 +90,7 @@ public class Shop : NetworkBehaviour
         return shopItemEntryList[itemID];
     }
     
-    private void Start()
+    public virtual void Start()
     {
         shopMonitor.onInteract.AddListener(() => {
             //Buy item
@@ -138,6 +141,8 @@ public class Shop : NetworkBehaviour
                 Money.AddMoney(-selectedShopItem.price);
                 
                 SyncShopItemRpc(selectedShopItem);
+                
+                onItemBought.Invoke();
             }
             else
             {

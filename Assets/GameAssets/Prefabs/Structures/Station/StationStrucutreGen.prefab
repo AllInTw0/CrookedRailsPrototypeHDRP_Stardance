@@ -25,7 +25,7 @@ Transform:
   m_GameObject: {fileID: 403648997013242677}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 3.5, y: 0.6, z: 0}
+  m_LocalPosition: {x: 4.25, y: 1.25, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -43,6 +43,8 @@ GameObject:
   - component: {fileID: 6911581046793506319}
   - component: {fileID: 173760328443247355}
   - component: {fileID: 3068164435285337769}
+  - component: {fileID: 3205228344252398228}
+  - component: {fileID: 5891925090784811124}
   m_Layer: 0
   m_Name: StationStrucutreGen
   m_TagString: Untagged
@@ -107,6 +109,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   structureGeneratorList:
   - {fileID: 3068164435285337769}
+  - {fileID: 3205228344252398228}
+  - {fileID: 5891925090784811124}
   structureType: 1
   startConnection:
     connectionTransform: {fileID: 4651122525546521565}
@@ -153,7 +157,7 @@ MonoBehaviour:
     countType: 1
     minMaxCount: {x: 6, y: 10}
     lengthType: 1
-    lengthAddition: 20
+    lengthAddition: 4
     countCurve:
       serializedVersion: 2
       m_Curve: []
@@ -255,7 +259,7 @@ MonoBehaviour:
   - sectionPrefabList:
     - {fileID: 5861913691153950515, guid: eb5449541c5ae8d4397f008e4b3d1553, type: 3}
     countType: 0
-    minMaxCount: {x: 7, y: 8}
+    minMaxCount: {x: 5, y: 7}
     lengthType: 2
     lengthAddition: 0
     countCurve:
@@ -278,3 +282,63 @@ MonoBehaviour:
       m_PostInfinity: 0
       m_RotationOrder: 4
     obligatory: 0
+--- !u!114 &3205228344252398228
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5848184906683987402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9f42cd77c2d8e114b8af3c08f658897d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PropSpawner
+  ShowTopMostFoldoutHeaderGroup: 1
+  propProbabilityList:
+  - element: {fileID: 8233793823709743621, guid: 9f01320a72e4d0c4e918565a2e493d37, type: 3}
+    probability: 1.2
+    maxCount: 20
+    pickCount: 7
+    enabled: 0
+  - element: {fileID: 5665030851727382187, guid: 4c0909c6d993074409bbe9ca9acebe60, type: 3}
+    probability: 1
+    maxCount: 20
+    pickCount: 8
+    enabled: 0
+  - element: {fileID: 3455371132266965207, guid: 278ed4a35cd971c468ab7742c842f4a4, type: 3}
+    probability: 1
+    maxCount: 20
+    pickCount: 9
+    enabled: 0
+  - element: {fileID: 3018761946558244021, guid: e7ff3f933410c82478e1bcfab988bd9d, type: 3}
+    probability: 1
+    maxCount: 20
+    pickCount: 5
+    enabled: 0
+  - element: {fileID: 3542499168498709358, guid: f7879c08aff8e9444a30e644b5d95cc7, type: 3}
+    probability: 1
+    maxCount: 20
+    pickCount: 10
+    enabled: 0
+  overlapCheckLayerMask:
+    serializedVersion: 2
+    m_Bits: 2097152
+  maxPropCount: 30
+  maxSpawnTries: 200
+  terrainSpawnOffset: -0.25
+--- !u!114 &5891925090784811124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5848184906683987402}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3c8c104c80568a4882428dba72f1878, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSpawner
+  ShowTopMostFoldoutHeaderGroup: 1
+  spawnParams: {fileID: 11400000, guid: a150153a34e69bac29bd616bfd2fb66b, type: 2}
+  minMaxCount: {x: 5, y: 10}

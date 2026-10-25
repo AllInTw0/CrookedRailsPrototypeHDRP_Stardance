@@ -78,64 +78,12 @@ MonoBehaviour:
   stationSpeedTrackDistance: 280
   stationSO: {fileID: 11400000, guid: 90fd05ee2ae83f74f983b92f006f26e6, type: 2}
   preStationSO: {fileID: 11400000, guid: 737eb10537f91c0478967c61f4ba7b02, type: 2}
-  strutureSpawnParamList:
-  - structureInfoList:
-    - {fileID: 11400000, guid: 53277ed3d6046724b9d3dfdd3113b6c8, type: 2}
-    ignore: 0
-    distanceType: 1
-    distanceTypeValue: {x: 0.75, y: 0.85}
-    repeating: 1
-    minStationDistance: 5
-    distanceTillStructure: 0
-    spawningDisabled: 0
-  - structureInfoList:
-    - {fileID: 11400000, guid: 4f66dd1664a026242b42ee7bc9acd39d, type: 2}
-    ignore: 1
-    distanceType: 0
-    distanceTypeValue: {x: 50, y: 300}
-    repeating: 1
-    minStationDistance: 50
-    distanceTillStructure: 0
-    spawningDisabled: 1
-  - structureInfoList:
-    - {fileID: 11400000, guid: 74d7eb2e4728b69489619a067d303b48, type: 2}
-    - {fileID: 11400000, guid: 9ab9ed1f338d07c42867dc0e38021465, type: 2}
-    ignore: 1
-    distanceType: 0
-    distanceTypeValue: {x: 250, y: 350}
-    repeating: 1
-    minStationDistance: 100
-    distanceTillStructure: 0
-    spawningDisabled: 1
-  - structureInfoList:
-    - {fileID: 11400000, guid: 9ab9ed1f338d07c42867dc0e38021465, type: 2}
-    ignore: 1
-    distanceType: 0
-    distanceTypeValue: {x: 80, y: 100}
-    repeating: 0
-    minStationDistance: 100
-    distanceTillStructure: 0
-    spawningDisabled: 1
-  - structureInfoList:
-    - {fileID: 11400000, guid: 74d7eb2e4728b69489619a067d303b48, type: 2}
-    ignore: 1
-    distanceType: 0
-    distanceTypeValue: {x: 150, y: 200}
-    repeating: 0
-    minStationDistance: 100
-    distanceTillStructure: 0
-    spawningDisabled: 1
-  - structureInfoList:
-    - {fileID: 11400000, guid: 6d0b1c5c2c560ddf88d880c419b12096, type: 2}
-    ignore: 0
-    distanceType: 0
-    distanceTypeValue: {x: 80, y: 130}
-    repeating: 0
-    minStationDistance: 50
-    distanceTillStructure: 0
-    spawningDisabled: 0
+  structureSpawnList:
+  - {fileID: 11400000, guid: 53277ed3d6046724b9d3dfdd3113b6c8, type: 2}
+  - {fileID: 11400000, guid: 74d7eb2e4728b69489619a067d303b48, type: 2}
+  - {fileID: 11400000, guid: 9ab9ed1f338d07c42867dc0e38021465, type: 2}
   distanceBufferBetweenStructures: 20
-  trainStartLocation: 1
+  trainStartLocation: 0
   disableNavMeshGen: 0
 --- !u!1 &738210242235767204
 GameObject:
@@ -446,6 +394,30 @@ MonoBehaviour:
     m_RotationOrder: 4
   minTrainSectionCountAhead: 8
   minTrainSectionCountBehind: 2
+  dangerMultiplayerMultiplier:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 1.0011749
+      value: 1.0154877
+      inSlope: 0.32666346
+      outSlope: 0.32666346
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 4.0202026
+      value: 2.0016937
+      inSlope: 0.32666346
+      outSlope: 0.32666346
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   enemiesSpawnAlways: 0
   disableEnemySpawning: 0
 --- !u!1 &4103196173146610950
@@ -600,10 +572,12 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 9e5ccac0b40767a48ad247eeea535c71, type: 2}
   - {fileID: 11400000, guid: 4715cc542e4088448b6041c9ea8e2fa9, type: 2}
   - {fileID: 11400000, guid: c7165577b5b2daf45a63c32b6e74982d, type: 2}
+  - {fileID: 11400000, guid: c18aac838a46d06fd86a4e256c5ac26d, type: 2}
   railCarInfoList:
   - {fileID: 11400000, guid: 363cbbfcbb730f741a9d75758f6bf0f5, type: 2}
   - {fileID: 11400000, guid: e70d30f70047ab14cabcce1ae6cdb5c0, type: 2}
   - {fileID: 11400000, guid: 4b6e685f31014c845b8386bbafd91566, type: 2}
+  - {fileID: 11400000, guid: a60e7e6c91e6b482fbcbb6177b6e654f, type: 2}
   payIncreaseFor100Meters: {x: 5, y: 12}
   renderLayer:
     serializedVersion: 2
@@ -697,10 +671,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e646b9dc73f6af19a9056f7d1fdb52f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DebugHelper
-  railCar: {fileID: 11400000, guid: 0b9737e8447e9f34a8d8cf8704479988, type: 2}
-  cargo: {fileID: 11400000, guid: 9e5ccac0b40767a48ad247eeea535c71, type: 2}
+  railCar: {fileID: 11400000, guid: a60e7e6c91e6b482fbcbb6177b6e654f, type: 2}
+  cargo: {fileID: 0}
   enemy: {fileID: 11400000, guid: fb00dc0c533df4d4a9b006ca29b43a84, type: 2}
-  item: {fileID: 11400000, guid: 1457224a86245a9478a0cd1917d563cf, type: 2}
+  item: {fileID: 11400000, guid: 02439b0d4cb249a9fa3964ddef96853f, type: 2}
   shakeStrength: 1
   shakeSpring: 1
   shakeDamp: 1
@@ -766,7 +740,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 229873088
+  GlobalObjectIdHash: 1708868192
   InScenePlacedSourceGlobalObjectIdHash: 229873088
   DeferredDespawnTick: 0
   Ownership: 1
@@ -1267,7 +1241,7 @@ MonoBehaviour:
     maxCount: -1
     pickCount: 0
     enabled: 0
-  foliageDensity: 10
+  foliageDensity: 7
   foliageSpawnProbability_DistanceFromTrack:
     serializedVersion: 2
     m_Curve:
@@ -1452,6 +1426,10 @@ MonoBehaviour:
   - targetShopItem: {fileID: 11400000, guid: 989eeba39d1dd8e4081946ecc68bddd3, type: 2}
     neededShopItemList:
     - {fileID: 11400000, guid: eace34aab063c944ab7933acb4427aa0, type: 2}
+    isUnlocked: 0
+  - targetShopItem: {fileID: 11400000, guid: ffb5d0c83a2ed0a27937acb109d8a0ee, type: 2}
+    neededShopItemList:
+    - {fileID: 11400000, guid: 541bf2873324b227e826662374bd726e, type: 2}
     isUnlocked: 0
 --- !u!114 &3093925036794678692
 MonoBehaviour:

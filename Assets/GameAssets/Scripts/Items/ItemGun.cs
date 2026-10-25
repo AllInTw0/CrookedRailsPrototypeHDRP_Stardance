@@ -192,6 +192,11 @@ public class ItemGun : Item
     {
         return coolDown > 0f;
     }
+
+    public float GetCooldown()
+    {
+        return coolDown;
+    }
     private void UpdateText()
     {
         InventoryUI.active.SetToolText("Clip:"+clip+"/"+clipSize);

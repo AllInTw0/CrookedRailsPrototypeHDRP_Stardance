@@ -45,7 +45,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemSpawnBounds
   maxRandomOffset: {x: 0.2, y: 0.6, z: 0.8}
-  itemFilter: []
+  itemWhiteList: []
+  itemBlackList:
+  - {fileID: 11400000, guid: 02439b0d4cb249a9fa3964ddef96853f, type: 2}
   maxItemCount: 4
 --- !u!1001 &4384945075064446126
 PrefabInstance:

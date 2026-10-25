@@ -76,7 +76,8 @@ public class PauseMenu : MonoBehaviour
 
                 Cursor.lockState = CursorLockMode.None;
 
-                Time.timeScale = 0f;
+                if(Player.playerList.Count == 1)
+                    Time.timeScale = 0f;
             }
             else
             { 

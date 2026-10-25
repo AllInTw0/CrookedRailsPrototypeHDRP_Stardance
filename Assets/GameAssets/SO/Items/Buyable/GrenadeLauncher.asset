@@ -137,6 +137,8 @@ MonoBehaviour:
     m_RotationOrder: 4
   neededBoughtItems: []
   maxCountBought: -1
+  bonusItems:
+  - {fileID: 11400000, guid: eace34aab063c944ab7933acb4427aa0, type: 2}
   offset: {x: -0.75, y: 0, z: -0.06}
   origin: {x: 0, y: 0, z: -0.06}
   rotation: {x: -25, y: 0, z: 0}

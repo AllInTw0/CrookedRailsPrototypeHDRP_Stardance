@@ -207,6 +207,25 @@ public class LocomotiveControls : NetworkBehaviour
         }
         else if (currentState.Value == State.normal) 
         {
+            if (onSetOffTriggerGenerationReset.Value)
+            {
+                if (StartingShop.activeStartingShop != null && StartingShop.hasBoughtEveryItem.Value == false)
+                {
+                    throttle.SetLocked(true);
+                    throttle.SetActionNameOverride("Choose starting items first!");
+                }
+                else
+                {
+                    throttle.SetActionNameOverride("Start Game");
+                    throttle.SetLocked(false);
+                }
+            }
+            else
+            {
+                throttle.SetActionNameOverride("Start Game");
+                throttle.SetLocked(false);
+            }
+            
             if(train.HasEnoughFuel(out string depletedFuelSourceName) == false)
             {
                 //throttle.SetActionNameOverride("No " + depletedFuelSourceName + "!");

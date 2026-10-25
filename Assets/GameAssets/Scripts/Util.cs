@@ -172,10 +172,14 @@ public static class Util
         private float probabilitySum = 0f;
         private int lastPicked = -1;
         
-        public ProbabilityList(List<ProbabilityListElement<T>> probabilityList)
+        public ProbabilityList(List<ProbabilityListElement<T>> _probabilityList)
         {
             //Copy
-            probabilityList = new List<ProbabilityListElement<T>>(probabilityList);
+            probabilityList = new List<ProbabilityListElement<T>>();
+            for (int i = 0; i < _probabilityList.Count; i++)
+            {
+                probabilityList.Add(new ProbabilityListElement<T>(_probabilityList[i].element, _probabilityList[i].probability, _probabilityList[i].maxCount));
+            }
 
             //Get probability sum and reset count just in case
             for (int i = 0; i < probabilityList.Count; i++)

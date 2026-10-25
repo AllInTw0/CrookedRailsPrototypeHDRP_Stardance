@@ -5,6 +5,7 @@ using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Rendering;
+using UnityEngine.Rendering.HighDefinition;
 using UnityEngine.UI;
 
 public class Settings : MonoBehaviour
@@ -34,6 +35,8 @@ public class Settings : MonoBehaviour
     private RectTransform _sectionParent; private static RectTransform sectionParent;
     [SerializeField]
     private Button backButton;
+    [SerializeField]
+    private VolumeProfile volumeProfile;
     [Header("Setting Prefabs")]
     [SerializeField]
     private RectTransform _checkboxPrefab; private static RectTransform checkboxPrefab;
@@ -46,7 +49,7 @@ public class Settings : MonoBehaviour
     [Header("Sound")]
     [SerializeField]
     private string _clickSoundString = "Click"; private static string clickSoundString;
-
+    
     private static List<RectTransform> sectionList = new List<RectTransform>();
     public class Section
     {
@@ -142,7 +145,7 @@ public class Settings : MonoBehaviour
     private void Start()
     {
         Section graphicsSection = new Section("Graphics");
-
+        
         for (int i = 0; i < Display.displays.Length; i++)
         {
             Display.displays[i].Activate();
@@ -177,6 +180,17 @@ public class Settings : MonoBehaviour
         
         graphicsSection.AddTitle("View");
 
+        float gamma = PlayerPrefs.GetFloat("gamma", 1.4f);
+        if(volumeProfile.TryGet(out Tonemapping tonemapping))
+            tonemapping.gamma.value = gamma;
+        graphicsSection.AddSlider("Gamma", 0.5f, 2f, gamma).onValueChanged.AddListener((float newValue) =>
+        {
+            gamma = newValue;
+            PlayerPrefs.SetFloat("gamma", gamma);
+            if(volumeProfile.TryGet(out Tonemapping tonemapping))
+                tonemapping.gamma.value = gamma;
+        });
+        
         fov = PlayerPrefs.GetFloat("fov", 60f);
         graphicsSection.AddSlider("Camera's FOV", 10f, 160f, fov).onValueChanged.AddListener((float newValue) =>
         {

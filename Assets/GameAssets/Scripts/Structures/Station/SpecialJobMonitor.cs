@@ -66,7 +66,7 @@ public class SpecialJobMonitor : NetworkBehaviour
         else if (networkState.Value == State.Disabled)
         {
             jobMonitor.DisableMonitor();
-            jobMonitor.printer.ClearNotifications();
+            //jobMonitor.printer.ClearNotifications();
         }
     }
     public void PlayerEntered()

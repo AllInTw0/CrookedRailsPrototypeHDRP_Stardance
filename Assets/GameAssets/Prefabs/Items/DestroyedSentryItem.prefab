@@ -132,7 +132,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3140944376010762303, guid: 221c75568a78042c8892ba8727f1af62, type: 3}
       propertyPath: objectName
-      value: Destroyed Sentry
+      value: Scrap
       objectReference: {fileID: 0}
     - target: {fileID: 3751801714539862511, guid: 221c75568a78042c8892ba8727f1af62, type: 3}
       propertyPath: m_LocalPosition.x

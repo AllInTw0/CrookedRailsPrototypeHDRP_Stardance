@@ -65,7 +65,7 @@ public class Enemy : NetworkBehaviour
         if (IsOwner == false)
         {
             float timeDiff = NetworkManager.Singleton.LocalTime.TimeAsFloat - current.time;
-            Debug.Log("Time Diff:" + timeDiff);
+            //Debug.Log("Time Diff:" + timeDiff);
             
             Rigidbody rb = GetComponent<Rigidbody>();
             rb.MovePosition(current.position + current.velocity * timeDiff);

@@ -30,5 +30,6 @@ MonoBehaviour:
     sightDistance: 35
     importanceWeight: 1.2
   sightDistance: 35
-  playerDistanceFromTrainToAttack: 500
+  playerDistanceFromTrainToAttack: 15
   dangerValue: 0.5
+  minWaveSpawnedDangerValue: 0

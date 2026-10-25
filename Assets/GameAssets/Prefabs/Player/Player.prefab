@@ -1376,7 +1376,7 @@ MonoBehaviour:
   maxStamina: 100
   staminaGainDelay: 0.9
   staminaGain: 10
-  staminaLoss: 8
+  staminaLoss: 5
   jumpForce: 500
   jumpCoolDown: 0.2
   variableJumpTime: {x: 0, y: 1}
@@ -1483,15 +1483,19 @@ MonoBehaviour:
   startingMaxHealth: 100
   audioOnDamageTaken: Player Takes Damage
   origin: {fileID: 0}
-  invulnerable: 1
+  invulnerable: 0
   clientSideDamage: 0
+  debuffVisualizerList: []
   onTakeDamage:
+    m_PersistentCalls:
+      m_Calls: []
+  onHealthReachedZero:
     m_PersistentCalls:
       m_Calls: []
   ragdollPrefab: {fileID: 1675445366504888117, guid: 7d62f7b7999a9a0408eeeee7d03b4d2b, type: 3}
   drowningDelay: 5
-  drowningDamageDelay: 0
-  drowningDamage: 0
+  drowningDamageDelay: 1
+  drowningDamage: 2
   targetAlpha: 0.15
   fadeInDuration: 0.1
   fadeOutDuration: 0.2
@@ -1517,6 +1521,10 @@ MonoBehaviour:
   rotSmoothTime: 0.2
   maxPositionDistanceError: 0.1
   velocityImpactOnError: 0.75
+  playerNamePrefab: {fileID: 372774723156600736, guid: e8bca7343de1b6e21b5ff26568f91086, type: 3}
+  playerNameFollowTransform: {fileID: 5218909676136322038}
+  playerNameOffset: {x: 0, y: 0.2, z: 0}
+  playerNameFadeSpeed: 10
 --- !u!1 &7210116391051118702
 GameObject:
   m_ObjectHideFlags: 0

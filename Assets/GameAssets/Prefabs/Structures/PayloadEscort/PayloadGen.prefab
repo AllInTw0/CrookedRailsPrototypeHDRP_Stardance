@@ -129,7 +129,11 @@ MonoBehaviour:
   overlapCheckLayerMask:
     serializedVersion: 2
     m_Bits: 1064960
+  onlyRotateY: 1
   maxRetryCount: 20
+  addAutoStop: 0
+  stopType: 0
+  stopOffset: 0
   structureConnectionList: []
   structureSectionList: []
   onSectionAdded:
@@ -250,7 +254,7 @@ MonoBehaviour:
   handleLength: 2
   payloadTrackMeshIndex: 4
   payloadPrefab: {fileID: 9133909337229533351, guid: 4b360a0902a22e1fdaad3ed1a5c6e73c, type: 3}
-  debugSpawnAtEnd: 1
+  debugSpawnAtEnd: 0
 --- !u!114 &317972694134042417
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -358,40 +362,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ItemSpawner
   ShowTopMostFoldoutHeaderGroup: 1
-  itemSpawnEntryList:
-  - element:
-      item: {fileID: 11400000, guid: fba5de258cb318342bb90a8d0b6bf548, type: 2}
-      minMaxStackCount: {x: 1, y: 3}
-    probability: 0.65
-    maxCount: 16
-    pickCount: 8
-    enabled: 0
-  - element:
-      item: {fileID: 11400000, guid: 37b28eef436127340b96cf8afef5fc0a, type: 2}
-      minMaxStackCount: {x: 3, y: 6}
-    probability: 0.3
-    maxCount: -1
-    pickCount: 7
-    enabled: 0
-  - element:
-      item: {fileID: 11400000, guid: eace34aab063c944ab7933acb4427aa0, type: 2}
-      minMaxStackCount: {x: 3, y: 6}
-    probability: 0.25
-    maxCount: -1
-    pickCount: 5
-    enabled: 0
-  - element:
-      item: {fileID: 11400000, guid: 517ca367be1565a4294aa7684a1e17ae, type: 2}
-      minMaxStackCount: {x: 1, y: 1}
-    probability: 0.04
-    maxCount: 2
-    pickCount: 5
-    enabled: 0
-  - element:
-      item: {fileID: 11400000, guid: 277c7caad7a7f2447a65933adf1a7c17, type: 2}
-      minMaxStackCount: {x: 1, y: 1}
-    probability: 0.01
-    maxCount: 1
-    pickCount: 5
-    enabled: 0
+  spawnParams: {fileID: 11400000, guid: f05887e2de165462fbb6e9866ba2a844, type: 2}
   minMaxCount: {x: 20, y: 30}

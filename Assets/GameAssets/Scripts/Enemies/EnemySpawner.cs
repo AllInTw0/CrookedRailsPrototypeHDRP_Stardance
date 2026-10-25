@@ -57,6 +57,9 @@ public class EnemySpawner : MonoBehaviour
     private int minTrainSectionCountAhead;
     [SerializeField]
     private int minTrainSectionCountBehind;
+    [Header("Multiplayer")] 
+    [SerializeField]
+    private AnimationCurve dangerMultiplayerMultiplier;
     [Header("Debug")]
     [SerializeField]
     private bool enemiesSpawnAlways;
@@ -121,6 +124,11 @@ public class EnemySpawner : MonoBehaviour
         {
             UpdateEnemySpawning(lastCoolDownLength);
         }
+    }
+
+    public static float GetDangerMultiplier()
+    {
+        return active.dangerMultiplayerMultiplier.Evaluate(Player.playerList.Count);
     }
     public static void ResetWaveValues(float cooldown)
     {
@@ -205,11 +213,11 @@ public class EnemySpawner : MonoBehaviour
                 return;
             }
 
-            Debug.Log("Spawning: " + randomSpawnDanger);
-            float spawnedDanger = SpawnDanger(randomSpawnDanger, currentWave.minMaxDistance, currentWave.minMaxRot);
+            Debug.Log("Spawning: " + randomSpawnDanger * GetDangerMultiplier());
+            float spawnedDanger = SpawnDanger(randomSpawnDanger * GetDangerMultiplier(), currentWave.minMaxDistance, currentWave.minMaxRot);
 
             currentWave.spawnedDanger += spawnedDanger;
-            if(currentWave.spawnedDanger >= currentWave.targetSpawnedDanger)
+            if(currentWave.spawnedDanger >= currentWave.targetSpawnedDanger * GetDangerMultiplier())
             {
                 EndWave();
                 return;
@@ -285,7 +293,8 @@ public class EnemySpawner : MonoBehaviour
 
             for (int i = 0; i < enemyProbabilityList.probabilityList.Count; i++)
             {
-                if (enemyProbabilityList.probabilityList[i].element.dangerValue > freeDanger)
+                if (enemyProbabilityList.probabilityList[i].element.dangerValue > freeDanger ||
+                    enemyProbabilityList.probabilityList[i].element.minWaveSpawnedDangerValue > spawnedDanger)
                 {
                     enemyProbabilityList.probabilityList[i].enabled = false;
                 }

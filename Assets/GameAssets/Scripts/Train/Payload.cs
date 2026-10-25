@@ -109,6 +109,8 @@ public class Payload : Train
 
             if (spawnPointList.Count > 0)
             {
+                builtUpDanger *= EnemySpawner.GetDangerMultiplier();
+                
                 float spreadDanger = builtUpDanger / spawnPointList.Count;
                 for (int i = 0; i < spawnPointList.Count; i++)
                 {

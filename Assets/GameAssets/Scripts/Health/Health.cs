@@ -168,6 +168,7 @@ public class Health : NetworkBehaviour
     }
     
     public UnityEvent<float,Vector3> onTakeDamage;
+    public UnityEvent<Vector3> onHealthReachedZero;
     private void Awake()
     {
         onTakeDamage = new UnityEvent<float,Vector3>();
@@ -323,7 +324,7 @@ public class Health : NetworkBehaviour
     }
     public virtual void HealthReachedZero(Vector3 force = default)   
     {
-        
+        onHealthReachedZero.Invoke(force);
     }
     private void OnDestroy()
     {

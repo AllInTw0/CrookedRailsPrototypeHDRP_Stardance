@@ -103,11 +103,12 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   healthType: 2
   startingHealth: 500
-  maxHealth: 500
+  startingMaxHealth: 500
   audioOnDamageTaken: 
   origin: {fileID: 0}
   invulnerable: 0
   clientSideDamage: 0
+  debuffVisualizerList: []
   onTakeDamage:
     m_PersistentCalls:
       m_Calls: []

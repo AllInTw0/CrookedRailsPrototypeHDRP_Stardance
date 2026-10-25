@@ -2385,6 +2385,79 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f899cdc4caeea1df7b93dc683839d613, type: 3}
+--- !u!1001 &1393114486
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6502506657835626044, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 941144637
+      objectReference: {fileID: 0}
+    - target: {fileID: 6502506657835626044, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 1829608918
+      objectReference: {fileID: 0}
+    - target: {fileID: 8458723657201459420, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.1592557
+      objectReference: {fileID: 0}
+    - target: {fileID: 8458723657201459420, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.111
+      objectReference: {fileID: 0}
+    - target: {fileID: 8458723657201459420, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 7.253153
+      objectReference: {fileID: 0}
+    - target: {fileID: 8458723657201459420, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8458723657201459420, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8458723657201459420, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8458723657201459420, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8458723657201459420, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8458723657201459420, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8458723657201459420, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8622153013058434737, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: GlobalObjectIdHash
+      value: 3548153600
+      objectReference: {fileID: 0}
+    - target: {fileID: 8622153013058434737, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: InScenePlacedSourceGlobalObjectIdHash
+      value: 1829608918
+      objectReference: {fileID: 0}
+    - target: {fileID: 9010281491717294523, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
+      propertyPath: m_Name
+      value: Companion
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 45d3158a9e5841af589981215f0d9787, type: 3}
 --- !u!1 &1445147041
 GameObject:
   m_ObjectHideFlags: 0
@@ -2798,6 +2871,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 410209315156222721, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
+      propertyPath: maxDistanceFromPlayer
+      value: 150
+      objectReference: {fileID: 0}
+    - target: {fileID: 410209315156222721, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
       propertyPath: inGameEnemyList.Array.size
       value: 3
       objectReference: {fileID: 0}
@@ -2872,10 +2949,6 @@ PrefabInstance:
     - target: {fileID: 6799618200178374423, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
       propertyPath: m_Name
       value: Managers
-      objectReference: {fileID: 0}
-    - target: {fileID: 7608711151052587601, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
-      propertyPath: hostLocally
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7886977643950884988, guid: 4247131c65b9d8a3483945c3a5a56f3b, type: 3}
       propertyPath: GlobalObjectIdHash
@@ -3136,7 +3209,7 @@ GameObject:
   - component: {fileID: 1731519780}
   - component: {fileID: 1731519779}
   - component: {fileID: 1731519778}
-  m_Layer: 0
+  m_Layer: 19
   m_Name: Plane
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3766,3 +3839,4 @@ SceneRoots:
   - {fileID: 517243015}
   - {fileID: 68796208}
   - {fileID: 1747636364}
+  - {fileID: 1393114486}

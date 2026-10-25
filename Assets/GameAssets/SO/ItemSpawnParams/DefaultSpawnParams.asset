@@ -1,0 +1,82 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b86b3c9d61f42923496ea0581a5f813a, type: 3}
+  m_Name: DefaultSpawnParams
+  m_EditorClassIdentifier: Assembly-CSharp::ItemSpawnerParamsSO
+  copySettingsFrom: {fileID: 0}
+  itemSpawnEntryList:
+  - element:
+      item: {fileID: 11400000, guid: fba5de258cb318342bb90a8d0b6bf548, type: 2}
+      minMaxStackCount: {x: 1, y: 3}
+      neededBoughtItemsToSpawn: []
+    probability: 0.65
+    maxCount: 16
+    pickCount: 8
+    enabled: 0
+  - element:
+      item: {fileID: 11400000, guid: 37b28eef436127340b96cf8afef5fc0a, type: 2}
+      minMaxStackCount: {x: 3, y: 6}
+      neededBoughtItemsToSpawn: []
+    probability: 0.3
+    maxCount: -1
+    pickCount: 7
+    enabled: 0
+  - element:
+      item: {fileID: 11400000, guid: eace34aab063c944ab7933acb4427aa0, type: 2}
+      minMaxStackCount: {x: 3, y: 6}
+      neededBoughtItemsToSpawn:
+      - {fileID: 11400000, guid: 989eeba39d1dd8e4081946ecc68bddd3, type: 2}
+    probability: 0.25
+    maxCount: -1
+    pickCount: 5
+    enabled: 0
+  - element:
+      item: {fileID: 11400000, guid: 517ca367be1565a4294aa7684a1e17ae, type: 2}
+      minMaxStackCount: {x: 1, y: 1}
+      neededBoughtItemsToSpawn: []
+    probability: 0.04
+    maxCount: 2
+    pickCount: 5
+    enabled: 0
+  - element:
+      item: {fileID: 11400000, guid: 277c7caad7a7f2447a65933adf1a7c17, type: 2}
+      minMaxStackCount: {x: 1, y: 1}
+      neededBoughtItemsToSpawn: []
+    probability: 0.01
+    maxCount: 1
+    pickCount: 5
+    enabled: 0
+  - element:
+      item: {fileID: 11400000, guid: 541bf2873324b227e826662374bd726e, type: 2}
+      minMaxStackCount: {x: 40, y: 60}
+      neededBoughtItemsToSpawn:
+      - {fileID: 11400000, guid: ffb5d0c83a2ed0a27937acb109d8a0ee, type: 2}
+    probability: 0.2
+    maxCount: 1
+    pickCount: 5
+    enabled: 0
+  - element:
+      item: {fileID: 11400000, guid: 541bf2873324b227e826662374bd726e, type: 2}
+      minMaxStackCount: {x: 100, y: 100}
+      neededBoughtItemsToSpawn: []
+    probability: 0.02
+    maxCount: 1
+    pickCount: 5
+    enabled: 0
+  - element:
+      item: {fileID: 11400000, guid: eace34aab063c944ab7933acb4427aa0, type: 2}
+      minMaxStackCount: {x: 10, y: 10}
+      neededBoughtItemsToSpawn: []
+    probability: 0.02
+    maxCount: 1
+    pickCount: 5
+    enabled: 0
