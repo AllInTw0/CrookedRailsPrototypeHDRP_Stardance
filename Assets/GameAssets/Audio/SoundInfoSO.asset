@@ -254,3 +254,18 @@ MonoBehaviour:
     volume: 0.7
     pitch: {x: 0.9, y: 1.1}
     groupType: 0
+  - name: ImpactHorn
+    AudioClips:
+    - {fileID: 8300000, guid: 94bc28230c82ebedb9be9febe13aff9d, type: 3}
+    - {fileID: 8300000, guid: fd96934c8abe349f7b2f76e926020d32, type: 3}
+    - {fileID: 8300000, guid: e4042ff732c58c56e89971280a2369b8, type: 3}
+    volume: 1
+    pitch: {x: 0.95, y: 1.05}
+    groupType: 0
+  - name: PowerUp
+    AudioClips:
+    - {fileID: 8300000, guid: a89e97546066718b29ad8e049a9be9ce, type: 3}
+    - {fileID: 8300000, guid: 746da60abefdbd015a57056d5b440544, type: 3}
+    volume: 1
+    pitch: {x: 0.95, y: 1.05}
+    groupType: 0

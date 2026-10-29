@@ -37,15 +37,15 @@ public class ItemMelee : Item
     {
         Invoke(nameof(Swing),damageDelay);
         
-        SoundManager.active.PlayAtPos(playerWhoHasItem.avatar.GetAnimationInfo().animatedObject.transform.position, swingSound);
-        playerWhoHasItem.avatar.animator.SetTrigger("Swing");
+        SoundManager.active.PlayAtPos(playerWhoHasItemClient.avatar.GetAnimationInfo().animatedObject.transform.position, swingSound);
+        playerWhoHasItemClient.avatar.animator.SetTrigger("Swing");
         
         coolDown = swingCoolDown;
     }
 
     public void Swing()
     {
-        playerWhoHasItem.GetCameraVectors(out Vector3 origin, out Vector3 dir);
+        playerWhoHasItemClient.GetCameraVectors(out Vector3 origin, out Vector3 dir);
 
         RaycastHit hit = BulletManager.active.ShootInvisibleBullet(origin, dir, IsOwner ? damage : 0, range);
         if (hit.transform != null)

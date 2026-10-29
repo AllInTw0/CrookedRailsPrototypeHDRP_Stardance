@@ -46,6 +46,8 @@ public class PathFindingGroundMovement : GroundMovement
         navPath = new NavMeshPath();
     }
 
+    
+
     private void FixedUpdate()
     {
         
@@ -112,7 +114,7 @@ public class PathFindingGroundMovement : GroundMovement
         if (IsNavigatingByPath() && Vector3.Distance(transform.position, navPath.corners[^1]) < 0.1f)
             return  0f;
         
-        return baseSpeed;
+        return base.GetTargetSpeed();
     }
 
     public void UpdateNavMovement()

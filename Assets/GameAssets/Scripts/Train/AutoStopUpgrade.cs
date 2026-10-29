@@ -20,8 +20,9 @@ public class AutoStopUpgrade : TrainUpgrade
 
     private float maxAutoStopOffset;
     private AutoStop currentAutoBreakingStop;
-    void Start()
+    public override void Start()
     {
+        base.Start();
         foreach (AutoStopType type in System.Enum.GetValues(typeof(AutoStopType)))
         {
             float offset = GetAutoStopTypeOffset(type);
@@ -35,7 +36,7 @@ public class AutoStopUpgrade : TrainUpgrade
     {
         if(IsUnlocked() == false || targetTrain.IsInitialized() == false)
             return;
-        
+        Debug.Log($"[AutoStopUpgrade] {IsUnlocked()}");
         AutoStopFilter currentFilter;
         if (leverInteractable != null)
         {

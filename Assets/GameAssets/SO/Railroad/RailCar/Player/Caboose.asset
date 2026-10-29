@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Caboose
   m_EditorClassIdentifier: Assembly-CSharp::RailCarSO
   railCarName: 
-  prefab: {fileID: 7421378637153406739, guid: df8736e030d2c0b49b4f85f35a36d681, type: 3}
-  icon: {fileID: 21300000, guid: 0dc0d2a1925392a4c925079bf9c02071, type: 3}
+  prefab: {fileID: 2908562537763430829, guid: 55b81507f89a5f5708cf547a87005326, type: 3}
+  icon: {fileID: 2800000, guid: 6ba3be11f6481154daf98366ac3b18f1, type: 2}
   weight: 50
   minLevel: 0
   maxLevel: 0
+  payRange: {x: 0, y: 0}

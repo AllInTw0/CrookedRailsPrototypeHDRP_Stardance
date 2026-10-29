@@ -13,6 +13,8 @@ public class DebugHelper : MonoBehaviour
     [Header("Item")]
     public ItemSO item;
     [Header("Camera shake")]
+    public UpgradeSO upgrade;
+    [Header("Camera shake")]
     public float shakeStrength;
     public float shakeSpring;
     public float shakeDamp;

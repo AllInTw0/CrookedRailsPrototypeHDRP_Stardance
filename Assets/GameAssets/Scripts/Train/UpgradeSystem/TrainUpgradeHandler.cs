@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public enum TrainStatType
 {
@@ -28,6 +29,9 @@ public class TrainUpgradeHandler : MonoBehaviour
 {
     public static TrainUpgradeHandler active;
 
+    public static UnityEvent<UpgradeSO> onUpgradeAdded;
+    public static UnityEvent<UpgradeSO> onUpgradeRemoved;
+    
     [System.Serializable]
     public class DefaultStats
     {
@@ -46,19 +50,22 @@ public class TrainUpgradeHandler : MonoBehaviour
     [SerializeField]
     private List<DefaultStats> defaultStatsList;
     //Run time
-    private TrainUpgrade[] trainUpgradeArray;
-
+    //private List<TrainUpgrade> trainUpgradeList;
+    private List<UpgradeSO> currentUpgradeList = new List<UpgradeSO>();
+    
     private Dictionary<TrainStatType, DefaultStats> defaultStatsDict = new Dictionary<TrainStatType, DefaultStats>();
     public Dictionary<TrainStatType, List<Upgrade>> currentUpgradeDict = new Dictionary<TrainStatType, List<Upgrade>>();
     void Awake()
     {
+        onUpgradeAdded = new UnityEvent<UpgradeSO>();
+        onUpgradeRemoved = new UnityEvent<UpgradeSO>();
         foreach (DefaultStats defaultStats in defaultStatsList)
         {
             defaultStatsDict.Add(defaultStats.trainStat, defaultStats);
             currentUpgradeDict.Add(defaultStats.trainStat, new List<Upgrade>());
         }
         active = this;
-        trainUpgradeArray = GetComponentsInChildren<TrainUpgrade>();
+        //trainUpgradeList = new List<TrainUpgrade>(GetComponentsInChildren<TrainUpgrade>());
     }
 
     void Update()
@@ -68,14 +75,9 @@ public class TrainUpgradeHandler : MonoBehaviour
     
     public void AddUpgrade(UpgradeSO upgradeInfo)
     {
-        for (int i = 0; i < trainUpgradeArray.Length; i++)
-        {
-            if (trainUpgradeArray[i].linkedUpgradeSO == upgradeInfo)
-            {
-                trainUpgradeArray[i].SetUnlocked(true);
-            }
-        }
-
+        currentUpgradeList.Add(upgradeInfo);
+        onUpgradeAdded.Invoke(upgradeInfo);
+        
         for (int i = 0; i < upgradeInfo.replaceList.Count; i++)
         {
             RemoveUpgrade(upgradeInfo.replaceList[i]);
@@ -84,13 +86,18 @@ public class TrainUpgradeHandler : MonoBehaviour
 
     public void RemoveUpgrade(UpgradeSO upgradeInfo)
     {
-        for (int i = 0; i < trainUpgradeArray.Length; i++)
+        currentUpgradeList.Remove(upgradeInfo);
+        onUpgradeRemoved.Invoke(upgradeInfo);
+    }
+
+    public static bool IsUpgradeUnlocked(UpgradeSO upgradeInfo)
+    {
+        for (int i = 0; i < active.currentUpgradeList.Count; i++)
         {
-            if (trainUpgradeArray[i].linkedUpgradeSO == upgradeInfo)
-            {
-                trainUpgradeArray[i].SetUnlocked(false);
-            }
+            if (active.currentUpgradeList[i] == upgradeInfo)
+                return true;
         }
+        return false;
     }
     public float GetStatValue(TrainStatType trainStatType)
     {

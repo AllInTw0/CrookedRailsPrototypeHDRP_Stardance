@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Tender
   m_EditorClassIdentifier: Assembly-CSharp::RailCarSO
   railCarName: 
-  prefab: {fileID: 6829916163831001656, guid: 9ff3574bf839aa24784d0eedd4a61ef2, type: 3}
-  icon: {fileID: 21300000, guid: e05aeed946e73e1458345948a2b990e0, type: 3}
+  prefab: {fileID: 3910561704289764144, guid: bd259a7a591c8d47e8b469ed28a00ad8, type: 3}
+  icon: {fileID: 2800000, guid: 125fa502338c3394e87fe0b1297901e2, type: 2}
   weight: 50
   minLevel: 0
   maxLevel: 0
+  payRange: {x: 0, y: 0}

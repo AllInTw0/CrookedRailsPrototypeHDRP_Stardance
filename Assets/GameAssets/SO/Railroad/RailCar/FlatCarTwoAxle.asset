@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: FlatCarTwoAxle
   m_EditorClassIdentifier: Assembly-CSharp::RailCarSO
   railCarName: FlatCar
-  prefab: {fileID: 4591550788232894288, guid: ba589ba20da3c18448aa498a777336b1, type: 3}
+  prefab: {fileID: 1779353006241084702, guid: 3d726fb3dde53d4b78eb950f7940fa1a, type: 3}
   icon: {fileID: 21300000, guid: b22fd9176e9549e4d88e573d6df86ebf, type: 3}
   weight: 50
   minLevel: 0

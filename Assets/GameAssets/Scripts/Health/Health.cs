@@ -6,6 +6,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
+using UnityEngine.VFX;
 
 public enum HealthType
 {
@@ -19,7 +20,9 @@ public enum HealthType
 }
 public enum DebuffType
 {
-    Fire
+    Fire,
+    Invulnerability,
+    Electricity
 }
 public class Health : NetworkBehaviour
 {
@@ -123,7 +126,7 @@ public class Health : NetworkBehaviour
     {
         public DebuffType type;
         public List<ParticleSystem> ParticleSystemList = new List<ParticleSystem>();
-
+        public List<VisualEffect> visualEffectList = new List<VisualEffect>();
         public void ChangeState(bool enabled)
         {
             for (int i = 0; i < ParticleSystemList.Count; i++)
@@ -133,9 +136,15 @@ public class Health : NetworkBehaviour
                 else
                     ParticleSystemList[i].Stop();
             }
+            for (int i = 0; i < visualEffectList.Count; i++)
+            {
+                visualEffectList[i].enabled = enabled;
+            }
         }
     }
 
+    public UnityEvent<Debuff> onDebuffAdded;
+    public UnityEvent<Debuff> onDebuffRemoved;
     private List<Debuff> debuffList = new List<Debuff>();
     [SerializeField]
     private List<DebuffVisualizer> debuffVisualizerList = new List<DebuffVisualizer>();
@@ -149,6 +158,7 @@ public class Health : NetworkBehaviour
                 debuffVisualizerList[i].ChangeState(true);
             }
         }
+        onDebuffAdded.Invoke(debuff);
     }
     public Debuff GetDebuff(DebuffType type)
     {
@@ -171,7 +181,15 @@ public class Health : NetworkBehaviour
     public UnityEvent<Vector3> onHealthReachedZero;
     private void Awake()
     {
+        onDebuffAdded = new UnityEvent<Debuff>();
+        onDebuffRemoved = new UnityEvent<Debuff>();
+        
         onTakeDamage = new UnityEvent<float,Vector3>();
+        
+        for (int i = 0; i < debuffVisualizerList.Count; i++)
+        {
+            debuffVisualizerList[i].ChangeState(false);
+        }
     }
     public virtual void Start()
     {
@@ -226,21 +244,7 @@ public class Health : NetworkBehaviour
             EnemyManager.active.healthTypeArray[(int)healthType].Add(this);
     }
     
-    private void Update()
-    {
-        UpdateCall();
-    }
-
-    public void DebuffTick()
-    {
-        Debuff fire = GetDebuff(DebuffType.Fire);
-        if (fire != null && fire.owner)
-        {
-            TakeDamage(fire.value);
-            HitSound.active.HandleHitSound(this, fire.value, transform.localPosition + Vector3.up);
-        }
-    }
-    public void UpdateCall()
+    public virtual void Update()
     {
         if (damageSum != 0)
         {
@@ -261,15 +265,25 @@ public class Health : NetworkBehaviour
             {
                 for (int j = 0; j < debuffVisualizerList.Count; j++)
                 {
-                    if (debuffVisualizerList[i].type == debuffList[i].type)
+                    if (debuffVisualizerList[j].type == debuffList[i].type)
                     {
-                        debuffVisualizerList[i].ChangeState(false);
+                        debuffVisualizerList[j].ChangeState(false);
                     }
                 }
-                
+                onDebuffRemoved.Invoke(debuffList[i]);
                 debuffList.RemoveAt(i);
                 i--;
             }
+        }
+    }
+
+    public void DebuffTick()
+    {
+        Debuff fire = GetDebuff(DebuffType.Fire);
+        if (fire != null && fire.owner)
+        {
+            TakeDamage(fire.value);
+            HitSound.active.HandleHitSound(this, fire.value, transform.localPosition + Vector3.up);
         }
     }
     public int TakeDamage(float damage, Vector3 force = default)

@@ -31,6 +31,10 @@ public class DebugHelperEditor : Editor
         {
             Item.SpawnItem(debugHelper.item,Player.localPlayer.transform.position + Player.localPlayer.transform.forward + Vector3.up,Quaternion.identity,debugHelper.item.maxCount);
         }
+        if (GUILayout.Button("Unlock Upgrade"))
+        {
+            TrainUpgradeHandler.active.AddUpgrade(debugHelper.upgrade);
+        }
         if (GUILayout.Button("Shake Camera"))
         {
             PlayerCamera.active.Shake(debugHelper.shakeStrength, debugHelper.shakeSpring, debugHelper.shakeDamp);

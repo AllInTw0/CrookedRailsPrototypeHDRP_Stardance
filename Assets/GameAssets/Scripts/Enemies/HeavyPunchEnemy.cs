@@ -19,6 +19,10 @@ public class HeavyPunchEnemy : GroundEnemy
 
     private Health targetPunchHealth;
 
+    public override void Start()
+    {
+        base.Start();
+    }
     public override void UpdateBehaviour()
     {
         bool targetReached = movement.HasReachedTarget();

@@ -130,9 +130,9 @@ public class PlayerInventory : NetworkBehaviour
         MovingPlatformManager.active.RemoveEntry(item.transform);
         InventoryUI.active.UpdateToolIcon();
 
-        item.playerWhoHasItem = player;
+        item.playerWhoHasItemClient = player;
     }
-    private void EquipAsItem(Item item)
+    public void EquipAsItem(Item item)
     {
         items.Add(item);
         filledSlots += item.itemInfo.slotCount;
@@ -144,7 +144,7 @@ public class PlayerInventory : NetworkBehaviour
         MovingPlatformManager.active.RemoveEntry(item.transform);
         InventoryUI.active.UpdateItemIcons();
         
-        item.playerWhoHasItem = player;
+        item.playerWhoHasItemClient = player;
     }
 
     private void EquipStackableItem(Item equippedItem, Item item)
@@ -193,7 +193,7 @@ public class PlayerInventory : NetworkBehaviour
         tool.transform.rotation = rot;
         tool.DropFromPos(pos);
         
-        tool.playerWhoHasItem = null;
+        tool.playerWhoHasItemClient = null;
         
         Item reference = tool;
 
@@ -220,7 +220,7 @@ public class PlayerInventory : NetworkBehaviour
             item.DropFromPos(transform.position + Vector3.up + orientation.forward * itemInfo.dropOffset.z +
                              orientation.up * itemInfo.dropOffset.y + orientation.right * itemInfo.dropOffset.x);
 
-            item.playerWhoHasItem = null;
+            item.playerWhoHasItemClient = null;
 
             if (selectIndex > items.Count)
                 selectIndex--;

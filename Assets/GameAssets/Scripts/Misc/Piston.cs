@@ -16,14 +16,14 @@ public class Piston : MonoBehaviour
 
     void Update()
     {
-        if (targetTransform == null)
+        if (!targetTransform)
             return;
 
         float distance = Vector3.Distance(transform.position, targetTransform.position);
 
-        if (pistonStartModel != null) pistonStartModel.LookAt(targetTransform);
-        if (pistonStretchModel != null) { pistonStretchModel.LookAt(targetTransform); pistonStretchModel.localScale = new Vector3(pistonStretchModel.localScale.x, pistonStretchModel.localScale.y, distance); }
-        if (pistonEndModel != null) pistonEndModel.LookAt(transform.position);
+        if (pistonStartModel) pistonStartModel.LookAt(targetTransform);
+        if (pistonStretchModel) { pistonStretchModel.LookAt(targetTransform); pistonStretchModel.localScale = new Vector3(pistonStretchModel.localScale.x, pistonStretchModel.localScale.y, distance); }
+        if (pistonEndModel) pistonEndModel.LookAt(transform.position);
 
     }
 }

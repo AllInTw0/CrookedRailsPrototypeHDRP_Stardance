@@ -13,8 +13,9 @@ MonoBehaviour:
   m_Name: Locomotive
   m_EditorClassIdentifier: Assembly-CSharp::RailCarSO
   railCarName: 
-  prefab: {fileID: 6367483308797791140, guid: 3f8d429966968834da156b31b8f28db4, type: 3}
-  icon: {fileID: 21300000, guid: fea4014a2368d3f41b3da47d6df6be32, type: 3}
+  prefab: {fileID: 3216462463562781526, guid: 0daa11f6c568af2889196ea7e8bba890, type: 3}
+  icon: {fileID: 2800000, guid: 4e7c643a8f86ae24e85cbcbdf673a511, type: 2}
   weight: 100
   minLevel: 0
   maxLevel: 0
+  payRange: {x: 0, y: 0}

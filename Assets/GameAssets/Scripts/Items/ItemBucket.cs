@@ -46,7 +46,7 @@ public class ItemBucket : Item
 
     private void UpdateVisual(bool isFilled)
     {
-        ToolAnimationInfo toolAnimInfo = playerWhoHasItem.avatar.GetAnimationInfo();
+        ToolAnimationInfo toolAnimInfo = playerWhoHasItemClient.avatar.GetAnimationInfo();
         
         SoundManager.active.PlayAtPos(toolAnimInfo.animatedObject.transform.position,isFilled ? fillUpSound : emptySound);
         

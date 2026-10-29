@@ -242,7 +242,7 @@ public class Companion : NetworkBehaviour
     }
     private void UpdateBehaviour()
     { 
-        Debug.Log("Current state: " + state);
+        //Debug.Log("Current state: " + state);
         switch (state)
         {
             case CompanionState.normal:
@@ -482,6 +482,7 @@ public class Companion : NetworkBehaviour
                 }
                 break;
         }
+        
         movement.UpdateNavigationBehaviour(preferPath: true);
         
         //Multiplayer
@@ -562,6 +563,9 @@ public class Companion : NetworkBehaviour
     }
     private void Update()
     {
+        if(movement.rb.isKinematic)
+            return;
+        
         if (state != CompanionState.ragdolled)
         {
             movement.UpdateNavMovement();
@@ -575,6 +579,9 @@ public class Companion : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        if(movement.rb.isKinematic)
+            return;
+        
         if (state != CompanionState.ragdolled)
         {
             movement.FixedUpdateMovement();

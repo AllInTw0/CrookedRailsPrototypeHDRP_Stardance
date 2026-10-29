@@ -19,9 +19,20 @@ public class TrainUpgrade : NetworkBehaviour
     public UpgradeSO linkedUpgradeSO;
     public bool unlockedAtStart;
     
-    private void Awake()
+    public virtual void Start()
     {
         unlocked.OnValueChanged += UnlockedStateChanged;
+        
+        TrainUpgradeHandler.onUpgradeAdded.AddListener((UpgradeSO upgrade) =>
+        {
+            if(upgrade == linkedUpgradeSO)
+                SetUnlocked(true);
+        });
+        TrainUpgradeHandler.onUpgradeRemoved.AddListener((UpgradeSO upgrade) =>
+        {
+            if(upgrade == linkedUpgradeSO)
+                SetUnlocked(false);
+        });
     }
 
     public override void OnNetworkSpawn()
@@ -29,13 +40,15 @@ public class TrainUpgrade : NetworkBehaviour
         if (IsServer)
         {
             if(unlockedAtStart)
-                SetUnlocked(true);
+                TrainUpgradeHandler.active.AddUpgrade(linkedUpgradeSO);
+            else if (TrainUpgradeHandler.IsUpgradeUnlocked(linkedUpgradeSO))
+                TrainUpgradeHandler.active.AddUpgrade(linkedUpgradeSO);
             else
-                UnlockedStateChanged(unlocked.Value, unlocked.Value);
+                UnlockedStateChanged(IsUnlocked(), IsUnlocked());
         }
         else
         {
-            UnlockedStateChanged(unlocked.Value, unlocked.Value);
+            UnlockedStateChanged(IsUnlocked(), IsUnlocked());
         }
     }
 
@@ -62,7 +75,7 @@ public class TrainUpgrade : NetworkBehaviour
     {
         foreach (Transform childTransform in GetComponentInChildren<Transform>())
         {
-            if (childTransform != transform)
+            if (childTransform.parent == transform)
             {
                 childTransform.gameObject.SetActive(enabled);
             }

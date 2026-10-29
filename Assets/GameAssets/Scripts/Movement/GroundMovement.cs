@@ -12,6 +12,8 @@ public class GroundMovement : MonoBehaviour
     [SerializeField]
     public float deceleration = 1f;
     [SerializeField]
+    public float decelerationAir = 1f;
+    [SerializeField]
     private float maxAngle = 45f;
     [SerializeField]
     public CapsuleCollider capsuleCollider;
@@ -66,6 +68,14 @@ public class GroundMovement : MonoBehaviour
     
     [NonSerialized]
     public Vector3 projectedVector; //World space target direction of movement also projected on ground
+    private bool movementDisabled = false;
+    public bool IsMovementDisabled() => movementDisabled;
+    public void SetMovementState(bool enabled) => movementDisabled = !enabled;
+    [NonSerialized]
+    private float? tempSpeed = null;
+    public void SetTempSpeed(float? speed = null) => tempSpeed = speed;
+    
+    
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -78,6 +88,8 @@ public class GroundMovement : MonoBehaviour
     }
     public virtual float GetTargetSpeed()
     {
+        if(tempSpeed != null)
+            return tempSpeed.Value;
         return baseSpeed;
     }
 
@@ -93,6 +105,8 @@ public class GroundMovement : MonoBehaviour
 
     public void UpdateMovement()
     {
+        if(IsMovementDisabled())
+            return;
         CheckGrounded();
         
         //FootStep Sound
@@ -119,12 +133,16 @@ public class GroundMovement : MonoBehaviour
 
     public void FixedUpdateMovement()
     {
+        
         targetSpeed = GetTargetSpeed();
         movementVector = GetMovementVector();
         
         //Gravity
         rb.AddForce(grounded ? -groundNormal * (gravityForce * 0.5f) : Vector3.down * gravityForce);
 
+        if(IsMovementDisabled())
+            return;
+        
         //Velocity relative to direction
         float lookAngle = Mathf.Atan2(movementVector.x, movementVector.y) * Mathf.Rad2Deg;
         float moveAngle = Mathf.Atan2(rb.linearVelocity.x, rb.linearVelocity.z) * Mathf.Rad2Deg;
@@ -159,7 +177,7 @@ public class GroundMovement : MonoBehaviour
                 //Drag
                 if (velocity > 0.1f)
                 {
-                    rb.AddForce(-velocityPlane.normalized * deceleration);
+                    rb.AddForce(-velocityPlane.normalized * (grounded ? deceleration : decelerationAir));
                 }
                 else
                 {
@@ -220,6 +238,18 @@ public class GroundMovement : MonoBehaviour
     private void CheckGrounded()
     {
         if (rb.constraints == RigidbodyConstraints.FreezeAll) return;
+
+        if (rb.linearVelocity.y > 1f)
+        {
+            if (grounded)
+            {
+                grounded = false;
+                groundNormal = Vector3.up;
+                MovingPlatformManager.active.RemoveEntry(transform);
+                onRailCar = null;
+            }
+            return;
+        }
         
         Debug.DrawRay(transform.position + new Vector3(0, capsuleCollider.radius, 0),Vector3.down * (capsuleCollider.radius * 2f));
         if (Physics.SphereCast(transform.position + new Vector3(0, capsuleCollider.radius, 0), capsuleCollider.radius - 0.01f, Vector3.down, out RaycastHit  hit , capsuleCollider.radius * 1.5f, groundLayer))

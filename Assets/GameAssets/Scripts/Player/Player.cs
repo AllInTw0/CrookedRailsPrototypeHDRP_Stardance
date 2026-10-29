@@ -12,7 +12,7 @@ public class Player : NetworkBehaviour
     //Static
     public static List<Player> playerList = new List<Player>();
     public static Player localPlayer = null;
-    private static byte nextPlayerID = 0; // byte is a 0-255 int
+    private static byte nextPlayerID = 1; // byte is a 0-255 int
     
     //Network
     private NetworkVariable<FixedString32Bytes> playerName = new NetworkVariable<FixedString32Bytes>(writePerm: NetworkVariableWritePermission.Owner);
@@ -25,6 +25,18 @@ public class Player : NetworkBehaviour
     public byte playerID
     {
         get { return playerIDNetworkVariable.Value; }
+    }
+
+    public static Player GetPlayerByID(byte playerID)
+    {
+        for (int i = 0; i < playerList.Count; i++)
+        {
+            if (playerList[i].playerID == playerID)
+            {
+                return playerList[i];
+            }
+        }
+        return null;
     }
     //Components
     [NonSerialized] public new PlayerCamera camera;
@@ -228,6 +240,9 @@ public class Player : NetworkBehaviour
 
             if (playerNameTransform)
             {
+                if (health.isAlive == false)
+                    playerNameDuration = 0f;
+                
                 playerNameTransform.position = playerNameFollowTransform.position + playerNameOffset;
                 playerNameTransform.LookAt(PlayerCamera.active.transform.position);
                 

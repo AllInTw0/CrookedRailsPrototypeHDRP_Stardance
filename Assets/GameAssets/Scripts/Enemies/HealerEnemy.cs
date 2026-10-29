@@ -57,6 +57,10 @@ public class HealerEnemy : GroundEnemy
         }
     }
 
+    public override void Start()
+    {
+        base.Start();
+    }
     public override void UpdateCall()
     {
         base.UpdateCall();

@@ -2,6 +2,11 @@ using UnityEngine;
 
 public class MeleeEnemy : GroundEnemy
 {
+    public override void Start()
+    {
+        base.Start();
+    }
+
     public override void UpdateBehaviour()
     {
         bool targetReached = movement.HasReachedTarget();

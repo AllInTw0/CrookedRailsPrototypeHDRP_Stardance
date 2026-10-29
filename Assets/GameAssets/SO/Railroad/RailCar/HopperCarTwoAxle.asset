@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: HopperCarTwoAxle
   m_EditorClassIdentifier: Assembly-CSharp::RailCarSO
   railCarName: HopperCar
-  prefab: {fileID: 4286117842949470604, guid: eb0fb2c6e3857e24395e9e8fc7233d51, type: 3}
+  prefab: {fileID: 2404371913804739819, guid: 358e990a44d4ffea29e9f54287469fb1, type: 3}
   icon: {fileID: 21300000, guid: 197872cf989ba1746a262ccbdfa6b00a, type: 3}
   weight: 50
   minLevel: 0

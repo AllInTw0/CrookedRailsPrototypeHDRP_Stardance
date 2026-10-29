@@ -45,10 +45,10 @@ public class PlayerHealth : Health
         });
     }
 
-    private void Update()
+    public override void Update()
     {
-        UpdateCall();
-        
+        base.Update();
+    
         if(IsOwner == false)
             return;
         

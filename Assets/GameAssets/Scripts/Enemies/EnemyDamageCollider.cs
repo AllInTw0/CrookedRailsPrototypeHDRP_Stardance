@@ -21,6 +21,8 @@ public class EnemyDamageCollider : MonoBehaviour
     private float attackDamage = 5f;
     [SerializeField]
     private float attackForce = 2.5f;
+    [SerializeField]
+    private float playerInvulnerabilityBuffDuration = 1f;
     [SerializeField] 
     private string attackSoundName;
     [SerializeField] 
@@ -42,7 +44,7 @@ public class EnemyDamageCollider : MonoBehaviour
         if (coolDownTime < 0f)
         {
             Health healthScript = other.GetComponent<Health>();
-            if (healthScript != null && healthScript.GetHealth() > 0f && healthTypeFilterList.Contains(healthScript.healthType))
+            if (healthScript != null && healthScript.GetHealth() > 0f && healthTypeFilterList.Contains(healthScript.healthType) && healthScript.GetDebuff(DebuffType.Invulnerability) == null)
             {
                 SoundManager.active.PlayAtPos(transform.position,attackSoundName);
 
@@ -51,8 +53,10 @@ public class EnemyDamageCollider : MonoBehaviour
                 coolDownTime = coolDown;
                 enemyBehaviour.Freeze();
                 
+                if (healthScript is PlayerHealth) healthScript.AddDebuff(new Health.Debuff(DebuffType.Invulnerability, playerInvulnerabilityBuffDuration));
+                
                 Invoke(nameof(UnFreeze),freezeTime);
-
+                
                 StartCoroutine(DamageDelayed(healthScript, attackDamage,(healthScript.GetOrigin() - transform.position + Vector3.up * 1.5f).normalized * attackForce, attackDelay));
             }
         }

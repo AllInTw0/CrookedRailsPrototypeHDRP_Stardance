@@ -17,6 +17,7 @@ public class GroundEnemy : Enemy
     private float timeStandingStill;
     private float minMovementVelcoity = 0.1f;
 
+    private bool disableRotationAnimation;
     public float GetTimeStandingStill()
     {
         return timeStandingStill;
@@ -27,12 +28,38 @@ public class GroundEnemy : Enemy
     }
     public override void Awake()
     {
+        base.Awake();
         movement = GetComponent<PathFindingGroundMovement>();
     }
-
+    
     public override void Start()
     {
         base.Start();
+        Debug.Log("[GroundEnemy] Start Called!");
+        health.onDebuffAdded.AddListener((debuff) =>
+        {
+            if (debuff.type == DebuffType.Electricity)
+            {
+                Debug.Log("[GroundEnemy] Temp Speed Set!");
+                movement.SetTempSpeed(0f);
+                disableRotationAnimation = true;
+            }
+        });
+        health.onDebuffRemoved.AddListener((debuff) =>
+        {
+            if (debuff.type == DebuffType.Electricity)
+            {
+                Debug.Log("[GroundEnemy] Temp Speed Revoked!");
+                movement.SetTempSpeed();
+                disableRotationAnimation = false;
+            }
+        });
+        health.onTakeDamage.AddListener((dmg, force) =>
+        {
+            Debug.Log($"[GroundEnemy] Force! {force}");
+            movement.UnFreeze();
+            movement.rb.AddForce(force * 0.35f,ForceMode.VelocityChange);
+        });
     }
 
     public override void FixedUpdateCall()
@@ -84,7 +111,7 @@ public class GroundEnemy : Enemy
     {
         animator.SetFloat("Velocity", movement.velocity);
         animator.SetFloat("SpeedMult", movement.velocity * walkCycleSpeedMult);
-        if (movement.targetDirVector != Vector3.zero)
+        if (movement.targetDirVector != Vector3.zero && !disableRotationAnimation)
             movement.rb.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(new Vector3(movement.targetDirVector.x,0, movement.targetDirVector.z)), Time.deltaTime * rotationSpeed);
     }
 }

@@ -22,9 +22,9 @@ public class EnemyHealth : Health
         base.Start();
     }
 
-    private void Update()
+    public override void Update()
     {
-        UpdateCall();
+        base.Update();
     }
     public override void HealthReachedZero(Vector3 force = default)
     {

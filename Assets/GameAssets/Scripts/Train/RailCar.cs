@@ -147,43 +147,6 @@ public class RailCar : NetworkBehaviour
     public float swaySpring = 0.2f;
     public float swayDrag = 0.025f;
     public float swayMaxAngle = 5f;
-
-    [Header("Display Board")] 
-    [SerializeField]
-    private GameObject displayBoardPrefab;
-    [SerializeField]
-    private List<Transform> displayBoardPositionList = new List<Transform>();
-    private List<DisplayBoard> displayBoardList = new List<DisplayBoard>();
-    public class DisplayBoard
-    {
-        public GameObject displayBoardObject;
-        public TMP_Text healthText;
-        public TMP_Text cargoText;
-    }
-    
-    public void AddDisplayBoards()
-    {
-        displayBoardList = new List<DisplayBoard>();
-        foreach (Transform displayPosTransform in displayBoardPositionList)
-        {
-            GameObject clone = Instantiate(displayBoardPrefab);
-            clone.transform.SetParent(displayPosTransform);
-            clone.transform.localPosition = Vector3.zero;
-            clone.transform.localRotation = Quaternion.identity;
-
-            TMP_Text[] textArray = clone.GetComponentsInChildren<TMP_Text>();
-            DisplayBoard displayBoard = new DisplayBoard();
-            displayBoard.displayBoardObject = clone;
-            
-            foreach (TMP_Text text in textArray)
-            {
-                if (text.name == "HealthText") displayBoard.healthText = text;
-                //if (text.name == "CargoText") displayBoard.cargoText = text;
-            }
-            
-            displayBoardList.Add(displayBoard);
-        }
-    }
     
     //Run Time
     //[NonSerialized]
@@ -260,8 +223,6 @@ public class RailCar : NetworkBehaviour
             };
         if(IsServer == false)
             ServerValuesChanged(default, networkData.Value);
-
-        AddDisplayBoards();
     }
     
     public virtual void Update()
@@ -270,21 +231,6 @@ public class RailCar : NetworkBehaviour
         derailTime = Mathf.Clamp01(derailTime);
 
         UpdateSway();
-
-        foreach (DisplayBoard displayBoard in displayBoardList)
-        {
-            if (displayBoard.healthText)
-            {
-                displayBoard.healthText.text = railCarSO.GetName() + ": " + networkCargo.Value.GetRailCarHealth().GetHealthPercent() + "%";
-            
-                //Debug.Log(railCarSO.GetName() + ":" +networkCargo.Value.GetCargoSO());
-                if (networkCargo.Value.GetCargoSO() && networkCargo.Value.GetCargoHealth())
-                {
-                    displayBoard.healthText.text += "\n" + networkCargo.Value.GetCargoSO().GetName() + ": " +
-                                                   networkCargo.Value.GetCargoHealth().GetHealthPercent() + "%";
-                }
-            }
-        }
     }
 
     private void LateUpdate()

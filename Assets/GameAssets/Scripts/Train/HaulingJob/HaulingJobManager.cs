@@ -286,7 +286,7 @@ public class HaulingJobManager : NetworkBehaviour
         foreach (CargoSO cargoInfo in haulingCargoInfoList)
         {
             GameObject cargoCopy = null;
-            Debug.Log("1");
+            //Debug.Log("1");
             if (cargoInfo.cargoPrefab)
             {
                 cargoCopy = Instantiate(cargoInfo.cargoPrefab);
@@ -318,7 +318,7 @@ public class HaulingJobManager : NetworkBehaviour
 
     private Texture2D RenderIcon(RailCarSO railCarInfo, GameObject cargoCopy = null)
     {
-        Debug.Log("2");
+        //Debug.Log("2");
         GameObject railCarCopy = Instantiate(railCarInfo.prefab, Vector3.zero, Quaternion.identity);
         Util.ChangeObjectsLayer(railCarCopy, renderLayer);
         railCarCopy.transform.position = Vector3.zero;

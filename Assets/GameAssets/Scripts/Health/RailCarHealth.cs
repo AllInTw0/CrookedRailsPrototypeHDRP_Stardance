@@ -100,6 +100,10 @@ public class RailCarHealth : Health
             obj.SetActive(false);
         }
         
+        foreach (EventInteractable interactable in rerailInteractableList)
+        {
+            interactable.objectName = linkedRailCar.railCarSO.GetName();
+        }
         
         onTakeDamage.AddListener((float damage, Vector3 force) =>
         {
@@ -107,9 +111,9 @@ public class RailCarHealth : Health
         });
         UpdateHealthState();
     }
-    private void Update()
+    public override void Update()
     {
-        UpdateCall();
+        base.Update();
     }
 
     private void UpdateHealthState()

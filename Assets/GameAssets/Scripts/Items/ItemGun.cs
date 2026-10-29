@@ -132,7 +132,7 @@ public class ItemGun : Item
             Shoot(bulletOrigin, direction, false);
         }
         
-        playerWhoHasItem.avatar.animator.SetTrigger("Shoot");
+        playerWhoHasItemClient.avatar.animator.SetTrigger("Shoot");
     }
 
     public void Shoot(Vector3 bulletOrigin, Vector3 direction, bool doDamage = true, ShooterType shooterType = ShooterType.Player)
@@ -163,9 +163,9 @@ public class ItemGun : Item
     [Rpc(SendTo.Everyone)]
     private void ReloadRpc()
     {
-        if (playerWhoHasItem.inventory.RemoveItem(ammoItem, out int itemCountRemoved, clipSize - clip, IsServer))
+        if (playerWhoHasItemClient.inventory.RemoveItem(ammoItem, out int itemCountRemoved, clipSize - clip, IsServer))
         {
-            playerWhoHasItem.avatar.animator.SetTrigger("Reload");
+            playerWhoHasItemClient.avatar.animator.SetTrigger("Reload");
             ReloadClient(itemCountRemoved, GetBulletOrigin());
         }
         else
@@ -204,10 +204,10 @@ public class ItemGun : Item
 
     private Vector3 GetBulletOrigin()
     {
-        if(!playerWhoHasItem)
+        if(!playerWhoHasItemClient)
             return transform.position;
         
-        return playerWhoHasItem.avatar.GetAnimationInfo().bulletSpawn.transform.position;
+        return playerWhoHasItemClient.avatar.GetAnimationInfo().bulletSpawn.transform.position;
     }
     private void GetBulletDefiningVariables(Vector3 aimPos, out Vector3 bulletOrigin, out Vector3 direction)
     {

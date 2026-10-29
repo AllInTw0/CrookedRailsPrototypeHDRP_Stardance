@@ -59,20 +59,82 @@ public class Item : NetworkBehaviour
     private bool physicsEnabled;
     private bool dropSilently;
 
-    [NonSerialized] 
-    public Player playerWhoHasItem = null;
+    public struct ItemOwnershipNetwork : INetworkSerializable
+    {
+        public byte playerID; //null
+        public bool tool;
+        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        {
+            serializer.SerializeValue(ref playerID);
+            serializer.SerializeValue(ref tool);
+        }
+    }
+    
+    private NetworkVariable<ItemOwnershipNetwork> ownershipNetworkVariable = new NetworkVariable<ItemOwnershipNetwork>(writePerm: NetworkVariableWritePermission.Server);
+    public Player playerWhoHasItemServer
+    {
+        get
+        {
+            return Player.GetPlayerByID(ownershipNetworkVariable.Value.playerID);
+        }
+        set
+        {
+            if (IsServer)
+            {
+                if(value)
+                    ownershipNetworkVariable.Value = new ItemOwnershipNetwork(){playerID = value.playerID,  tool = value.inventory.tool == this};
+                else
+                    ownershipNetworkVariable.Value = new ItemOwnershipNetwork(); //Equipped by none
+            }
+        }
+    }
+    [NonSerialized]
+    public Player playerWhoHasItemClient;
+
+    private void OnPlayerChanged(ItemOwnershipNetwork previous, ItemOwnershipNetwork current)
+    {
+        Debug.Log($"Recieved pickup data {ownershipNetworkVariable.Value.playerID} ,{ownershipNetworkVariable.Value.tool} ");
+        if (IsServer == false)
+        {
+            if(playerWhoHasItemClient == playerWhoHasItemServer)
+                return;
+            
+            if (playerWhoHasItemClient)
+            {
+                if (playerWhoHasItemClient.inventory.tool == this)
+                    playerWhoHasItemClient.inventory.UnEquipTool();
+                else
+                    playerWhoHasItemClient.inventory.UnEquipItem(this);
+            }
+
+            if (playerWhoHasItemServer)
+            {
+                if (ownershipNetworkVariable.Value.tool)
+                {
+                    if (playerWhoHasItemServer.inventory.tool)
+                        playerWhoHasItemServer.inventory.UnEquipTool();
+                    playerWhoHasItemServer.inventory.TryEquipping(this);
+                }
+                else
+                {
+                    playerWhoHasItemServer.inventory.EquipAsItem(this);
+                }
+            }
+        }
+    }
     public override void OnNetworkSpawn()
     {
         //ItemManager.AddItem(this);
         if(IsServer)
             SetCountServerRpc(spawnCount);
 
+        ownershipNetworkVariable.OnValueChanged += OnPlayerChanged;
         count.OnValueChanged += CountChanged;
     }
 
     private void CountChanged(int previous, int current)
     {
-        if (playerWhoHasItem == Player.localPlayer)
+        if (playerWhoHasItemClient == Player.localPlayer)
         {
             InventoryUI.active.UpdateItemIcons();
         }
@@ -144,10 +206,10 @@ public class Item : NetworkBehaviour
     private void EquipItemServerRpc(ulong clientID)
     {
         Player targetPlayer = Player.GetPlayerByClientID(clientID);
-        if (playerWhoHasItem == targetPlayer || TryEquipping(targetPlayer, false))
+        if (playerWhoHasItemClient == targetPlayer || TryEquipping(targetPlayer, false))
         {
             NetworkObject.ChangeOwnership(clientID);
-            EquipItemClientRpc(clientID);
+            playerWhoHasItemServer = playerWhoHasItemClient;
             Debug.Log("[Item Server] Server Agrees On Equip");
         }
         else
@@ -155,62 +217,28 @@ public class Item : NetworkBehaviour
             Debug.Log("[Item Server] Server Disagrees On Equip");
         }
     }
-    [Rpc(SendTo.NotServer)]
-    private void EquipItemClientRpc(ulong clientID)
-    {
-        Player targetPlayer = Player.GetPlayerByClientID(clientID);
-        if (playerWhoHasItem == targetPlayer || TryEquipping(targetPlayer,false))
-        {
-            Debug.Log("[Item Client] Client Agrees On Equip");
-        }
-        else
-        {
-            Debug.Log("[Item Client] Client Disagrees On Equip");
-        }
-    }
     //Dropping Multiplayer
     [Rpc(SendTo.Server)]
     public void UnEquipItemServerRpc(RpcParams receiveParams = default)
     {
         Player senderPlayer = Player.GetPlayerByClientID(receiveParams.Receive.SenderClientId);
-        if (playerWhoHasItem == null || playerWhoHasItem == senderPlayer)
+        if (playerWhoHasItemClient == null || playerWhoHasItemClient == senderPlayer)
         {
-            UnEquipItemClientRpc(receiveParams.Receive.SenderClientId);
-            if (playerWhoHasItem == senderPlayer)
+            if (playerWhoHasItemClient == senderPlayer)
             {
-                if (playerWhoHasItem.inventory.tool == this)
-                    playerWhoHasItem.inventory.UnEquipTool();
+                if (playerWhoHasItemClient.inventory.tool == this)
+                    playerWhoHasItemClient.inventory.UnEquipTool();
                 else
-                    playerWhoHasItem.inventory.UnEquipItem(this);
+                    playerWhoHasItemClient.inventory.UnEquipItem(this);
             }
             
             NetworkObject.ChangeOwnership(NetworkManager.ServerClientId);
-            
+            playerWhoHasItemServer = playerWhoHasItemClient;
             Debug.Log("[Item Server] Server Agrees On UnEquip");
         }
         else
         {
             Debug.Log("[Item Server] Server Disagrees On UnEquip");
-        }
-    }
-    [Rpc(SendTo.NotServer)]
-    private void UnEquipItemClientRpc(ulong clientID)
-    {
-        Player targetPlayer = Player.GetPlayerByClientID(clientID);
-        if (playerWhoHasItem == null || playerWhoHasItem == targetPlayer)
-        {
-            if (playerWhoHasItem == targetPlayer)
-            {
-                if (playerWhoHasItem.inventory.tool == this)
-                    playerWhoHasItem.inventory.UnEquipTool();
-                else
-                    playerWhoHasItem.inventory.UnEquipItem(this);
-            }
-            Debug.Log("[Item Client] Client Agrees On UnEquip");
-        }
-        else
-        {
-            Debug.Log("[Item Client] Client Disagrees On UnEquip");
         }
     }
     private void Update()
@@ -414,12 +442,12 @@ public class Item : NetworkBehaviour
     
     public override void OnDestroy()
     {
-        if (playerWhoHasItem)
+        if (playerWhoHasItemClient)
         {
-            if (playerWhoHasItem.inventory.tool == this)
-                playerWhoHasItem.inventory.UnEquipTool();
+            if (playerWhoHasItemClient.inventory.tool == this)
+                playerWhoHasItemClient.inventory.UnEquipTool();
             else
-                playerWhoHasItem.inventory.UnEquipItem(this);
+                playerWhoHasItemClient.inventory.UnEquipItem(this);
         }
 
         transform.position = Vector3.zero;

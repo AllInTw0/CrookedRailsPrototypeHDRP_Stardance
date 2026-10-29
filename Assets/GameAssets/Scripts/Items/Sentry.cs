@@ -19,8 +19,8 @@ public class Sentry : Item
     {
         if (current.TryGet(out ItemGun itemGun))
         {
-            if(itemGun.playerWhoHasItem)
-                itemGun.playerWhoHasItem.inventory.UnEquipTool();
+            if(itemGun.playerWhoHasItemClient)
+                itemGun.playerWhoHasItemClient.inventory.UnEquipTool();
             
             itemGun.BecomeInvisible();
             foreach (GunVisual visual in gunVisualList)
@@ -151,7 +151,14 @@ public class Sentry : Item
             {
                 if (senderPlayer.inventory.tool && senderPlayer.inventory.tool is ItemGun)
                 {
-                    equippedGun.Value = (ItemGun)senderPlayer.inventory.tool;
+                    for (int i = 0; i < gunVisualList.Count; i++)
+                    {
+                        if (gunVisualList[i].itemInfo == senderPlayer.inventory.tool.itemInfo)
+                        {
+                            equippedGun.Value = (ItemGun)senderPlayer.inventory.tool;
+                            break;
+                        }
+                    }
                 }
             }
             else

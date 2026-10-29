@@ -83,7 +83,7 @@ public class Enemy : NetworkBehaviour
     
     public virtual void Awake()
     {
-
+        if(xRayObject && xRayObject.activeSelf) xRayObject.SetActive(false);
     }
     public virtual void Start()
     {
